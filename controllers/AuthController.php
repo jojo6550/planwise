@@ -14,6 +14,7 @@ class AuthController
 {
     private $auth;
     private $activityLog;
+    private $passwordReset;
 
     /**
      * Constructor - Initialize Auth class
@@ -22,6 +23,7 @@ class AuthController
     {
         $this->auth = new Auth();
         $this->activityLog = new ActivityLog();
+        $this->passwordReset = new PasswordReset();
     }
 
     /**

@@ -12,6 +12,7 @@ require_once __DIR__ . '/../../../classes/Auth.php';
 require_once __DIR__ . '/../../../classes/LessonPlan.php';
 require_once __DIR__ . '/../../../classes/LessonSection.php';
 require_once __DIR__ . '/../../../classes/File.php';
+require_once __DIR__ . '/../../../classes/QRCode.php';
 
 $auth = new Auth();
 

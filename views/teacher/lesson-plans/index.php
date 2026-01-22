@@ -4,7 +4,9 @@
  * Displays all lesson plans for the teacher
  */
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once __DIR__ . '/../../../classes/Database.php';
 require_once __DIR__ . '/../../../classes/User.php';

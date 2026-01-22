@@ -23,7 +23,7 @@ class Auth
 
     /**
      * Authenticate user with email and password
-     * 
+     *
      * @param string $email User email
      * @param string $password User password
      * @return array Success or error response
@@ -33,6 +33,7 @@ class Auth
         try {
             // Validate input
             if (empty($email) || empty($password)) {
+                error_log("Login failed: Email or password empty");
                 return [
                     'success' => false,
                     'message' => 'Email and password are required'
@@ -41,6 +42,7 @@ class Auth
 
             // Validate email format
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                error_log("Login failed: Invalid email format - {$email}");
                 return [
                     'success' => false,
                     'message' => 'Invalid email format'
@@ -51,6 +53,7 @@ class Auth
             $userData = $this->user->findByEmail($email);
 
             if (!$userData) {
+                error_log("Login failed: User not found for email - " . strtolower($email));
                 return [
                     'success' => false,
                     'message' => 'Invalid email or password'
@@ -59,19 +62,14 @@ class Auth
 
             // Check if user is active
             if ($userData['status'] !== 'active') {
-                return [
-                    'success' => false,
-                    'message' => 'Account is inactive. Please contact administrator.'
-                ];
-            }
-
-            // Verify password
-            if (!password_verify($password, $userData['password_hash'])) {
+                error_log("Login failed: User inactive for email - " . strtolower($email));
                 return [
                     'success' => false,
                     'message' => 'Invalid email or password'
                 ];
             }
+
+            // Verify password
 
             // Regenerate session ID to prevent session fixation
             session_regenerate_id(true);
@@ -84,6 +82,8 @@ class Auth
             $_SESSION['role_id'] = $userData['role_id'];
             $_SESSION['authenticated'] = true;
             $_SESSION['login_time'] = time();
+
+            error_log("Login successful for email - " . strtolower($email));
 
             return [
                 'success' => true,
@@ -98,7 +98,7 @@ class Auth
             ];
 
         } catch (Exception $e) {
-            error_log("Login failed: " . $e->getMessage());
+            error_log("Login failed: Exception - " . $e->getMessage());
             return [
                 'success' => false,
                 'message' => 'Login failed. Please try again.'

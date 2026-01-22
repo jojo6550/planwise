@@ -215,7 +215,7 @@ class AuthController
 
     /**
      * Redirect with success message
-     * 
+     *
      * @param string $message Success message
      * @param string $page Page to redirect to
      * @return void
@@ -223,7 +223,7 @@ class AuthController
     private function redirectWithSuccess(string $message, string $page)
     {
         $_SESSION['success'] = $message;
-        header("Location: /public/index.php?page={$page}");
+        header("Location: /planwise/public/index.php?page={$page}");
         exit();
     }
 

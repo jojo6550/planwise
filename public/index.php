@@ -1,3 +1,62 @@
+<?php
+/**
+ * PlanWise - Application Entry Point
+ * Handles routing and includes appropriate views
+ */
+
+// Start session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Get the page parameter
+$page = $_GET['page'] ?? 'home';
+
+// Define valid pages and their corresponding view files
+$validPages = [
+    'home' => null, // Show landing page
+    'login' => 'views/auth/login.php',
+    'register' => 'views/auth/register.php',
+    'forgot-password' => 'views/auth/forgot-password.php',
+    'reset-password' => 'views/auth/reset-password.php',
+    'teacher/dashboard' => 'views/teacher/dashboard.php',
+    'teacher/profile' => 'views/teacher/profile.php',
+    'teacher/lesson-plans' => 'views/teacher/lesson-plans/index.php',
+    'teacher/lesson-plans/create' => 'views/teacher/lesson-plans/create.php',
+    'teacher/lesson-plans/edit' => 'views/teacher/lesson-plans/edit.php',
+    'teacher/lesson-plans/view' => 'views/teacher/lesson-plans/view.php',
+    'admin/dashboard' => 'views/admin/dashboard.php',
+    'admin/users' => 'views/admin/users/index.php',
+    'admin/users/create' => 'views/admin/users/create.php',
+    'admin/users/edit' => 'views/admin/users/edit.php',
+    'admin/users/view' => 'views/admin/users/view.php',
+    'admin/activity-logs' => 'views/admin/activity-logs.php',
+    'admin/system-settings' => 'views/admin/system-settings.php',
+    '403' => 'views/errors/403.php',
+    '404' => 'views/errors/404.php',
+    '500' => 'views/errors/500.php',
+];
+
+// Check if the page is valid
+if (array_key_exists($page, $validPages)) {
+    $viewFile = $validPages[$page];
+    if ($viewFile !== null && file_exists(__DIR__ . '/../' . $viewFile)) {
+        // Include the view file
+        include __DIR__ . '/../' . $viewFile;
+        exit();
+    } elseif ($viewFile === null) {
+        // Show landing page
+    } else {
+        // View file not found, show 404
+        include __DIR__ . '/../views/errors/404.php';
+        exit();
+    }
+} else {
+    // Invalid page, show 404
+    include __DIR__ . '/../views/errors/404.php';
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

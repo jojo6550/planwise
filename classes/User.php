@@ -113,4 +113,180 @@ class User
             ];
         }
     }
+
+    /**
+     * Get all users (admin only)
+     *
+     * @return array All users
+     */
+    public function getAll(): array
+    {
+        try {
+            $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC";
+
+            return $this->db->fetchAll($sql);
+
+        } catch (Exception $e) {
+            error_log("Get all users failed: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get user by ID
+     *
+     * @param int $userId User ID
+     * @return array|null User data
+     */
+    public function findById(int $userId): ?array
+    {
+        try {
+            $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    WHERE u.user_id = :user_id";
+
+            $result = $this->db->fetch($sql, [':user_id' => $userId]);
+            return $result ?: null;
+
+        } catch (Exception $e) {
+            error_log("Find user by ID failed: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Update user
+     *
+     * @param int $userId User ID
+     * @param array $data Updated data
+     * @return array Result
+     */
+    public function update(int $userId, array $data): array
+    {
+        try {
+            // Check if user exists
+            $existing = $this->findById($userId);
+            if (!$existing) {
+                return [
+                    'success' => false,
+                    'message' => 'User not found'
+                ];
+            }
+
+            // Validate email format if provided
+            if (isset($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid email format'
+                ];
+            }
+
+            // Check if email is being changed and already exists
+            if (isset($data['email']) && strtolower($data['email']) !== strtolower($existing['email'])) {
+                $existingUser = $this->findByEmail($data['email']);
+                if ($existingUser) {
+                    return [
+                        'success' => false,
+                        'message' => 'Email already exists'
+                    ];
+                }
+            }
+
+            $sql = "UPDATE users SET
+                    first_name = :first_name,
+                    last_name = :last_name,
+                    email = :email,
+                    role_id = :role_id,
+                    status = :status,
+                    updated_at = NOW()
+                    WHERE user_id = :user_id";
+
+            $params = [
+                ':user_id' => $userId,
+                ':first_name' => trim($data['first_name'] ?? $existing['first_name']),
+                ':last_name' => trim($data['last_name'] ?? $existing['last_name']),
+                ':email' => trim(strtolower($data['email'] ?? $existing['email'])),
+                ':role_id' => $data['role_id'] ?? $existing['role_id'],
+                ':status' => $data['status'] ?? $existing['status']
+            ];
+
+            $this->db->update($sql, $params);
+
+            return [
+                'success' => true,
+                'message' => 'User updated successfully'
+            ];
+
+        } catch (Exception $e) {
+            error_log("User update failed: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Failed to update user'
+            ];
+        }
+    }
+
+    /**
+     * Delete user
+     *
+     * @param int $userId User ID
+     * @return array Result
+     */
+    public function delete(int $userId): array
+    {
+        try {
+            $sql = "DELETE FROM users WHERE user_id = :user_id";
+            $this->db->delete($sql, [':user_id' => $userId]);
+
+            return [
+                'success' => true,
+                'message' => 'User deleted successfully'
+            ];
+
+        } catch (Exception $e) {
+            error_log("User deletion failed: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Failed to delete user'
+            ];
+        }
+    }
+
+    /**
+     * Update user status
+     *
+     * @param int $userId User ID
+     * @param string $status New status (active/inactive)
+     * @return array Result
+     */
+    public function updateStatus(int $userId, string $status): array
+    {
+        try {
+            if (!in_array($status, ['active', 'inactive'])) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid status value'
+                ];
+            }
+
+            $sql = "UPDATE users SET status = :status, updated_at = NOW() WHERE user_id = :user_id";
+            $this->db->update($sql, [':user_id' => $userId, ':status' => $status]);
+
+            return [
+                'success' => true,
+                'message' => 'User status updated successfully'
+            ];
+
+        } catch (Exception $e) {
+            error_log("User status update failed: " . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Failed to update user status'
+            ];
+        }
+    }
 }

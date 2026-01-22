@@ -70,6 +70,13 @@ class Auth
             }
 
             // Verify password
+            if (!password_verify($password, $userData['password_hash'])) {
+                error_log("Login failed: Invalid password for email - " . strtolower($email));
+                return [
+                    'success' => false,
+                    'message' => 'Invalid email or password'
+                ];
+            }
 
             // Regenerate session ID to prevent session fixation
             session_regenerate_id(true);

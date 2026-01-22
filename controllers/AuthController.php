@@ -23,7 +23,7 @@ class AuthController
 
     /**
      * Handle login request
-     * 
+     *
      * @return void
      */
     public function login()
@@ -50,7 +50,12 @@ class AuthController
         if ($result['success']) {
             // Login successful - redirect to dashboard based on role
             $user = $this->auth->user();
-            
+
+            // Store debug info in session if in development mode
+            if (defined('DEBUG_MODE') && DEBUG_MODE && isset($result['debug'])) {
+                $_SESSION['debug'] = $result['debug'];
+            }
+
             // Role ID 1 = Admin, Role ID 2 = Teacher
             if ($user['role_id'] == 1) {
                 $this->redirectWithSuccess($result['message'], 'admin/dashboard');
@@ -58,7 +63,10 @@ class AuthController
                 $this->redirectWithSuccess($result['message'], 'teacher/dashboard');
             }
         } else {
-            // Login failed - redirect back with error
+            // Login failed - redirect back with error and debug info
+            if (defined('DEBUG_MODE') && DEBUG_MODE && isset($result['debug'])) {
+                $_SESSION['debug'] = $result['debug'];
+            }
             $this->redirectWithError($result['message'], 'login');
         }
     }
@@ -176,10 +184,18 @@ class AuthController
 
         if ($result['success']) {
             error_log("Registration successful for email '{$data['email']}'");
+            // Store debug info in session if in development mode
+            if (defined('DEBUG_MODE') && DEBUG_MODE && isset($result['debug'])) {
+                $_SESSION['debug'] = $result['debug'];
+            }
             // Registration successful - redirect to login
             $this->redirectWithSuccess('Registration successful. Please login.', 'login');
         } else {
             error_log("Registration failed: " . $result['message']);
+            // Store debug info in session if in development mode
+            if (defined('DEBUG_MODE') && DEBUG_MODE && isset($result['debug'])) {
+                $_SESSION['debug'] = $result['debug'];
+            }
             // Registration failed - redirect back with error
             $this->redirectWithError($result['message'], 'register');
         }

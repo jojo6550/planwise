@@ -75,6 +75,19 @@ $csrfToken = AuthController::generateCsrfToken();
                             </div>
                         <?php endif; ?>
 
+                        <!-- Debug Output (Development Mode Only) -->
+                        <?php if (defined('DEBUG_MODE') && DEBUG_MODE && !empty($debug)): ?>
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                <h6 class="alert-heading">Debug Information</h6>
+                                <ul class="mb-0">
+                                    <?php foreach ($debug as $step): ?>
+                                        <li><?php echo htmlspecialchars($step); ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
+
                         <!-- Registration Form -->
                         <form method="POST" action="/planwise/controllers/AuthController.php?action=register" id="registerForm" novalidate>
                             <!-- CSRF Token -->

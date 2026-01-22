@@ -19,7 +19,7 @@ $auth = new Auth();
 // Redirect to login if not authenticated
 if (!$auth->check()) {
     $_SESSION['error'] = 'Please login to access the dashboard';
-    header('Location: /public/index.php?page=login');
+    header('Location: /planwise/public/index.php?page=login');
     exit();
 }
 
@@ -37,13 +37,13 @@ unset($_SESSION['success']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - PlanWise</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/planwise/public/css/style.css">
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/public/index.php?page=teacher/dashboard">
+            <a class="navbar-brand fw-bold" href="/planwise/public/index.php?page=teacher/profile">
                 PlanWise
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -58,10 +58,10 @@ unset($_SESSION['success']);
                         <a class="nav-link" href="/public/index.php?page=teacher/lesson-plans">Lesson Plans</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/public/index.php?page=teacher/profile">Profile</a>
+                        <a class="nav-link" href="/planwise/public/index.php?page=teacher/profile">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/controllers/AuthController.php?action=logout">Logout</a>
+                        <a class="nav-link" href="/planwise/controllers/AuthController.php?action=logout">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -163,7 +163,7 @@ unset($_SESSION['success']);
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-3">
-                                <a href="/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary w-100">
+                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary w-100">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="me-2" viewBox="0 0 16 16">
                                         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                     </svg>
@@ -171,17 +171,17 @@ unset($_SESSION['success']);
                                 </a>
                             </div>
                             <div class="col-md-3">
-                                <a href="/public/index.php?page=teacher/lesson-plans" class="btn btn-outline-primary w-100">
+                                <a href="/planwise/public/index.php?page=teacher/lesson-plans" class="btn btn-outline-primary w-100">
                                     View All Plans
                                 </a>
                             </div>
                             <div class="col-md-3">
-                                <a href="/public/index.php?page=teacher/profile" class="btn btn-outline-secondary w-100">
+                                <a href="/planwise/public/index.php?page=teacher/profile" class="btn btn-outline-secondary w-100">
                                     Edit Profile
                                 </a>
                             </div>
                             <div class="col-md-3">
-                                <a href="/controllers/AuthController.php?action=logout" class="btn btn-outline-danger w-100">
+                                <a href="/planwise/controllers/AuthController.php?action=logout" class="btn btn-outline-danger w-100">
                                     Logout
                                 </a>
                             </div>
@@ -205,7 +205,7 @@ unset($_SESSION['success']);
                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                             </svg>
                             <p class="text-muted">No recent activity. Start by creating your first lesson plan!</p>
-                            <a href="/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">
+                            <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">
                                 Create Lesson Plan
                             </a>
                         </div>

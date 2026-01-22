@@ -11,6 +11,7 @@ class File
 {
     private $db;
     private $uploadDir;
+    private $thumbnailDir;
     private $allowedTypes;
     private $maxFileSize;
 
@@ -21,6 +22,7 @@ class File
     {
         $this->db = Database::getInstance();
         $this->uploadDir = __DIR__ . '/../uploads/lesson-plans/';
+        $this->thumbnailDir = __DIR__ . '/../uploads/thumbnails/';
         $this->allowedTypes = [
             'image/jpeg',
             'image/jpg',
@@ -35,9 +37,12 @@ class File
         ];
         $this->maxFileSize = 5 * 1024 * 1024; // 5MB
 
-        // Create upload directory if it doesn't exist
+        // Create directories if they don't exist
         if (!file_exists($this->uploadDir)) {
             mkdir($this->uploadDir, 0755, true);
+        }
+        if (!file_exists($this->thumbnailDir)) {
+            mkdir($this->thumbnailDir, 0755, true);
         }
     }
 
@@ -128,7 +133,15 @@ class File
             ];
         }
 
-        // Check file type
+        // Check file size is not zero
+        if ($file['size'] === 0) {
+            return [
+                'success' => false,
+                'message' => 'File is empty'
+            ];
+        }
+
+        // Check file type using multiple methods
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file['tmp_name']);
         finfo_close($finfo);
@@ -140,7 +153,56 @@ class File
             ];
         }
 
+        // Additional security: Check file extension
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $dangerousExtensions = ['php', 'php3', 'php4', 'php5', 'phtml', 'exe', 'bat', 'cmd', 'com', 'scr', 'pif', 'jar', 'vb', 'vbs', 'js', 'hta'];
+        if (in_array($extension, $dangerousExtensions)) {
+            return [
+                'success' => false,
+                'message' => 'File type not allowed for security reasons'
+            ];
+        }
+
+        // Sanitize filename
+        $originalName = $file['name'];
+        $sanitizedName = $this->sanitizeFileName($originalName);
+        if ($sanitizedName !== $originalName) {
+            // Update the file array with sanitized name
+            $file['name'] = $sanitizedName;
+        }
+
         return ['success' => true];
+    }
+
+    /**
+     * Sanitize filename to prevent security issues
+     *
+     * @param string $filename Original filename
+     * @return string Sanitized filename
+     */
+    private function sanitizeFileName(string $filename): string
+    {
+        // Remove any path information
+        $filename = basename($filename);
+
+        // Replace dangerous characters
+        $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $filename);
+
+        // Remove multiple dots
+        $filename = preg_replace('/\.+/', '.', $filename);
+
+        // Ensure it doesn't start or end with dot
+        $filename = trim($filename, '.');
+
+        // Limit length
+        if (strlen($filename) > 255) {
+            $extension = pathinfo($filename, PATHINFO_EXTENSION);
+            $name = pathinfo($filename, PATHINFO_FILENAME);
+            $name = substr($name, 0, 250 - strlen($extension));
+            $filename = $name . '.' . $extension;
+        }
+
+        return $filename;
     }
 
     /**
@@ -226,6 +288,90 @@ class File
                 'success' => false,
                 'message' => 'File deletion failed'
             ];
+        }
+    }
+
+    /**
+     * Generate thumbnail for image
+     *
+     * @param string $imagePath Original image path
+     * @param string $fileName Original filename
+     * @return string|null Thumbnail path or null if failed
+     */
+    private function generateThumbnail(string $imagePath, string $fileName): ?string
+    {
+        try {
+            // Get image info
+            $imageInfo = getimagesize($imagePath);
+            if (!$imageInfo) {
+                return null;
+            }
+
+            $width = $imageInfo[0];
+            $height = $imageInfo[1];
+            $mime = $imageInfo['mime'];
+
+            // Calculate thumbnail size (max 200px)
+            $maxSize = 200;
+            if ($width > $height) {
+                $newWidth = $maxSize;
+                $newHeight = ($height / $width) * $maxSize;
+            } else {
+                $newHeight = $maxSize;
+                $newWidth = ($width / $height) * $maxSize;
+            }
+
+            // Create image resource
+            $sourceImage = null;
+            switch ($mime) {
+                case 'image/jpeg':
+                    $sourceImage = imagecreatefromjpeg($imagePath);
+                    break;
+                case 'image/png':
+                    $sourceImage = imagecreatefrompng($imagePath);
+                    break;
+                case 'image/gif':
+                    $sourceImage = imagecreatefromgif($imagePath);
+                    break;
+                default:
+                    return null;
+            }
+
+            if (!$sourceImage) {
+                return null;
+            }
+
+            // Create thumbnail
+            $thumbnail = imagecreatetruecolor($newWidth, $newHeight);
+            imagecopyresampled($thumbnail, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+            // Generate thumbnail filename
+            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+            $thumbnailName = 'thumb_' . pathinfo($fileName, PATHINFO_FILENAME) . '.' . $extension;
+            $thumbnailPath = $this->thumbnailDir . $thumbnailName;
+
+            // Save thumbnail
+            switch ($mime) {
+                case 'image/jpeg':
+                    imagejpeg($thumbnail, $thumbnailPath, 90);
+                    break;
+                case 'image/png':
+                    imagepng($thumbnail, $thumbnailPath, 9);
+                    break;
+                case 'image/gif':
+                    imagegif($thumbnail, $thumbnailPath);
+                    break;
+            }
+
+            // Clean up memory
+            imagedestroy($sourceImage);
+            imagedestroy($thumbnail);
+
+            return $thumbnailPath;
+
+        } catch (Exception $e) {
+            error_log("Thumbnail generation failed: " . $e->getMessage());
+            return null;
         }
     }
 

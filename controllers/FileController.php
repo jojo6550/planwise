@@ -1,149 +1,153 @@
-<?php
-/**
- * FileController
- * Handles file upload and management operations
- * CS334 Module 2 - Use of Files (10), Upload images (10), Built-in PHP functions (5)
- */
-
-session_start();
-
-require_once __DIR__ . '/../classes/Database.php';
-require_once __DIR__ . '/../classes/Auth.php';
-require_once __DIR__ . '/../classes/User.php';
-require_once __DIR__ . '/../classes/File.php';
-require_once __DIR__ . '/../classes/ActivityLog.php';
-
-class FileController
-{
-    private $auth;
-    private $fileHandler;
-    private $activityLog;
-
-    /**
-     * Constructor
+* Send JSON response
      */
-    public function __construct()
+    private function jsonResponse(array $data, int $statusCode = 200)
     {
-        $this->auth = new Auth();
-        $this->fileHandler = new File();
-        $this->activityLog = new ActivityLog();
-
-        // Require authentication
-        if (!$this->auth->check()) {
-            $this->jsonResponse([
-                'success' => false,
-                'message' => 'Unauthorized access'
-            ], 401);
-        }
+        http_response_code($statusCode);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit();
     }
-
+=======
     /**
-     * Upload file
+     * Import data from CSV
      */
-    public function upload()
+    public function import()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->jsonResponse(['success' => false, 'message' => 'Invalid request method'], 400);
+            return;
+        }
+
+        $type = $_GET['type'] ?? '';
+        if (!in_array($type, ['lesson_plans', 'users'])) {
+            $this->jsonResponse(['success' => false, 'message' => 'Invalid import type'], 400);
+            return;
+        }
+
+        // Check if admin
+        $user = $this->auth->user();
+        if ($user['role_id'] != 1) {
+            $this->jsonResponse(['success' => false, 'message' => 'Unauthorized'], 403);
             return;
         }
 
         // Check if file was uploaded
-        if (!isset($_FILES['file']) || $_FILES['file']['error'] === UPLOAD_ERR_NO_FILE) {
-            $this->jsonResponse(['success' => false, 'message' => 'No file uploaded'], 400);
+        if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] === UPLOAD_ERR_NO_FILE) {
+            $this->jsonResponse(['success' => false, 'message' => 'No CSV file uploaded'], 400);
             return;
         }
 
-        $userId = $this->auth->id();
-        $lessonPlanId = isset($_POST['lesson_plan_id']) && $_POST['lesson_plan_id'] !== '' ? (int)$_POST['lesson_plan_id'] : null;
+        $file = $_FILES['csv_file'];
 
-        // Upload file
-        $result = $this->fileHandler->upload($_FILES['file'], $userId, $lessonPlanId);
-
-        if ($result['success']) {
-            // Log activity
-            $this->activityLog->log(
-                $userId,
-                'file_uploaded',
-                "Uploaded file: {$result['original_name']}" . ($lessonPlanId ? " to lesson plan ID: {$lessonPlanId}" : '')
-            );
+        // Validate file type
+        if ($file['type'] !== 'text/csv' && !preg_match('/\.csv$/i', $file['name'])) {
+            $this->jsonResponse(['success' => false, 'message' => 'File must be a CSV'], 400);
+            return;
         }
+
+        // Process CSV
+        $result = $this->processCSVImport($file['tmp_name'], $type);
 
         $this->jsonResponse($result);
     }
 
     /**
-     * Delete file
+     * Process CSV import
      */
-    public function delete()
+    private function processCSVImport(string $filePath, string $type): array
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->jsonResponse(['success' => false, 'message' => 'Invalid request method'], 400);
-            return;
+        $successCount = 0;
+        $errorCount = 0;
+        $errors = [];
+
+        if (($handle = fopen($filePath, "r")) !== FALSE) {
+            $header = fgetcsv($handle, 1000, ",");
+            $rowNumber = 1;
+
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                $rowNumber++;
+
+                try {
+                    if ($type === 'lesson_plans') {
+                        $result = $this->importLessonPlan($data);
+                    } elseif ($type === 'users') {
+                        $result = $this->importUser($data);
+                    }
+
+                    if ($result['success']) {
+                        $successCount++;
+                    } else {
+                        $errorCount++;
+                        $errors[] = "Row {$rowNumber}: " . $result['message'];
+                    }
+                } catch (Exception $e) {
+                    $errorCount++;
+                    $errors[] = "Row {$rowNumber}: " . $e->getMessage();
+                }
+            }
+            fclose($handle);
         }
 
-        $input = json_decode(file_get_contents('php://input'), true);
-        $fileId = (int)($input['file_id'] ?? 0);
-        $userId = $this->auth->id();
-
-        if ($fileId <= 0) {
-            $this->jsonResponse(['success' => false, 'message' => 'Invalid file ID'], 400);
-            return;
-        }
-
-        // Delete file
-        $result = $this->fileHandler->delete($fileId, $userId);
-
-        if ($result['success']) {
-            // Log activity
-            $this->activityLog->log(
-                $userId,
-                'file_deleted',
-                "Deleted file ID: {$fileId}"
-            );
-        }
-
-        $this->jsonResponse($result);
+        return [
+            'success' => true,
+            'message' => "Import completed. Success: {$successCount}, Errors: {$errorCount}",
+            'success_count' => $successCount,
+            'error_count' => $errorCount,
+            'errors' => array_slice($errors, 0, 10) // Limit errors shown
+        ];
     }
 
     /**
-     * Download file
+     * Import a single lesson plan
      */
-    public function download()
+    private function importLessonPlan(array $data): array
     {
-        $fileId = (int)($_GET['id'] ?? 0);
+        require_once __DIR__ . '/../classes/LessonPlan.php';
+        $lessonPlan = new LessonPlan();
 
-        if ($fileId <= 0) {
-            http_response_code(400);
-            echo 'Invalid file ID';
-            exit();
+        $planData = [
+            'user_id' => $this->auth->id(),
+            'title' => trim($data[0] ?? ''),
+            'subject' => trim($data[1] ?? ''),
+            'grade_level' => trim($data[2] ?? ''),
+            'duration' => (int)($data[3] ?? 0),
+            'objectives' => trim($data[4] ?? ''),
+            'materials' => trim($data[5] ?? ''),
+            'procedures' => trim($data[6] ?? ''),
+            'assessment' => trim($data[7] ?? ''),
+            'notes' => trim($data[8] ?? ''),
+            'status' => 'draft'
+        ];
+
+        if (empty($planData['title'])) {
+            return ['success' => false, 'message' => 'Title is required'];
         }
 
-        // Get file data
-        $file = $this->fileHandler->getById($fileId);
+        return $lessonPlan->create($planData);
+    }
 
-        if (!$file || !file_exists($file['file_path'])) {
-            http_response_code(404);
-            echo 'File not found';
-            exit();
+    /**
+     * Import a single user
+     */
+    private function importUser(array $data): array
+    {
+        require_once __DIR__ . '/../classes/User.php';
+        $user = new User();
+
+        $userData = [
+            'first_name' => trim($data[0] ?? ''),
+            'last_name' => trim($data[1] ?? ''),
+            'email' => trim($data[2] ?? ''),
+            'password' => trim($data[3] ?? ''),
+            'role_id' => 2, // Default to teacher
+            'status' => 'active'
+        ];
+
+        if (empty($userData['first_name']) || empty($userData['last_name']) || empty($userData['email']) || empty($userData['password'])) {
+            return ['success' => false, 'message' => 'All fields are required'];
         }
 
-        // Log activity
-        $this->activityLog->log(
-            $this->auth->id(),
-            'file_downloaded',
-            "Downloaded file: {$file['original_name']}"
-        );
-
-        // Set headers for download
-        header('Content-Type: ' . $file['file_type']);
-        header('Content-Disposition: attachment; filename="' . $file['original_name'] . '"');
-        header('Content-Length: ' . $file['file_size']);
-        header('Cache-Control: no-cache, must-revalidate');
-        header('Pragma: public');
-
-        // Output file
-        readfile($file['file_path']);
-        exit();
+        return $user->create($userData);
     }
 
     /**
@@ -156,26 +160,3 @@ class FileController
         echo json_encode($data);
         exit();
     }
-}
-
-// Handle direct requests
-if (basename($_SERVER['PHP_SELF']) === 'FileController.php') {
-    $controller = new FileController();
-    $action = $_GET['action'] ?? '';
-
-    switch ($action) {
-        case 'upload':
-            $controller->upload();
-            break;
-        case 'delete':
-            $controller->delete();
-            break;
-        case 'download':
-            $controller->download();
-            break;
-        default:
-            http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Invalid action']);
-            exit();
-    }
-}

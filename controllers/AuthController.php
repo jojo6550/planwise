@@ -8,10 +8,12 @@
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/Auth.php';
+require_once __DIR__ . '/../classes/PasswordReset.php';
 
 class AuthController
 {
     private $auth;
+    private $activityLog;
 
     /**
      * Constructor - Initialize Auth class
@@ -19,6 +21,7 @@ class AuthController
     public function __construct()
     {
         $this->auth = new Auth();
+        $this->activityLog = new ActivityLog();
     }
 
     /**
@@ -287,6 +290,12 @@ if (basename($_SERVER['PHP_SELF']) === 'AuthController.php') {
             break;
         case 'register':
             $controller->register();
+            break;
+        case 'forgot-password':
+            $controller->forgotPassword();
+            break;
+        case 'reset-password':
+            $controller->resetPassword();
             break;
         default:
             header('Location: /planwise/public/index.php');

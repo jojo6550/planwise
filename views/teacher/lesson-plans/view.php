@@ -43,6 +43,8 @@ if (!$plan) {
 
 $sections = $lessonSection->getByLessonPlan($lessonPlanId);
 $files = $fileHandler->getByLessonPlan($lessonPlanId);
+$qrCode = new QRCode();
+$qr = $qrCode->getByLessonPlanId($lessonPlanId);
 ?>
 <!DOCTYPE html>
 <html lang="en">

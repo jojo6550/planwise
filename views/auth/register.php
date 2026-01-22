@@ -189,7 +189,7 @@ $csrfToken = AuthController::generateCsrfToken();
                             <!-- Login Link -->
                             <div class="text-center">
                                 <span class="text-muted">Already have an account?</span>
-                                <a href="/public/index.php?page=login" class="text-decoration-none">
+                                <a href="/planwise/public/index.php?page=login" class="text-decoration-none">
                                     Sign In
                                 </a>
                             </div>

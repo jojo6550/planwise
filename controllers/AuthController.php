@@ -65,15 +65,16 @@ class AuthController
 
     /**
      * Handle logout request
-     * 
+     *
      * @return void
      */
     public function logout()
     {
         $result = $this->auth->logout();
-        
-        // Redirect to login page
-        header('Location: /public/index.php?page=login&message=' . urlencode($result['message']));
+
+        // Redirect to login page with success message via session
+        $_SESSION['success'] = $result['message'];
+        header('Location: /planwise/public/index.php?page=login');
         exit();
     }
 
@@ -84,14 +85,19 @@ class AuthController
      */
     public function register()
     {
+        error_log("AuthController::register() called with method: " . ($_SERVER['REQUEST_METHOD'] ?? 'unknown'));
+
         // Check if request method is POST
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            error_log("Registration failed: Invalid request method");
             $this->redirectWithError('Invalid request method', 'register');
             return;
         }
 
         // Validate CSRF token
-        if (!$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!$this->validateCsrfToken($csrfToken)) {
+            error_log("Registration failed: Invalid CSRF token");
             $this->redirectWithError('Invalid security token', 'register');
             return;
         }
@@ -106,29 +112,43 @@ class AuthController
             'status' => 'active'
         ];
 
+        error_log("Registration input data: " . json_encode([
+            'first_name' => !empty($data['first_name']),
+            'last_name' => !empty($data['last_name']),
+            'email' => !empty($data['email']),
+            'password_length' => strlen($data['password']),
+            'role_id' => $data['role_id'],
+            'status' => $data['status']
+        ]));
+
         // Validate required fields
         if (empty($data['first_name'])) {
+            error_log("Registration failed: First name is required");
             $this->redirectWithError('First name is required', 'register');
             return;
         }
 
         if (empty($data['last_name'])) {
+            error_log("Registration failed: Last name is required");
             $this->redirectWithError('Last name is required', 'register');
             return;
         }
 
         if (empty($data['email'])) {
+            error_log("Registration failed: Email is required");
             $this->redirectWithError('Email is required', 'register');
             return;
         }
 
         if (empty($data['password'])) {
+            error_log("Registration failed: Password is required");
             $this->redirectWithError('Password is required', 'register');
             return;
         }
 
         // Validate email format
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            error_log("Registration failed: Invalid email format for '{$data['email']}'");
             $this->redirectWithError('Invalid email format', 'register');
             return;
         }
@@ -136,24 +156,30 @@ class AuthController
         // Validate password confirmation
         $passwordConfirm = $_POST['password_confirm'] ?? '';
         if ($data['password'] !== $passwordConfirm) {
+            error_log("Registration failed: Passwords do not match");
             $this->redirectWithError('Passwords do not match', 'register');
             return;
         }
 
         // Validate password strength (minimum 8 characters)
         if (strlen($data['password']) < 8) {
+            error_log("Registration failed: Password too short");
             $this->redirectWithError('Password must be at least 8 characters long', 'register');
             return;
         }
+
+        error_log("Registration validation passed, attempting to create user");
 
         // Create user using User class
         $user = new User();
         $result = $user->create($data);
 
         if ($result['success']) {
+            error_log("Registration successful for email '{$data['email']}'");
             // Registration successful - redirect to login
             $this->redirectWithSuccess('Registration successful. Please login.', 'login');
         } else {
+            error_log("Registration failed: " . $result['message']);
             // Registration failed - redirect back with error
             $this->redirectWithError($result['message'], 'register');
         }

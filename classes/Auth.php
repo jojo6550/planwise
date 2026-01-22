@@ -219,12 +219,12 @@ class Auth
 
     /**
      * Require specific role - redirect if user doesn't have the role
-     * 
+     *
      * @param int $roleId Required role ID
      * @param string $redirectUrl URL to redirect if role check fails
      * @return void
      */
-    public function requireRole(int $roleId, string $redirectUrl = '/public/index.php?page=403')
+    public function requireRole(int $roleId, string $redirectUrl = '/planwise/public/index.php?page=403')
     {
         if (!$this->hasRole($roleId)) {
             header("Location: {$redirectUrl}");

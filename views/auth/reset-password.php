@@ -57,7 +57,7 @@ $token = $_GET['token'] ?? '';
                                 Enter your new password below.
                             </p>
 
-                            <form method="POST" action="/planwise/public/index.php?page=reset-password">
+                            <form method="POST" action="/planwise/controllers/AuthController.php?action=reset-password">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
                                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
 

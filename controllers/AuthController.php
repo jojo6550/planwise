@@ -260,8 +260,109 @@ class AuthController
     }
 
     /**
+     * Handle forgot password request
+     *
+     * @return void
+     */
+    public function forgotPassword()
+    {
+        // Check if request method is POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirectWithError('Invalid request method', 'forgot-password');
+            return;
+        }
+
+        // Validate CSRF token
+        if (!$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            $this->redirectWithError('Invalid security token', 'forgot-password');
+            return;
+        }
+
+        // Get and sanitize email
+        $email = $this->sanitizeInput($_POST['email'] ?? '');
+
+        if (empty($email)) {
+            $this->redirectWithError('Email is required', 'forgot-password');
+            return;
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->redirectWithError('Invalid email format', 'forgot-password');
+            return;
+        }
+
+        // Generate reset token
+        $result = $this->passwordReset->generateToken($email);
+
+        if ($result['success']) {
+            // In a real application, send email with reset link
+            // For now, store token in session for demo purposes
+            $_SESSION['reset_token'] = $result['token'];
+            $_SESSION['reset_email'] = $result['email'];
+
+            $this->redirectWithSuccess('Password reset link has been sent to your email. Check your email for the reset link.', 'login');
+        } else {
+            $this->redirectWithError($result['message'], 'forgot-password');
+        }
+    }
+
+    /**
+     * Handle reset password request
+     *
+     * @return void
+     */
+    public function resetPassword()
+    {
+        // Check if request method is POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirectWithError('Invalid request method', 'reset-password');
+            return;
+        }
+
+        // Validate CSRF token
+        if (!$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            $this->redirectWithError('Invalid security token', 'reset-password');
+            return;
+        }
+
+        // Get input
+        $token = $_POST['token'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $passwordConfirm = $_POST['password_confirm'] ?? '';
+
+        if (empty($token)) {
+            $this->redirectWithError('Invalid reset token', 'reset-password&token=' . urlencode($token));
+            return;
+        }
+
+        if (empty($password)) {
+            $this->redirectWithError('Password is required', 'reset-password&token=' . urlencode($token));
+            return;
+        }
+
+        if (strlen($password) < 8) {
+            $this->redirectWithError('Password must be at least 8 characters long', 'reset-password&token=' . urlencode($token));
+            return;
+        }
+
+        if ($password !== $passwordConfirm) {
+            $this->redirectWithError('Passwords do not match', 'reset-password&token=' . urlencode($token));
+            return;
+        }
+
+        // Reset password
+        $result = $this->passwordReset->resetPassword($token, $password);
+
+        if ($result['success']) {
+            $this->redirectWithSuccess('Password has been reset successfully. Please login with your new password.', 'login');
+        } else {
+            $this->redirectWithError($result['message'], 'reset-password&token=' . urlencode($token));
+        }
+    }
+
+    /**
      * Generate CSRF token
-     * 
+     *
      * @return string Generated token
      */
     public static function generateCsrfToken(): string
@@ -269,11 +370,11 @@ class AuthController
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         if (!isset($_SESSION['csrf_token'])) {
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
-        
+
         return $_SESSION['csrf_token'];
     }
 }

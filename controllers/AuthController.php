@@ -183,7 +183,7 @@ class AuthController
     private function redirectWithError(string $message, string $page)
     {
         $_SESSION['error'] = $message;
-        header("Location: /public/index.php?page={$page}");
+        header("Location: /planwise/public/index.php?page={$page}");
         exit();
     }
 
@@ -247,7 +247,7 @@ if (basename($_SERVER['PHP_SELF']) === 'AuthController.php') {
             $controller->register();
             break;
         default:
-            header('Location: /public/index.php');
+            header('Location: /planwise/public/index.php');
             exit();
     }
 }

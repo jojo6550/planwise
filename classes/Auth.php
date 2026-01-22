@@ -209,7 +209,7 @@ class Auth
      * @param string $redirectUrl URL to redirect if not authenticated
      * @return void
      */
-    public function requireAuth(string $redirectUrl = '/public/index.php?page=login')
+    public function requireAuth(string $redirectUrl = '/planwise/public/index.php?page=login')
     {
         if (!$this->check()) {
             header("Location: {$redirectUrl}");

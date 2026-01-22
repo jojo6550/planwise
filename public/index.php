@@ -81,8 +81,8 @@ if (array_key_exists($page, $validPages)) {
                     </svg>
                 </div>
                 <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-                    <a href="/public/index.php?page=login" class="btn btn-primary btn-lg">Login</a>
-                    <a href="/public/index.php?page=register" class="btn btn-secondary btn-lg">Register</a>
+                    <a href="/planwise/public/index.php?page=login" class="btn btn-primary btn-lg">Login</a>
+                    <a href="/planwise/public/index.php?page=register" class="btn btn-secondary btn-lg">Register</a>
                 </div>
             </main>
             <footer class="mt-5">

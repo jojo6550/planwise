@@ -52,10 +52,10 @@ unset($_SESSION['success']);
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="/public/index.php?page=teacher/dashboard">Dashboard</a>
+                        <a class="nav-link active" href="/planwise/public/index.php?page=teacher/dashboard">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/public/index.php?page=teacher/lesson-plans">Lesson Plans</a>
+                        <a class="nav-link" href="planwise/public/index.php?page=teacher/lesson-plans">Lesson Plans</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/planwise/public/index.php?page=teacher/profile">Profile</a>

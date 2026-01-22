@@ -34,15 +34,15 @@ class AuthController
             return;
         }
 
+        // Validate CSRF token
+        if (!$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            $this->redirectWithError('Invalid security token', 'login');
+            return;
+        }
+
         // Get and sanitize input
         $email = $this->sanitizeInput($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
-
-        // Validate CSRF token if implemented
-        // if (!$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
-        //     $this->redirectWithError('Invalid security token', 'login');
-        //     return;
-        // }
 
         // Attempt login
         $result = $this->auth->login($email, $password);
@@ -90,6 +90,12 @@ class AuthController
             return;
         }
 
+        // Validate CSRF token
+        if (!$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            $this->redirectWithError('Invalid security token', 'register');
+            return;
+        }
+
         // Get and sanitize input
         $data = [
             'first_name' => $this->sanitizeInput($_POST['first_name'] ?? ''),
@@ -99,6 +105,33 @@ class AuthController
             'role_id' => 2, // Default to teacher role
             'status' => 'active'
         ];
+
+        // Validate required fields
+        if (empty($data['first_name'])) {
+            $this->redirectWithError('First name is required', 'register');
+            return;
+        }
+
+        if (empty($data['last_name'])) {
+            $this->redirectWithError('Last name is required', 'register');
+            return;
+        }
+
+        if (empty($data['email'])) {
+            $this->redirectWithError('Email is required', 'register');
+            return;
+        }
+
+        if (empty($data['password'])) {
+            $this->redirectWithError('Password is required', 'register');
+            return;
+        }
+
+        // Validate email format
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            $this->redirectWithError('Invalid email format', 'register');
+            return;
+        }
 
         // Validate password confirmation
         $passwordConfirm = $_POST['password_confirm'] ?? '';

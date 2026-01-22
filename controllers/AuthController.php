@@ -57,6 +57,13 @@ class AuthController
             // Login successful - redirect to dashboard based on role
             $user = $this->auth->user();
 
+            // Log successful login
+            $this->activityLog->log(
+                $user['user_id'],
+                'user_login',
+                "User logged in: {$user['email']}"
+            );
+
             // Store debug info in session if in development mode
             if (defined('DEBUG_MODE') && DEBUG_MODE && isset($result['debug'])) {
                 $_SESSION['debug'] = $result['debug'];
@@ -84,7 +91,21 @@ class AuthController
      */
     public function logout()
     {
+        // Get user info before logout for logging
+        $user = $this->auth->user();
+        $userId = $user['user_id'] ?? null;
+        $userEmail = $user['email'] ?? 'unknown';
+
         $result = $this->auth->logout();
+
+        // Log logout if we had a valid user
+        if ($userId) {
+            $this->activityLog->log(
+                $userId,
+                'user_logout',
+                "User logged out: {$userEmail}"
+            );
+        }
 
         // Redirect to login page with success message via session
         $_SESSION['success'] = $result['message'];
@@ -190,6 +211,14 @@ class AuthController
 
         if ($result['success']) {
             error_log("Registration successful for email '{$data['email']}'");
+
+            // Log successful registration
+            $this->activityLog->log(
+                $result['user_id'] ?? 0, // Assuming the result includes user_id
+                'user_registered',
+                "New user registered: {$data['email']}"
+            );
+
             // Store debug info in session if in development mode
             if (defined('DEBUG_MODE') && DEBUG_MODE && isset($result['debug'])) {
                 $_SESSION['debug'] = $result['debug'];
@@ -355,6 +384,13 @@ class AuthController
         $result = $this->passwordReset->resetPassword($token, $password);
 
         if ($result['success']) {
+            // Log successful password reset
+            $this->activityLog->log(
+                $result['user_id'] ?? 0, // Assuming the result includes user_id
+                'password_reset_completed',
+                "Password reset completed for user ID: " . ($result['user_id'] ?? 'unknown')
+            );
+
             $this->redirectWithSuccess('Password has been reset successfully. Please login with your new password.', 'login');
         } else {
             $this->redirectWithError($result['message'], 'reset-password&token=' . urlencode($token));

@@ -8,6 +8,7 @@
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/Auth.php';
+require_once __DIR__ . '/../classes/ActivityLog.php';
 require_once __DIR__ . '/../classes/PasswordReset.php';
 
 class AuthController

@@ -13,6 +13,7 @@ require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/LessonPlan.php';
 require_once __DIR__ . '/../classes/LessonSection.php';
 require_once __DIR__ . '/../classes/ActivityLog.php';
+require_once __DIR__ . '/../classes/Validator.php';
 
 class LessonPlanController
 {
@@ -573,6 +574,15 @@ class LessonPlanController
             'imported' => $imported,
             'errors' => $errors
         ]);
+    }
+
+    /**
+     * Check if request is AJAX
+     */
+    private function isAjaxRequest(): bool
+    {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     /**

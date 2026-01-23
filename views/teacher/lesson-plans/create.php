@@ -69,7 +69,7 @@ unset($_SESSION['error']);
 
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
-                        <form id="lesson-plan-form" method="POST">
+                        <form id="lesson-plan-form" action="/planwise/controllers/LessonPlanController.php?action=create" method="POST">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
 
                             <!-- Basic Information -->

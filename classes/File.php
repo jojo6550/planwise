@@ -77,12 +77,12 @@ class File
             }
 
             // Store file metadata in database
-            $sql = "INSERT INTO files (user_id, lesson_plan_id, original_name, file_name, file_path, file_type, file_size, uploaded_at)
-                    VALUES (:user_id, :lesson_plan_id, :original_name, :file_name, :file_path, :file_type, :file_size, NOW())";
+            $sql = "INSERT INTO files (user_id, lesson_id, original_name, file_name, file_path, file_type, file_size, uploaded_at)
+                    VALUES (:user_id, :lesson_id, :original_name, :file_name, :file_path, :file_type, :file_size, NOW())";
 
             $params = [
                 ':user_id' => $userId,
-                ':lesson_plan_id' => $lessonPlanId,
+                ':lesson_id' => $lessonPlanId,
                 ':original_name' => $file['name'],
                 ':file_name' => $fileName,
                 ':file_path' => $filePath,
@@ -236,10 +236,10 @@ class File
     {
         try {
             $sql = "SELECT * FROM files
-                    WHERE lesson_plan_id = :lesson_plan_id
+                    WHERE lesson_id = :lesson_id
                     ORDER BY uploaded_at DESC";
 
-            return $this->db->fetchAll($sql, [':lesson_plan_id' => $lessonPlanId]);
+            return $this->db->fetchAll($sql, [':lesson_id' => $lessonPlanId]);
 
         } catch (Exception $e) {
             error_log("Get files by lesson plan failed: " . $e->getMessage());

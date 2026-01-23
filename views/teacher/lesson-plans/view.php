@@ -84,8 +84,8 @@ $qr = $qrCode->getByLessonPlanId($lessonPlanId);
                 <p class="text-muted">Created on <?php echo date('F j, Y', strtotime($plan['created_at'])); ?></p>
             </div>
             <div class="col-md-4 text-end">
-                <a href="/planwise/public/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_plan_id']; ?>" class="btn btn-secondary">Edit</a>
-                <a href="/planwise/controllers/ExportController.php?action=exportPDF&id=<?php echo $plan['lesson_plan_id']; ?>" class="btn btn-primary">Export PDF</a>
+                <a href="/planwise/public/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-secondary">Edit</a>
+                <a href="/planwise/controllers/ExportController.php?action=exportPDF&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-primary">Export PDF</a>
             </div>
         </div>
 

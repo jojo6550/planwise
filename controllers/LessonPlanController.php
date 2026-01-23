@@ -78,14 +78,14 @@ class LessonPlanController
         error_log("LessonPlanController::create - Create result: " . json_encode($result));
 
         if ($result['success']) {
-            $lessonPlanId = $result['lesson_plan_id'];
+            $lessonPlanId = $result['lesson_id'];
 
             // Create sections if provided
             if (isset($_POST['sections']) && is_array($_POST['sections'])) {
                 foreach ($_POST['sections'] as $sectionData) {
                     if (!empty($sectionData['title'])) {
                         $sectionResult = $this->lessonSection->create([
-                            'lesson_plan_id' => $lessonPlanId,
+                            'lesson_id' => $lessonPlanId,
                             'section_type' => $sectionData['section_type'] ?? 'introduction',
                             'title' => $this->sanitize($sectionData['title']),
                             'content' => $this->sanitize($sectionData['content'] ?? ''),
@@ -134,7 +134,7 @@ class LessonPlanController
             return;
         }
 
-        $lessonPlanId = (int)($_POST['lesson_plan_id'] ?? 0);
+        $lessonPlanId = (int)($_POST['lesson_id'] ?? 0);
         $userId = $this->auth->id();
 
         // Prepare data
@@ -185,7 +185,7 @@ class LessonPlanController
 
         // Get JSON input
         $input = json_decode(file_get_contents('php://input'), true);
-        $lessonPlanId = (int)($input['lesson_plan_id'] ?? 0);
+        $lessonPlanId = (int)($input['lesson_id'] ?? 0);
         $userId = $this->auth->id();
 
         if ($lessonPlanId <= 0) {

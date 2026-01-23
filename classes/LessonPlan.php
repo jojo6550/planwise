@@ -80,7 +80,7 @@ class LessonPlan
             return [
                 'success' => true,
                 'message' => 'Lesson plan created successfully',
-                'lesson_plan_id' => $lessonPlanId
+                'lesson_id' => $lessonPlanId
             ];
 
         } catch (Exception $e) {
@@ -105,9 +105,9 @@ class LessonPlan
             $sql = "SELECT lp.*, u.first_name, u.last_name, u.email
                     FROM lesson_plans lp
                     JOIN users u ON lp.user_id = u.user_id
-                    WHERE lp.lesson_id = :lesson_plan_id";
+                    WHERE lp.lesson_id = :lesson_id";
 
-            $params = [':lesson_plan_id' => $lessonPlanId];
+            $params = [':lesson_id' => $lessonPlanId];
 
             // Add user restriction if provided
             if ($userId !== null) {
@@ -200,10 +200,10 @@ class LessonPlan
                     notes = :notes,
                     status = :status,
                     updated_at = NOW()
-                    WHERE lesson_plan_id = :lesson_plan_id AND user_id = :user_id";
+                    WHERE lesson_id = :lesson_id AND user_id = :user_id";
 
             $params = [
-                ':lesson_plan_id' => $lessonPlanId,
+                ':lesson_id' => $lessonPlanId,
                 ':user_id' => $userId,
                 ':title' => trim($data['title'] ?? $existing['title']),
                 ':subject' => trim($data['subject'] ?? $existing['subject']),
@@ -252,8 +252,8 @@ class LessonPlan
                 ];
             }
 
-            $sql = "DELETE FROM lesson_plans WHERE lesson_id = :lesson_plan_id AND user_id = :user_id";
-            $this->db->delete($sql, [':lesson_plan_id' => $lessonPlanId, ':user_id' => $userId]);
+            $sql = "DELETE FROM lesson_plans WHERE lesson_id = :lesson_id AND user_id = :user_id";
+            $this->db->delete($sql, [':lesson_id' => $lessonPlanId, ':user_id' => $userId]);
 
             return [
                 'success' => true,

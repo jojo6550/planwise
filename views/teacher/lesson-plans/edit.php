@@ -50,7 +50,7 @@
                     <div class="card-body">
                         <form action="/planwise/controllers/LessonPlanController.php?action=update" method="POST">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                            <input type="hidden" name="lesson_plan_id" value="<?php echo $plan['lesson_plan_id']; ?>">
+                            <input type="hidden" name="lesson_id" value="<?php echo $plan['lesson_id']; ?>">
 
                             <!-- Basic Information -->
                             <h5 class="mb-3">Basic Information</h5>

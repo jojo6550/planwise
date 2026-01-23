@@ -28,11 +28,11 @@ class LessonSection
     public function create(array $data): array
     {
         try {
-            $sql = "INSERT INTO lesson_sections (lesson_plan_id, section_type, title, content, duration, order_position, created_at, updated_at)
-                    VALUES (:lesson_plan_id, :section_type, :title, :content, :duration, :order_position, NOW(), NOW())";
+            $sql = "INSERT INTO lesson_sections (lesson_id, section_type, title, content, duration, order_position, created_at, updated_at)
+                    VALUES (:lesson_id, :section_type, :title, :content, :duration, :order_position, NOW(), NOW())";
 
             $params = [
-                ':lesson_plan_id' => $data['lesson_plan_id'],
+                ':lesson_id' => $data['lesson_id'],
                 ':section_type' => $data['section_type'],
                 ':title' => trim($data['title']),
                 ':content' => trim($data['content'] ?? ''),
@@ -67,10 +67,10 @@ class LessonSection
     {
         try {
             $sql = "SELECT * FROM lesson_sections
-                    WHERE lesson_id = :lesson_plan_id
+                    WHERE lesson_id = :lesson_id
                     ORDER BY order_position ASC";
 
-            return $this->db->fetchAll($sql, [':lesson_plan_id' => $lessonPlanId]);
+            return $this->db->fetchAll($sql, [':lesson_id' => $lessonPlanId]);
 
         } catch (Exception $e) {
             error_log("Get sections failed: " . $e->getMessage());

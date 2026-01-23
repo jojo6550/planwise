@@ -163,10 +163,10 @@ unset($_SESSION['success'], $_SESSION['error']);
                                         <td><?php echo date('M j, Y', strtotime($plan['updated_at'] ?? '')); ?></td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/view&id=<?php echo $plan['lesson_plan_id'] ?? 0; ?>" class="btn btn-outline-primary">View</a>
-                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_plan_id'] ?? 0; ?>" class="btn btn-outline-secondary">Edit</a>
-                                                <a href="/planwise/controllers/ExportController.php?action=exportPDF&id=<?php echo $plan['lesson_plan_id'] ?? 0; ?>" class="btn btn-outline-info">PDF</a>
-                                                <button onclick="deletePlan(<?php echo $plan['lesson_plan_id'] ?? 0; ?>)" class="btn btn-outline-danger">Delete</button>
+                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/view&id=<?php echo $plan['lesson_id'] ?? 0; ?>" class="btn btn-outline-primary">View</a>
+                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_id'] ?? 0; ?>" class="btn btn-outline-secondary">Edit</a>
+                                                <a href="/planwise/controllers/ExportController.php?action=exportPDF&id=<?php echo $plan['lesson_id'] ?? 0; ?>" class="btn btn-outline-info">PDF</a>
+                                                <button onclick="deletePlan(<?php echo $plan['lesson_id'] ?? 0; ?>)" class="btn btn-outline-danger">Delete</button>
                                             </div>
                                         </td>
                                     </tr>
@@ -191,7 +191,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ lesson_plan_id: id })
+                body: JSON.stringify({ lesson_id: id })
             })
             .then(response => response.json())
             .then(data => {

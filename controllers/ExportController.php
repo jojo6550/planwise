@@ -78,7 +78,7 @@ class ExportController
         }
 
         $input = json_decode(file_get_contents('php://input'), true);
-        $lessonPlanId = (int)($input['lesson_plan_id'] ?? 0);
+        $lessonPlanId = (int)($input['lesson_id'] ?? 0);
         $userId = $this->auth->id();
 
         if ($lessonPlanId <= 0) {

@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Lesson plans table
 CREATE TABLE IF NOT EXISTS lesson_plans (
-    lesson_plan_id INT PRIMARY KEY AUTO_INCREMENT,
+    lesson_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     subject VARCHAR(100),
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS lesson_plans (
 -- Lesson sections table
 CREATE TABLE IF NOT EXISTS lesson_sections (
     section_id INT PRIMARY KEY AUTO_INCREMENT,
-    lesson_plan_id INT NOT NULL,
+    lesson_id INT NOT NULL,
     section_type ENUM('introduction', 'main_activity', 'conclusion', 'assessment') NOT NULL,
     title VARCHAR(255) NOT NULL,
     content TEXT,
@@ -58,14 +58,14 @@ CREATE TABLE IF NOT EXISTS lesson_sections (
     order_position INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (lesson_plan_id) REFERENCES lesson_plans(lesson_plan_id) ON DELETE CASCADE
+    FOREIGN KEY (lesson_id) REFERENCES lesson_plans(lesson_id) ON DELETE CASCADE
 );
 
 -- Files table
 CREATE TABLE IF NOT EXISTS files (
     file_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    lesson_plan_id INT NULL,
+    lesson_id INT NULL,
     original_name VARCHAR(255) NOT NULL,
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(500) NOT NULL,
@@ -73,17 +73,17 @@ CREATE TABLE IF NOT EXISTS files (
     file_size INT NOT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (lesson_plan_id) REFERENCES lesson_plans(lesson_plan_id) ON DELETE SET NULL
+    FOREIGN KEY (lesson_id) REFERENCES lesson_plans(lesson_id) ON DELETE SET NULL
 );
 
 -- QR codes table
 CREATE TABLE IF NOT EXISTS qr_codes (
     qr_id INT PRIMARY KEY AUTO_INCREMENT,
-    lesson_plan_id INT NOT NULL,
+    lesson_id INT NOT NULL,
     qr_code_data TEXT NOT NULL,
     qr_image_path VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (lesson_plan_id) REFERENCES lesson_plans(lesson_plan_id) ON DELETE CASCADE
+    FOREIGN KEY (lesson_id) REFERENCES lesson_plans(lesson_id) ON DELETE CASCADE
 );
 
 -- Activity logs table
@@ -115,9 +115,9 @@ CREATE INDEX idx_users_role_id ON users(role_id);
 CREATE INDEX idx_users_status ON users(status);
 CREATE INDEX idx_lesson_plans_user_id ON lesson_plans(user_id);
 CREATE INDEX idx_lesson_plans_status ON lesson_plans(status);
-CREATE INDEX idx_lesson_sections_lesson_plan_id ON lesson_sections(lesson_plan_id);
+CREATE INDEX idx_lesson_sections_lesson_id ON lesson_sections(lesson_id);
 CREATE INDEX idx_files_user_id ON files(user_id);
-CREATE INDEX idx_files_lesson_plan_id ON files(lesson_plan_id);
+CREATE INDEX idx_files_lesson_id ON files(lesson_id);
 CREATE INDEX idx_activity_logs_user_id ON activity_logs(user_id);
 CREATE INDEX idx_password_resets_token ON password_resets(reset_token);
 CREATE INDEX idx_password_resets_expires ON password_resets(expires_at);

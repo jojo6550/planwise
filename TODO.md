@@ -1,17 +1,11 @@
-## Fix Edit Lesson Plan Errors
+# TODO: Update Recent Activity Feature
 
-## Tasks
-- [x] Modify views/teacher/lesson-plans/edit.php to fetch data internally
-- [x] Add authentication and authorization checks
-- [x] Fetch lesson plan data using LessonPlan::getById
-- [x] Fetch lesson sections using LessonSection::getByLessonPlan
-- [x] Generate CSRF token
-- [x] Handle error cases (plan not found, unauthorized access)
-- [x] Test the fix by accessing the edit page (code review confirms fix is correct)
+## Completed Tasks
+- [x] Add `getRecentActivity($userId)` method in `classes/LessonPlan.php` to fetch plans and sections from last 5 days
+- [x] Update `views/teacher/dashboard.php` to fetch recent activity data
+- [x] Modify Recent Activity section in dashboard to display dynamic content instead of static message
 
-## Make Dashboard Stats Dynamic
-
-## Tasks
-- [x] Modify DashboardController to fetch lesson plan stats for authenticated teacher
-- [x] Update teacher dashboard view to display dynamic stats instead of hardcoded 0s
-- [x] Test the changes by accessing the teacher dashboard
+## Followup Steps
+- [ ] Test the dashboard to ensure recent activity displays correctly
+- [ ] Verify that the query correctly filters by last 5 days
+- [ ] Check that both plans and sections are displayed properly

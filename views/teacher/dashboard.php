@@ -31,6 +31,9 @@ require_once __DIR__ . '/../../classes/LessonPlan.php';
 $lessonPlan = new LessonPlan();
 $stats = $lessonPlan->getStats($user['user_id']);
 
+// Get recent activity
+$recentActivity = $lessonPlan->getRecentActivity($user['user_id']);
+
 // Get success message from session if any
 $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);

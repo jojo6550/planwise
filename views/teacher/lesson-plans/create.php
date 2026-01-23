@@ -149,5 +149,64 @@ unset($_SESSION['error']);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let sectionIndex = 1;
+
+        document.getElementById('add-section').addEventListener('click', function() {
+            const container = document.getElementById('sections-container');
+            const sectionHtml = `
+                <div class="section-item card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Section Type</label>
+                                <select class="form-select section-type" name="sections[${sectionIndex}][section_type]">
+                                    <option value="introduction">Introduction</option>
+                                    <option value="main_activity">Main Activity</option>
+                                    <option value="conclusion">Conclusion</option>
+                                    <option value="assessment">Assessment</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control section-title" name="sections[${sectionIndex}][title]" placeholder="Section title">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Duration (min)</label>
+                                <input type="number" class="form-control section-duration" name="sections[${sectionIndex}][duration]" min="0">
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="button" class="btn btn-danger btn-sm remove-section">&times;</button>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="form-label">Content</label>
+                            <textarea class="form-control section-content" name="sections[${sectionIndex}][content]" rows="3" placeholder="Section content"></textarea>
+                        </div>
+                        <input type="hidden" name="sections[${sectionIndex}][order_position]" value="${sectionIndex}">
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', sectionHtml);
+            sectionIndex++;
+            updateRemoveButtons();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-section')) {
+                e.target.closest('.section-item').remove();
+                updateRemoveButtons();
+            }
+        });
+
+        function updateRemoveButtons() {
+            const sections = document.querySelectorAll('.section-item');
+            sections.forEach((section, index) => {
+                const removeBtn = section.querySelector('.remove-section');
+                removeBtn.style.display = sections.length > 1 ? 'block' : 'none';
+            });
+        }
+    </script>
 </body>
 </html>

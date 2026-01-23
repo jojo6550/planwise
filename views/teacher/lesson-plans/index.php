@@ -4,33 +4,8 @@
  * Displays all lesson plans for the teacher
  */
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require_once __DIR__ . '/../../../classes/Database.php';
-require_once __DIR__ . '/../../../classes/User.php';
-require_once __DIR__ . '/../../../classes/Auth.php';
-require_once __DIR__ . '/../../../classes/LessonPlan.php';
-
-$auth = new Auth();
-
-// Redirect if not authenticated
-if (!$auth->check()) {
-    $_SESSION['error'] = 'Please login to access lesson plans';
-    header('Location: /planwise/public/index.php?page=login');
-    exit();
-}
-
-$user = $auth->user();
-$lessonPlan = new LessonPlan();
-$plans = $lessonPlan->getByUser($user['user_id']);
-$stats = $lessonPlan->getStats($user['user_id']);
-
-// Get messages
-$success = $_SESSION['success'] ?? '';
-$error = $_SESSION['error'] ?? '';
-unset($_SESSION['success'], $_SESSION['error']);
+// Data provided by controller
+// $user, $plans, $stats, $success, $error
 ?>
 <!DOCTYPE html>
 <html lang="en">

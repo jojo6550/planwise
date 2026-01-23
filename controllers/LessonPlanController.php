@@ -30,14 +30,6 @@ class LessonPlanController
         $this->lessonPlan = new LessonPlan();
         $this->lessonSection = new LessonSection();
         $this->activityLog = new ActivityLog();
-
-        // Require authentication
-        if (!$this->auth->check()) {
-            $this->jsonResponse([
-                'success' => false,
-                'message' => 'Unauthorized access'
-            ], 401);
-        }
     }
 
     /**
@@ -78,6 +70,28 @@ class LessonPlanController
         $result = $this->lessonPlan->create($data);
 
         if ($result['success']) {
+            $lessonPlanId = $result['lesson_plan_id'];
+
+            // Create sections if provided
+            if (isset($_POST['sections']) && is_array($_POST['sections'])) {
+                foreach ($_POST['sections'] as $sectionData) {
+                    if (!empty($sectionData['title'])) {
+                        $sectionResult = $this->lessonSection->create([
+                            'lesson_plan_id' => $lessonPlanId,
+                            'section_type' => $sectionData['section_type'] ?? 'introduction',
+                            'title' => $this->sanitize($sectionData['title']),
+                            'content' => $this->sanitize($sectionData['content'] ?? ''),
+                            'duration' => $sectionData['duration'] ?? null,
+                            'order_position' => $sectionData['order_position'] ?? 0
+                        ]);
+                        if (!$sectionResult['success']) {
+                            // Log error but continue
+                            error_log("Failed to create section: " . $sectionResult['message']);
+                        }
+                    }
+                }
+            }
+
             // Log activity
             $this->activityLog->log(
                 $userId,
@@ -96,6 +110,11 @@ class LessonPlanController
      */
     public function update()
     {
+        if (!$this->auth->check()) {
+            $this->redirectWithError('Please login to update lesson plans', 'login');
+            return;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirectWithError('Invalid request method', 'teacher/lesson-plans');
             return;
@@ -146,6 +165,11 @@ class LessonPlanController
      */
     public function delete()
     {
+        if (!$this->auth->check()) {
+            $this->jsonResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+            return;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->jsonResponse(['success' => false, 'message' => 'Invalid request method'], 400);
             return;
@@ -203,11 +227,128 @@ class LessonPlanController
      */
     public function getAll()
     {
+        if (!$this->auth->check()) {
+            $this->jsonResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+            return;
+        }
+
         $userId = $this->auth->id();
         $status = $_GET['status'] ?? null;
 
         $plans = $this->lessonPlan->getByUser($userId, $status);
         $this->jsonResponse(['success' => true, 'data' => $plans]);
+    }
+
+    /**
+     * Index page - list user's lesson plans
+     */
+    public function index()
+    {
+        if (!$this->auth->check()) {
+            $this->redirectWithError('Please login to access lesson plans', 'login');
+            return;
+        }
+
+        $data = $this->getIndexData();
+        extract($data);
+
+        require_once __DIR__ . '/../views/teacher/lesson-plans/index.php';
+    }
+
+    /**
+     * View lesson plan
+     */
+    public function view($id)
+    {
+        if (!$this->auth->check()) {
+            $this->redirectWithError('Please login to view lesson plans', 'login');
+            return;
+        }
+
+        $data = $this->getViewData($id);
+        if (!$data) {
+            $this->redirectWithError('Lesson plan not found', 'teacher/lesson-plans');
+            return;
+        }
+
+        extract($data);
+
+        require_once __DIR__ . '/../views/teacher/lesson-plans/view.php';
+    }
+
+    /**
+     * Edit lesson plan
+     */
+    public function edit($id)
+    {
+        if (!$this->auth->check()) {
+            $this->redirectWithError('Please login to edit lesson plans', 'login');
+            return;
+        }
+
+        $data = $this->getEditData($id);
+        if (!$data) {
+            $this->redirectWithError('Lesson plan not found', 'teacher/lesson-plans');
+            return;
+        }
+
+        extract($data);
+
+        require_once __DIR__ . '/../views/teacher/lesson-plans/edit.php';
+    }
+
+    /**
+     * Get data for index page
+     */
+    private function getIndexData(): array
+    {
+        $user = $this->auth->user();
+        $plans = $this->lessonPlan->getByUser($user['user_id']);
+        $stats = $this->lessonPlan->getStats($user['user_id']);
+        $success = $_SESSION['success'] ?? '';
+        $error = $_SESSION['error'] ?? '';
+        unset($_SESSION['success'], $_SESSION['error']);
+
+        return compact('user', 'plans', 'stats', 'success', 'error');
+    }
+
+    /**
+     * Get data for view page
+     */
+    private function getViewData(int $lessonPlanId): ?array
+    {
+        $user = $this->auth->user();
+        $plan = $this->lessonPlan->getById($lessonPlanId, $user['user_id']);
+        if (!$plan) {
+            return null;
+        }
+
+        $sections = $this->lessonSection->getByLessonPlan($lessonPlanId);
+
+        // Mock file and QR code handling (assuming classes exist)
+        $files = []; // $fileHandler->getByLessonPlan($lessonPlanId);
+        $qr = null; // $qrCode->getByLessonPlanId($lessonPlanId);
+
+        return compact('plan', 'sections', 'files', 'qr');
+    }
+
+    /**
+     * Get data for edit page
+     */
+    private function getEditData(int $lessonPlanId): ?array
+    {
+        $user = $this->auth->user();
+        $plan = $this->lessonPlan->getById($lessonPlanId, $user['user_id']);
+        if (!$plan) {
+            return null;
+        }
+
+        $sections = $this->lessonSection->getByLessonPlan($lessonPlanId);
+        $csrfToken = AuthController::generateCsrfToken();
+        $error = $_SESSION['error'] ?? '';
+        unset($_SESSION['error']);
+
+        return compact('plan', 'sections', 'csrfToken', 'error');
     }
 
     /**
@@ -262,6 +403,7 @@ class LessonPlanController
 if (basename($_SERVER['PHP_SELF']) === 'LessonPlanController.php') {
     $controller = new LessonPlanController();
     $action = $_GET['action'] ?? '';
+    $id = (int)($_GET['id'] ?? 0);
 
     switch ($action) {
         case 'create':
@@ -278,6 +420,25 @@ if (basename($_SERVER['PHP_SELF']) === 'LessonPlanController.php') {
             break;
         case 'getAll':
             $controller->getAll();
+            break;
+        case 'index':
+            $controller->index();
+            break;
+        case 'view':
+            if ($id > 0) {
+                $controller->view($id);
+            } else {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Invalid ID']);
+            }
+            break;
+        case 'edit':
+            if ($id > 0) {
+                $controller->edit($id);
+            } else {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Invalid ID']);
+            }
             break;
         default:
             http_response_code(404);

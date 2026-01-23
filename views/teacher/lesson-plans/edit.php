@@ -4,43 +4,8 @@
  * Form to edit an existing lesson plan
  */
 
-session_start();
-
-require_once __DIR__ . '/../../../classes/Database.php';
-require_once __DIR__ . '/../../../classes/User.php';
-require_once __DIR__ . '/../../../classes/Auth.php';
-require_once __DIR__ . '/../../../classes/LessonPlan.php';
-require_once __DIR__ . '/../../../controllers/AuthController.php';
-
-$auth = new Auth();
-
-// Redirect if not authenticated
-if (!$auth->check()) {
-    $_SESSION['error'] = 'Please login to edit lesson plans';
-    header('Location: /planwise/public/index.php?page=login');
-    exit();
-}
-
-$lessonPlanId = (int)($_GET['id'] ?? 0);
-if ($lessonPlanId <= 0) {
-    $_SESSION['error'] = 'Invalid lesson plan ID';
-    header('Location: /planwise/public/index.php?page=teacher/lesson-plans');
-    exit();
-}
-
-$user = $auth->user();
-$lessonPlan = new LessonPlan();
-$plan = $lessonPlan->getById($lessonPlanId, $user['user_id']);
-
-if (!$plan) {
-    $_SESSION['error'] = 'Lesson plan not found or unauthorized';
-    header('Location: /planwise/public/index.php?page=teacher/lesson-plans');
-    exit();
-}
-
-$csrfToken = AuthController::generateCsrfToken();
-$error = $_SESSION['error'] ?? '';
-unset($_SESSION['error']);
+// Data provided by controller
+// $plan, $sections, $csrfToken, $error
 ?>
 <!DOCTYPE html>
 <html lang="en">

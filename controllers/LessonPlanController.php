@@ -37,6 +37,11 @@ class LessonPlanController
      */
     public function create()
     {
+        if (!$this->auth->check()) {
+            $this->redirectWithError('Please login to create lesson plans', 'login');
+            return;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirectWithError('Invalid request method', 'teacher/lesson-plans');
             return;

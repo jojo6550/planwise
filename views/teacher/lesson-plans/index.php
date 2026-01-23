@@ -4,8 +4,31 @@
  * Displays all lesson plans for the teacher
  */
 
-// Data provided by controller
-// $user, $plans, $stats, $success, $error
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../../../classes/Database.php';
+require_once __DIR__ . '/../../../classes/User.php';
+require_once __DIR__ . '/../../../classes/Auth.php';
+require_once __DIR__ . '/../../../classes/LessonPlan.php';
+
+$auth = new Auth();
+
+// Redirect if not authenticated
+if (!$auth->check()) {
+    $_SESSION['error'] = 'Please login to access lesson plans';
+    header('Location: /planwise/public/index.php?page=login');
+    exit();
+}
+
+$user = $auth->user();
+$lessonPlan = new LessonPlan();
+$lessonPlans = $lessonPlan->getByUser($user['user_id']);
+$stats = $lessonPlan->getStats($user['user_id']);
+$success = $_SESSION['success'] ?? '';
+$error = $_SESSION['error'] ?? '';
+unset($_SESSION['success'], $_SESSION['error']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,15 +60,15 @@
 
     <div class="container mt-4">
         <!-- Alerts -->
-        <?php if ($success): ?>
+        <?php if (!empty($success ?? '')): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?php echo htmlspecialchars($success); ?>
+                <?php echo htmlspecialchars($success ?? ''); ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
-        <?php if ($error): ?>
+        <?php if (!empty($error ?? '')): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <?php echo htmlspecialchars($error); ?>
+                <?php echo htmlspecialchars($error ?? ''); ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
@@ -102,7 +125,7 @@
         <!-- Lesson Plans Table -->
         <div class="card shadow-sm border-0">
             <div class="card-body">
-                <?php if (empty($plans)): ?>
+                <?php if (empty($lessonPlans ?? [])): ?>
                     <div class="text-center py-5">
                         <p class="text-muted">No lesson plans yet. Create your first lesson plan!</p>
                         <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">Create Lesson Plan</a>
@@ -121,11 +144,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($plans as $plan): ?>
+                                <?php foreach (($lessonPlans ?? []) as $plan): ?>
                                     <tr>
-                                        <td><strong><?php echo htmlspecialchars($plan['title']); ?></strong></td>
-                                        <td><?php echo htmlspecialchars($plan['subject'] ?: 'N/A'); ?></td>
-                                        <td><?php echo htmlspecialchars($plan['grade_level'] ?: 'N/A'); ?></td>
+                                        <td><strong><?php echo htmlspecialchars($plan['title'] ?? ''); ?></strong></td>
+                                        <td><?php echo htmlspecialchars($plan['subject'] ?? 'N/A'); ?></td>
+                                        <td><?php echo htmlspecialchars($plan['grade_level'] ?? 'N/A'); ?></td>
                                         <td>
                                             <?php
                                             $statusClass = [
@@ -133,17 +156,17 @@
                                                 'published' => 'badge bg-success',
                                                 'archived' => 'badge bg-secondary'
                                             ];
-                                            $class = $statusClass[$plan['status']] ?? 'badge bg-secondary';
+                                            $class = $statusClass[$plan['status'] ?? ''] ?? 'badge bg-secondary';
                                             ?>
-                                            <span class="<?php echo $class; ?>"><?php echo ucfirst($plan['status']); ?></span>
+                                            <span class="<?php echo $class; ?>"><?php echo ucfirst($plan['status'] ?? ''); ?></span>
                                         </td>
-                                        <td><?php echo date('M j, Y', strtotime($plan['updated_at'])); ?></td>
+                                        <td><?php echo date('M j, Y', strtotime($plan['updated_at'] ?? '')); ?></td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/view&id=<?php echo $plan['lesson_plan_id']; ?>" class="btn btn-outline-primary">View</a>
-                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_plan_id']; ?>" class="btn btn-outline-secondary">Edit</a>
-                                                <a href="/planwise/controllers/ExportController.php?action=exportPDF&id=<?php echo $plan['lesson_plan_id']; ?>" class="btn btn-outline-info">PDF</a>
-                                                <button onclick="deletePlan(<?php echo $plan['lesson_plan_id']; ?>)" class="btn btn-outline-danger">Delete</button>
+                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/view&id=<?php echo $plan['lesson_plan_id'] ?? 0; ?>" class="btn btn-outline-primary">View</a>
+                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_plan_id'] ?? 0; ?>" class="btn btn-outline-secondary">Edit</a>
+                                                <a href="/planwise/controllers/ExportController.php?action=exportPDF&id=<?php echo $plan['lesson_plan_id'] ?? 0; ?>" class="btn btn-outline-info">PDF</a>
+                                                <button onclick="deletePlan(<?php echo $plan['lesson_plan_id'] ?? 0; ?>)" class="btn btn-outline-danger">Delete</button>
                                             </div>
                                         </td>
                                     </tr>

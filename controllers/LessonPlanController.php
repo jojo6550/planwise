@@ -306,13 +306,13 @@ class LessonPlanController
     private function getIndexData(): array
     {
         $user = $this->auth->user();
-        $plans = $this->lessonPlan->getByUser($user['user_id']);
+        $lessonPlans = $this->lessonPlan->getByUser($user['user_id']);
         $stats = $this->lessonPlan->getStats($user['user_id']);
         $success = $_SESSION['success'] ?? '';
         $error = $_SESSION['error'] ?? '';
         unset($_SESSION['success'], $_SESSION['error']);
 
-        return compact('user', 'plans', 'stats', 'success', 'error');
+        return compact('user', 'lessonPlans', 'stats', 'success', 'error');
     }
 
     /**

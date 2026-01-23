@@ -11,8 +11,6 @@ require_once __DIR__ . '/LessonPlan.php';
 require_once __DIR__ . '/LessonSection.php';
 require_once __DIR__ . '/File.php';
 
-use TCPDF;
-
 class PDFExporter
 {
     private $lessonPlan;

@@ -50,6 +50,9 @@ class ExportController
             exit();
         }
 
+        // Start output buffering to prevent any previous output from interfering with PDF
+        ob_start();
+
         // Generate PDF (download mode)
         $result = $this->pdfExporter->generateLessonPlanPDF($lessonPlanId, $userId, true);
 
@@ -85,6 +88,9 @@ class ExportController
             $this->jsonResponse(['success' => false, 'message' => 'Invalid lesson plan ID'], 400);
             return;
         }
+
+        // Start output buffering to prevent any previous output from interfering
+        ob_start();
 
         // Generate PDF (save mode)
         $result = $this->pdfExporter->generateLessonPlanPDF($lessonPlanId, $userId, false);

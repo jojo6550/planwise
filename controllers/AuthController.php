@@ -212,6 +212,19 @@ class AuthController
         if ($result['success']) {
             error_log("Registration successful for email '{$data['email']}'");
 
+            // Send welcome email
+            $mail = new Mail();
+            $userData = [
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => $data['email']
+            ];
+            $mailResult = $mail->sendRegistrationEmail($userData);
+            if (!$mailResult['success']) {
+                error_log("Failed to send registration email: " . $mailResult['message']);
+                // Don't fail registration if email fails
+            }
+
             // Log successful registration
             $this->activityLog->log(
                 $result['user_id'] ?? 0, // Assuming the result includes user_id

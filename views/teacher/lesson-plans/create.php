@@ -69,7 +69,7 @@ unset($_SESSION['error']);
 
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
-                        <form action="/planwise/controllers/LessonPlanController.php?action=create" method="POST">
+                        <form id="lesson-plan-form" method="POST">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
 
                             <!-- Basic Information -->
@@ -78,6 +78,7 @@ unset($_SESSION['error']);
                                 <div class="col-md-12">
                                     <label for="title" class="form-label">Lesson Title *</label>
                                     <input type="text" class="form-control" id="title" name="title" required>
+                                    <div class="invalid-feedback" id="title-error"></div>
                                 </div>
                             </div>
 

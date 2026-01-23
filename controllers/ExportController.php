@@ -26,6 +26,7 @@ class ExportController
     {
         $this->auth = new Auth();
         $this->pdfExporter = new PDFExporter();
+        $this->wordExporter = new WordExporter();
         $this->activityLog = new ActivityLog();
 
         // Require authentication

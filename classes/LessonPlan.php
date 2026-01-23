@@ -28,10 +28,13 @@ class LessonPlan
     public function create(array $data): array
     {
         try {
+            error_log("LessonPlan::create - Input data: " . json_encode($data));
+
             // Validate required fields
             $required = ['user_id', 'title'];
             foreach ($required as $field) {
                 if (empty($data[$field])) {
+                    error_log("LessonPlan::create - Validation failed: Field '{$field}' is empty");
                     return [
                         'success' => false,
                         'message' => "Field '{$field}' is required"

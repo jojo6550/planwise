@@ -66,8 +66,11 @@ class LessonPlanController
             'status' => $_POST['status'] ?? 'draft'
         ];
 
+        error_log("LessonPlanController::create - Prepared data: " . json_encode($data));
+
         // Create lesson plan
         $result = $this->lessonPlan->create($data);
+        error_log("LessonPlanController::create - Create result: " . json_encode($result));
 
         if ($result['success']) {
             $lessonPlanId = $result['lesson_plan_id'];

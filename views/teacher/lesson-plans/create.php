@@ -126,6 +126,17 @@ unset($_SESSION['error']);
                                 <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
                             </div>
 
+                            <!-- Lesson Sections -->
+                            <h5 class="mb-3 mt-4">Lesson Sections</h5>
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="add-section">
+                                    <i class="bi bi-plus-lg"></i> Add Section
+                                </button>
+                            </div>
+                            <div id="sections-container">
+                                <!-- Dynamic sections will be added here -->
+                            </div>
+
                             <!-- Status -->
                             <div class="mb-3">
                                 <label for="status" class="form-label">Status</label>

@@ -114,15 +114,19 @@ class Database
 
     /**
      * Insert record and return last insert ID
-     * 
+     *
      * @param string $sql
      * @param array $params
      * @return string
      */
     public function insert($sql, $params = [])
     {
+        error_log("Database::insert - SQL: " . $sql);
+        error_log("Database::insert - Params: " . json_encode($params));
         $this->query($sql, $params);
-        return $this->pdo->lastInsertId();
+        $lastId = $this->pdo->lastInsertId();
+        error_log("Database::insert - Last insert ID: " . $lastId);
+        return $lastId;
     }
 
     /**

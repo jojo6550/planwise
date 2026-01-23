@@ -106,6 +106,52 @@
                                 <textarea class="form-control" id="notes" name="notes" rows="3"><?php echo htmlspecialchars($plan['notes']); ?></textarea>
                             </div>
 
+                            <!-- Lesson Sections -->
+                            <h5 class="mb-3 mt-4">Lesson Sections</h5>
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="add-section">
+                                    <i class="bi bi-plus-lg"></i> Add Section
+                                </button>
+                            </div>
+                            <div id="sections-container">
+                                <?php if (!empty($sections)): ?>
+                                    <?php foreach ($sections as $index => $section): ?>
+                                        <div class="section-item card mb-3">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Section Type</label>
+                                                        <select class="form-select section-type" name="sections[<?php echo $index + 1; ?>][section_type]">
+                                                            <option value="introduction" <?php echo $section['section_type'] === 'introduction' ? 'selected' : ''; ?>>Introduction</option>
+                                                            <option value="main_activity" <?php echo $section['section_type'] === 'main_activity' ? 'selected' : ''; ?>>Main Activity</option>
+                                                            <option value="conclusion" <?php echo $section['section_type'] === 'conclusion' ? 'selected' : ''; ?>>Conclusion</option>
+                                                            <option value="assessment" <?php echo $section['section_type'] === 'assessment' ? 'selected' : ''; ?>>Assessment</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Title</label>
+                                                        <input type="text" class="form-control section-title" name="sections[<?php echo $index + 1; ?>][title]" value="<?php echo htmlspecialchars($section['title']); ?>" placeholder="Section title">
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">Duration (min)</label>
+                                                        <input type="number" class="form-control section-duration" name="sections[<?php echo $index + 1; ?>][duration]" value="<?php echo $section['duration']; ?>" min="0">
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <label class="form-label">&nbsp;</label>
+                                                        <button type="button" class="btn btn-danger btn-sm remove-section">&times;</button>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3">
+                                                    <label class="form-label">Content</label>
+                                                    <textarea class="form-control section-content" name="sections[<?php echo $index + 1; ?>][content]" rows="3" placeholder="Section content"><?php echo htmlspecialchars($section['content']); ?></textarea>
+                                                </div>
+                                                <input type="hidden" name="sections[<?php echo $index + 1; ?>][order_position]" value="<?php echo $section['order_position']; ?>">
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
+
                             <!-- Status -->
                             <div class="mb-3">
                                 <label for="status" class="form-label">Status</label>
@@ -129,5 +175,69 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let sectionIndex = <?php echo count($sections) + 1; ?>;
+
+        document.getElementById('add-section').addEventListener('click', function() {
+            const container = document.getElementById('sections-container');
+            const sectionHtml = `
+                <div class="section-item card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Section Type</label>
+                                <select class="form-select section-type" name="sections[${sectionIndex}][section_type]">
+                                    <option value="introduction">Introduction</option>
+                                    <option value="main_activity">Main Activity</option>
+                                    <option value="conclusion">Conclusion</option>
+                                    <option value="assessment">Assessment</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control section-title" name="sections[${sectionIndex}][title]" placeholder="Section title">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Duration (min)</label>
+                                <input type="number" class="form-control section-duration" name="sections[${sectionIndex}][duration]" min="0">
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="button" class="btn btn-danger btn-sm remove-section">&times;</button>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="form-label">Content</label>
+                            <textarea class="form-control section-content" name="sections[${sectionIndex}][content]" rows="3" placeholder="Section content"></textarea>
+                        </div>
+                        <input type="hidden" name="sections[${sectionIndex}][order_position]" value="${sectionIndex}">
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', sectionHtml);
+            sectionIndex++;
+            updateRemoveButtons();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-section')) {
+                e.target.closest('.section-item').remove();
+                updateRemoveButtons();
+            }
+        });
+
+        function updateRemoveButtons() {
+            const sections = document.querySelectorAll('.section-item');
+            sections.forEach((section, index) => {
+                const removeBtn = section.querySelector('.remove-section');
+                removeBtn.style.display = sections.length > 1 ? 'block' : 'none';
+            });
+        }
+
+        // Initialize remove buttons on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRemoveButtons();
+        });
+    </script>
 </body>
 </html>

@@ -126,6 +126,31 @@ class ActivityLog
     }
 
     /**
+     * Log activity to file
+     *
+     * @param int $userId User ID
+     * @param string $action Action performed
+     * @param string $description Description
+     */
+    private function logToFile(int $userId, string $action, string $description): void
+    {
+        $logFile = __DIR__ . '/../logs/activity.log';
+        $logDir = dirname($logFile);
+
+        // Create logs directory if it doesn't exist
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0755, true);
+        }
+
+        $timestamp = date('Y-m-d H:i:s');
+        $ip = $this->getIpAddress();
+        $logEntry = "[{$timestamp}] User:{$userId} Action:{$action} IP:{$ip} - {$description}" . PHP_EOL;
+
+        // Append to log file
+        file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
+    }
+
+    /**
      * Get client IP address
      *
      * @return string IP address
@@ -136,6 +161,7 @@ class ActivityLog
             'HTTP_CLIENT_IP',
             'HTTP_X_FORWARDED_FOR',
             'HTTP_X_FORWARDED',
+            'HTTP_FORWARDED',
             'HTTP_FORWARDED_FOR',
             'HTTP_FORWARDED',
             'REMOTE_ADDR'

@@ -119,8 +119,9 @@ class LessonPlanController
         if ($result['success']) {
             $lessonPlanId = $result['lesson_id'];
 
-            // Create sections if provided
+            // Create sections if provided - demonstrate foreach loop
             if (isset($inputData['sections']) && is_array($inputData['sections'])) {
+                $sectionCount = 0;
                 foreach ($inputData['sections'] as $sectionData) {
                     if (!empty($sectionData['title'])) {
                         $sectionResult = $this->lessonSection->create([
@@ -134,9 +135,23 @@ class LessonPlanController
                         if (!$sectionResult['success']) {
                             // Log error but continue
                             error_log("Failed to create section: " . $sectionResult['message']);
+                        } else {
+                            $sectionCount++;
                         }
                     }
                 }
+
+                // Demonstrate while loop - log section creation count
+                $logMessage = "Created lesson plan with {$sectionCount} sections";
+                $i = 0;
+                while ($i < $sectionCount && $i < 5) { // Log up to 5 sections
+                    $logMessage .= " (section " . ($i + 1) . ")";
+                    $i++;
+                }
+                if ($sectionCount > 5) {
+                    $logMessage .= " and " . ($sectionCount - 5) . " more";
+                }
+                $this->activityLog->log($userId, 'lesson_plan_sections_created', $logMessage);
             }
 
             // Log activity

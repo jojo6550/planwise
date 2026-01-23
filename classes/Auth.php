@@ -156,12 +156,28 @@ class Auth
 
     /**
      * Check if user is authenticated
-     * 
+     *
      * @return bool True if authenticated, false otherwise
      */
     public function check(): bool
     {
-        return isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true && isset($_SESSION['user_id']);
+        // Check basic authentication
+        if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true || !isset($_SESSION['user_id'])) {
+            return false;
+        }
+
+        // Check session timeout (30 minutes)
+        $sessionTimeout = 30 * 60; // 30 minutes in seconds
+        if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time']) > $sessionTimeout) {
+            // Session expired, logout user
+            $this->logout();
+            return false;
+        }
+
+        // Update last activity time
+        $_SESSION['last_activity'] = time();
+
+        return true;
     }
 
     /**

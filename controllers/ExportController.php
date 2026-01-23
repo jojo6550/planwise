@@ -11,6 +11,7 @@ require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/PDFExporter.php';
+require_once __DIR__ . '/../classes/WordExporter.php';
 require_once __DIR__ . '/../classes/ActivityLog.php';
 
 class ExportController
@@ -109,6 +110,70 @@ class ExportController
     }
 
     /**
+     * Export lesson plan to Word
+     */
+    public function exportWord()
+    {
+        $lessonPlanId = (int)($_GET['id'] ?? 0);
+        $userId = $this->auth->id();
+
+        if ($lessonPlanId <= 0) {
+            http_response_code(400);
+            echo 'Invalid lesson plan ID';
+            exit();
+        }
+
+        // Start output buffering to prevent any previous output from interfering with Word
+        ob_start();
+
+        // Generate Word document (download mode)
+        $result = $this->wordExporter->generateLessonPlanWord($lessonPlanId, $userId, true);
+
+        if (!$result['success']) {
+            http_response_code(500);
+            echo 'Failed to generate Word document: ' . $result['message'];
+            exit();
+        }
+    }
+
+    /**
+     * Save lesson plan Word document to server
+     */
+    public function saveWord()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->jsonResponse(['success' => false, 'message' => 'Invalid request method'], 400);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $lessonPlanId = (int)($input['lesson_id'] ?? 0);
+        $userId = $this->auth->id();
+
+        if ($lessonPlanId <= 0) {
+            $this->jsonResponse(['success' => false, 'message' => 'Invalid lesson plan ID'], 400);
+            return;
+        }
+
+        // Start output buffering to prevent any previous output from interfering
+        ob_start();
+
+        // Generate Word document (save mode)
+        $result = $this->wordExporter->generateLessonPlanWord($lessonPlanId, $userId, false);
+
+        if ($result['success']) {
+            // Log activity
+            $this->activityLog->log(
+                $userId,
+                'word_saved',
+                "Saved lesson plan ID: {$lessonPlanId} to Word document"
+            );
+        }
+
+        $this->jsonResponse($result);
+    }
+
+    /**
      * Send JSON response
      */
     private function jsonResponse(array $data, int $statusCode = 200)
@@ -131,6 +196,12 @@ if (basename($_SERVER['PHP_SELF']) === 'ExportController.php') {
             break;
         case 'savePDF':
             $controller->savePDF();
+            break;
+        case 'exportWord':
+            $controller->exportWord();
+            break;
+        case 'saveWord':
+            $controller->saveWord();
             break;
         default:
             http_response_code(404);

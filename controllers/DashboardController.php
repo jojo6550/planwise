@@ -51,7 +51,7 @@ class DashboardController
 
     /**
      * Display teacher dashboard
-     * 
+     *
      * @return void
      */
     public function teacher()
@@ -62,8 +62,17 @@ class DashboardController
         // Get current user data
         $user = $this->auth->user();
 
+        // Get lesson plan statistics for the user
+        require_once __DIR__ . '/../classes/LessonPlan.php';
+        $lessonPlan = new LessonPlan();
+        $stats = $lessonPlan->getStats($user['user_id']);
+
+        // Prepare data for view
+        $data = $user;
+        $data['stats'] = $stats;
+
         // Load teacher dashboard view
-        $this->loadView('teacher/dashboard', $user);
+        $this->loadView('teacher/dashboard', $data);
     }
 
     /**

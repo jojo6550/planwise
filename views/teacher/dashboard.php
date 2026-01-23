@@ -26,6 +26,11 @@ if (!$auth->check()) {
 // Get current user data
 $user = $auth->user();
 
+// Get lesson plan statistics for the user
+require_once __DIR__ . '/../../classes/LessonPlan.php';
+$lessonPlan = new LessonPlan();
+$stats = $lessonPlan->getStats($user['user_id']);
+
 // Get success message from session if any
 $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);
@@ -102,7 +107,7 @@ unset($_SESSION['success']);
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="text-muted mb-2">Total Lesson Plans</h6>
-                                <h3 class="mb-0">0</h3>
+                                <h3 class="mb-0"><?php echo htmlspecialchars($stats['total'] ?? 0); ?></h3>
                             </div>
                             <div class="bg-primary bg-opacity-10 p-3 rounded">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="text-primary" viewBox="0 0 16 16">
@@ -121,7 +126,7 @@ unset($_SESSION['success']);
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="text-muted mb-2">Active Plans</h6>
-                                <h3 class="mb-0">0</h3>
+                                <h3 class="mb-0"><?php echo htmlspecialchars($stats['published'] ?? 0); ?></h3>
                             </div>
                             <div class="bg-success bg-opacity-10 p-3 rounded">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="text-success" viewBox="0 0 16 16">
@@ -140,7 +145,7 @@ unset($_SESSION['success']);
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h6 class="text-muted mb-2">Drafts</h6>
-                                <h3 class="mb-0">0</h3>
+                                <h3 class="mb-0"><?php echo htmlspecialchars($stats['drafts'] ?? 0); ?></h3>
                             </div>
                             <div class="bg-warning bg-opacity-10 p-3 rounded">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="text-warning" viewBox="0 0 16 16">

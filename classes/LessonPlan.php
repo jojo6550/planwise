@@ -105,7 +105,7 @@ class LessonPlan
             $sql = "SELECT lp.*, u.first_name, u.last_name, u.email
                     FROM lesson_plans lp
                     JOIN users u ON lp.user_id = u.user_id
-                    WHERE lp.lesson_plan_id = :lesson_plan_id";
+                    WHERE lp.lesson_id = :lesson_plan_id";
 
             $params = [':lesson_plan_id' => $lessonPlanId];
 
@@ -252,7 +252,7 @@ class LessonPlan
                 ];
             }
 
-            $sql = "DELETE FROM lesson_plans WHERE lesson_plan_id = :lesson_plan_id AND user_id = :user_id";
+            $sql = "DELETE FROM lesson_plans WHERE lesson_id = :lesson_plan_id AND user_id = :user_id";
             $this->db->delete($sql, [':lesson_plan_id' => $lessonPlanId, ':user_id' => $userId]);
 
             return [

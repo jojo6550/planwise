@@ -67,7 +67,7 @@ class LessonSection
     {
         try {
             $sql = "SELECT * FROM lesson_sections
-                    WHERE lesson_plan_id = :lesson_plan_id
+                    WHERE lesson_id = :lesson_plan_id
                     ORDER BY order_position ASC";
 
             return $this->db->fetchAll($sql, [':lesson_plan_id' => $lessonPlanId]);

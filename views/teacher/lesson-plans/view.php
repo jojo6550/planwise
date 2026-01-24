@@ -202,7 +202,7 @@ $qr = $qrCode->getByLessonPlanId($lessonPlanId);
                 <h5 class="mb-0">QR Code Access</h5>
             </div>
             <div class="card-body text-center">
-                <?php if ($qr && !empty($qr['qr_image_path'])): ?>
+                <?php if ($qr && !empty($qr['qr_path'])): ?>
                     <!-- Display QR Code -->
                     <div class="mb-3">
                         <img src="/planwise/controllers/QRCodeController.php?action=display&lesson_id=<?php echo $plan['lesson_id']; ?>"

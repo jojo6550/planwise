@@ -4,6 +4,7 @@
  * Handles QR code generation and management for lesson plans
  */
 
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/Database.php';
 
 class QRCode
@@ -51,13 +52,12 @@ class QRCode
             }
 
             // Store QR code data in database
-            $sql = "INSERT INTO qr_codes (lesson_id, qr_code_data, qr_image_path, created_at)
-                    VALUES (:lesson_id, :qr_code_data, :qr_image_path, NOW())";
+            $sql = "INSERT INTO qr_codes (lesson_id, qr_path, generated_at)
+                    VALUES (:lesson_id, :qr_path, NOW())";
 
             $params = [
                 ':lesson_id' => $lessonPlanId,
-                ':qr_code_data' => $qrData,
-                ':qr_image_path' => $filePath
+                ':qr_path' => $filePath
             ];
 
             $this->db->insert($sql, $params);
@@ -87,7 +87,7 @@ class QRCode
     public function getByLessonPlanId(int $lessonPlanId): ?array
     {
         try {
-            $sql = "SELECT * FROM qr_codes WHERE lesson_id = :lesson_id ORDER BY created_at DESC LIMIT 1";
+            $sql = "SELECT * FROM qr_codes WHERE lesson_id = :lesson_id ORDER BY generated_at DESC LIMIT 1";
             $result = $this->db->fetch($sql, [':lesson_id' => $lessonPlanId]);
             return $result ?: null;
 

@@ -137,13 +137,13 @@ class QRCodeController
         // Get QR code data
         $qrData = $this->qrCode->getByLessonPlanId($lessonPlanId);
 
-        if (!$qrData || empty($qrData['qr_image_path'])) {
+        if (!$qrData || empty($qrData['qr_path'])) {
             http_response_code(404);
             echo 'QR code not found';
             exit();
         }
 
-        $imagePath = $qrData['qr_image_path'];
+        $imagePath = $qrData['qr_path'];
 
         // Check if file exists
         if (!file_exists($imagePath)) {

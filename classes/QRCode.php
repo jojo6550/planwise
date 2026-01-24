@@ -51,16 +51,32 @@ class QRCode
                 throw new Exception('QR code image file was not created');
             }
 
-            // Store QR code data in database
-            $sql = "INSERT INTO qr_codes (lesson_id, qr_path, generated_at)
-                    VALUES (:lesson_id, :qr_path, NOW())";
+            // Check if QR code already exists for this lesson plan
+            $existing = $this->getByLessonPlanId($lessonPlanId);
 
-            $params = [
-                ':lesson_id' => $lessonPlanId,
-                ':qr_path' => $filePath
-            ];
+            if ($existing) {
+                // Delete old QR code file if it exists
+                if (file_exists($existing['qr_path'])) {
+                    unlink($existing['qr_path']);
+                }
 
-            $this->db->insert($sql, $params);
+                // Update existing record
+                $sql = "UPDATE qr_codes SET qr_path = :qr_path, generated_at = NOW() WHERE lesson_id = :lesson_id";
+                $params = [
+                    ':lesson_id' => $lessonPlanId,
+                    ':qr_path' => $filePath
+                ];
+                $this->db->update($sql, $params);
+            } else {
+                // Insert new record
+                $sql = "INSERT INTO qr_codes (lesson_id, qr_path, generated_at)
+                        VALUES (:lesson_id, :qr_path, NOW())";
+                $params = [
+                    ':lesson_id' => $lessonPlanId,
+                    ':qr_path' => $filePath
+                ];
+                $this->db->insert($sql, $params);
+            }
 
             return [
                 'success' => true,

@@ -118,7 +118,6 @@ class QRCodeController
     public function display()
     {
         $lessonPlanId = (int)($_GET['lesson_id'] ?? 0);
-        $userId = $this->auth->id();
 
         if ($lessonPlanId <= 0) {
             http_response_code(400);
@@ -126,15 +125,7 @@ class QRCodeController
             exit();
         }
 
-        // Check if user owns the lesson plan
-        $lessonPlan = $this->getLessonPlan($lessonPlanId, $userId);
-        if (!$lessonPlan) {
-            http_response_code(404);
-            echo 'Lesson plan not found or access denied';
-            exit();
-        }
-
-        // Get QR code data
+        // Get QR code data (no authentication required for display)
         $qrData = $this->qrCode->getByLessonPlanId($lessonPlanId);
 
         if (!$qrData || empty($qrData['qr_path'])) {

@@ -196,11 +196,118 @@ $qr = $qrCode->getByLessonPlanId($lessonPlanId);
             </div>
         <?php endif; ?>
 
+        <!-- QR Code Access -->
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">QR Code Access</h5>
+            </div>
+            <div class="card-body text-center">
+                <?php if ($qr && !empty($qr['qr_image_path'])): ?>
+                    <!-- Display QR Code -->
+                    <div class="mb-3">
+                        <img src="/planwise/controllers/QRCodeController.php?action=display&lesson_id=<?php echo $plan['lesson_id']; ?>"
+                             alt="QR Code" class="img-fluid" style="max-width: 200px;">
+                    </div>
+                    <p class="text-muted mb-3">Scan this QR code to access this lesson plan</p>
+                    <!-- Regenerate Button -->
+                    <button id="regenerate-qr-btn" onclick="regenerateQRCode(<?php echo $plan['lesson_id']; ?>)" class="btn btn-outline-primary">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Regenerate QR Code
+                    </button>
+                <?php else: ?>
+                    <!-- Generate Button -->
+                    <div class="mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" class="text-muted mb-3" viewBox="0 0 16 16">
+                            <path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2H0V2zm2-1a1 1 0 0 0-1 1v1h10V2a1 1 0 0 0-1-1H2z"/>
+                            <path d="M0 5v-.5A1.5 1.5 0 0 1 1.5 3h11A1.5 1.5 0 0 1 14 4.5V5H0z"/>
+                            <path d="M0 7v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H0z"/>
+                        </svg>
+                        <p class="text-muted">No QR code generated yet</p>
+                    </div>
+                    <button id="generate-qr-btn" onclick="generateQRCode(<?php echo $plan['lesson_id']; ?>)" class="btn btn-primary">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Generate QR Code
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <div class="mb-4">
             <a href="/planwise/public/index.php?page=teacher/lesson-plans" class="btn btn-secondary">Back to Lesson Plans</a>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function generateQRCode(lessonId) {
+            const btn = document.getElementById('generate-qr-btn');
+            const spinner = btn.querySelector('.spinner-border');
+
+            // Show loading state
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+
+            fetch('/planwise/controllers/QRCodeController.php?action=generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ lesson_id: lessonId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload the page to show the new QR code
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('An error occurred while generating the QR code');
+                console.error(error);
+            })
+            .finally(() => {
+                // Hide loading state
+                btn.disabled = false;
+                spinner.classList.add('d-none');
+            });
+        }
+
+        function regenerateQRCode(lessonId) {
+            const btn = document.getElementById('regenerate-qr-btn');
+            const spinner = btn.querySelector('.spinner-border');
+
+            // Show loading state
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+
+            fetch('/planwise/controllers/QRCodeController.php?action=generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ lesson_id: lessonId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Reload the page to show the new QR code
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('An error occurred while regenerating the QR code');
+                console.error(error);
+            })
+            .finally(() => {
+                // Hide loading state
+                btn.disabled = false;
+                spinner.classList.add('d-none');
+            });
+        }
+    </script>
 </body>
 </html>

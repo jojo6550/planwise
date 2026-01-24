@@ -1,8 +1,7 @@
-# QRCodeController Implementation Plan
+# QR Code Auto-Generation Implementation
 
 ## Tasks
-- [x] Implement QRCodeController.php with generate, get, and display methods
-- [ ] Update LessonPlanController.php to properly handle QR codes
-- [x] Update views/teacher/lesson-plans/view.php to display QR codes
-- [ ] Test QR code generation and display functionality
-- [ ] Ensure QR directory exists and is writable
+- [ ] Fix QR code loading in LessonPlanController::getViewData()
+- [ ] Add automatic QR code generation in LessonPlanController::create()
+- [ ] Test QR code auto-generation for new lesson plans
+- [ ] Test QR code display for existing lesson plans

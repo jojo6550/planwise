@@ -14,6 +14,7 @@ require_once __DIR__ . '/../classes/LessonPlan.php';
 require_once __DIR__ . '/../classes/LessonSection.php';
 require_once __DIR__ . '/../classes/ActivityLog.php';
 require_once __DIR__ . '/../classes/Validator.php';
+require_once __DIR__ . '/../classes/QRCode.php';
 
 class LessonPlanController
 {
@@ -21,6 +22,7 @@ class LessonPlanController
     private $lessonPlan;
     private $lessonSection;
     private $activityLog;
+    private $qrCode;
 
     /**
      * Constructor
@@ -31,6 +33,7 @@ class LessonPlanController
         $this->lessonPlan = new LessonPlan();
         $this->lessonSection = new LessonSection();
         $this->activityLog = new ActivityLog();
+        $this->qrCode = new QRCode();
     }
 
     /**
@@ -119,6 +122,9 @@ class LessonPlanController
 
         if ($result['success']) {
             $lessonPlanId = $result['lesson_id'];
+
+            // Generate QR code for the lesson plan
+            $this->qrCode->generate($lessonPlanId);
 
             // Create sections if provided - demonstrate foreach loop
             if (isset($inputData['sections']) && is_array($inputData['sections'])) {
@@ -401,9 +407,9 @@ class LessonPlanController
 
         $sections = $this->lessonSection->getByLessonPlan($lessonPlanId);
 
-        // Mock file and QR code handling (assuming classes exist)
-        $files = []; // $fileHandler->getByLessonPlan($lessonPlanId);
-        $qr = null; // $qrCode->getByLessonPlanId($lessonPlanId);
+        // Load files and QR code
+        $files = []; // $fileHandler->getByLessonPlan($lessonPlanId); // TODO: Implement file handling
+        $qr = $this->qrCode->getByLessonPlanId($lessonPlanId);
 
         return compact('plan', 'sections', 'files', 'qr');
     }

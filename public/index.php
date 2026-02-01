@@ -4,8 +4,60 @@
  * Handles routing and includes appropriate views
  */
 
-// Start session
+// Global error handler for production
+function errorHandler($errno, $errstr, $errfile, $errline) {
+    // Log error to stderr for Render visibility
+    error_log("PHP Error [$errno]: $errstr in $errfile on line $errline", 4);
+
+    // Don't display errors in production
+    if (ini_get('display_errors') == '1') {
+        return false;
+    }
+
+    // For fatal errors, show custom 500 page
+    if ($errno == E_ERROR || $errno == E_PARSE || $errno == E_CORE_ERROR ||
+        $errno == E_COMPILE_ERROR || $errno == E_USER_ERROR) {
+        http_response_code(500);
+        include __DIR__ . '/../views/errors/500.php';
+        exit();
+    }
+
+    return true;
+}
+
+// Set error handler
+set_error_handler('errorHandler');
+
+// Fatal error handler
+function fatalErrorHandler() {
+    $error = error_get_last();
+    if ($error !== null && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR])) {
+        error_log("Fatal Error: " . $error['message'] . " in " . $error['file'] . " on line " . $error['line'], 4);
+        http_response_code(500);
+        include __DIR__ . '/../views/errors/500.php';
+        exit();
+    }
+}
+register_shutdown_function('fatalErrorHandler');
+
+// Configure error reporting for production
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
+
+// Log errors to stderr for Render
+ini_set('log_errors', 1);
+ini_set('error_log', 'php://stderr');
+
+// Start session with Render-friendly settings
 if (session_status() === PHP_SESSION_NONE) {
+    // Configure session for better Render compatibility
+    ini_set('session.cookie_secure', 1);
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.gc_maxlifetime', 3600); // 1 hour
+    ini_set('session.cookie_lifetime', 0); // Session cookie
+
     session_start();
 }
 

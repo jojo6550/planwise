@@ -51,8 +51,14 @@ class QRCode
             }
 
             // Generate QR code using chillerlan/php-qrcode library
-            $qrCode = new \chillerlan\QRCode\QRCode();
-            $qrCode->render($qrData, $filePath);
+            $options = new \chillerlan\QRCode\QROptions([
+                'outputType' => \chillerlan\QRCode\QRCode::OUTPUT_IMAGE_PNG,
+                'eccLevel' => \chillerlan\QRCode\QRCode::ECC_L,
+                'imageBase64' => false,
+            ]);
+            $qrCode = new \chillerlan\QRCode\QRCode($options);
+            $qrImageData = $qrCode->render($qrData);
+            file_put_contents($filePath, $qrImageData);
 
             // Verify file was created
             if (!file_exists($filePath)) {

@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../classes/Database.php';
 class QRCodeTest extends TestCase
 {
     private $qrCode;
-    private $testLessonId = 1; // Use existing lesson ID from database
+    private $testLessonId = 999; // Use test lesson ID from seed
 
     protected function setUp(): void
     {
@@ -85,10 +85,9 @@ class QRCodeTest extends TestCase
      */
     public function testGenerateWithZeroLessonId()
     {
-        // QR generation should still work but the link would be invalid
-        // The class doesn't validate lesson existence
+        // QR generation should fail for invalid lesson ID
         $result = $this->qrCode->generate(0);
-        $this->assertTrue($result['success']);
+        $this->assertFalse($result['success']);
     }
 
     /**

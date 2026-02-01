@@ -10,9 +10,13 @@ require_once __DIR__ . '/../../classes/Auth.php';
 require_once __DIR__ . '/../../classes/User.php';
 require_once __DIR__ . '/../../classes/Database.php';
 
+/**
+ * @runInSeparateProcess
+ */
 class AuthTest extends TestCase
 {
     private $auth;
+    private $userMock;
 
     protected function setUp(): void
     {
@@ -20,8 +24,11 @@ class AuthTest extends TestCase
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
-        $this->auth = new Auth();
+
+        // Create mock for User
+        $this->userMock = $this->createMock(User::class);
+
+        $this->auth = new Auth($this->userMock);
     }
 
     protected function tearDown(): void
@@ -37,7 +44,22 @@ class AuthTest extends TestCase
     {
         // Arrange
         $email = 'josiah.johnson6550@gmail.com';
-        $password = 'teacher123'; // Assuming this is the test password
+        $password = 'coriander6550'; // Assuming this is the test password
+
+        $userData = [
+            'user_id' => 1,
+            'first_name' => 'Josiah',
+            'last_name' => 'Johnson',
+            'email' => $email,
+            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
+            'role_id' => 2,
+            'status' => 'active'
+        ];
+
+        $this->userMock->expects($this->once())
+            ->method('findByEmail')
+            ->with($email)
+            ->willReturn($userData);
 
         // Act
         $result = $this->auth->login($email, $password);
@@ -56,6 +78,11 @@ class AuthTest extends TestCase
         // Arrange
         $email = 'nonexistent@example.com';
         $password = 'password123';
+
+        $this->userMock->expects($this->once())
+            ->method('findByEmail')
+            ->with($email)
+            ->willReturn(null);
 
         // Act
         $result = $this->auth->login($email, $password);

@@ -11,10 +11,10 @@ class Auth
     /**
      * Constructor - Initialize User class and start session if not started
      */
-    public function __construct()
+    public function __construct(User $user = null)
     {
-        $this->user = new User();
-        
+        $this->user = $user ?: new User();
+
         // Start session if not already started
         if (session_status() === PHP_SESSION_NONE) {
             session_start();

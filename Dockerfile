@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite for .htaccess support
-RUN a2enmod rewrite
+# Enable Apache modules for .htaccess support
+RUN a2enmod rewrite headers expires deflate
 
 # Copy the entire application to the container
 COPY . /var/www/html/

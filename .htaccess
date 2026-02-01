@@ -241,11 +241,11 @@
 #########################################################
 # 12. CUSTOM ERROR PAGES
 #########################################################
-ErrorDocument 400 /planwise/public/index.php?page=400
-ErrorDocument 401 /planwise/public/index.php?page=401
-ErrorDocument 403 /planwise/public/index.php?page=403
-ErrorDocument 404 /planwise/public/index.php?page=404
-ErrorDocument 500 /planwise/public/index.php?page=500
+ErrorDocument 400 /public/index.php?page=400
+ErrorDocument 401 /public/index.php?page=401
+ErrorDocument 403 /public/index.php?page=403
+ErrorDocument 404 /public/index.php?page=404
+ErrorDocument 500 /public/index.php?page=500
 
 #########################################################
 # 13. PHP CONFIGURATION (if allowed by server)

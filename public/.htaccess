@@ -13,10 +13,13 @@
     RewriteEngine On
     RewriteBase /
 
-    # Prevent infinite loops: skip existing files/directories
+    # Prevent infinite loops: skip existing files/directories and index.php requests
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
+
+    # Prevent rewriting index.php itself to avoid loops
+    RewriteCond %{REQUEST_URI} !^/index\.php
 
     # Protect sensitive directories
     RewriteRule ^(classes|config|helpers|middleware|tests|views|vendor|database)(/.*)?$ - [F,L]
@@ -24,8 +27,8 @@
     # Prevent PHP execution in uploads
     RewriteRule ^uploads/.*\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$ - [F,L]
 
-    # Route all other requests to front-controller
-    RewriteRule ^(.*)$ public/index.php?page=$1 [QSA,L]
+    # Route all other requests to front-controller (fixed: remove 'public/' since .htaccess is in public/)
+    RewriteRule ^(.*)$ index.php?page=$1 [QSA,L]
 </IfModule>
 
 # ------------------------------

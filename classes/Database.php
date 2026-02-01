@@ -16,7 +16,7 @@ class Database
     private function __construct()
     {
         $this->config = require __DIR__ . '/../config/database.php';
-        $this->connect();
+        // Lazy loading: connect only when needed
     }
 
     /**
@@ -37,6 +37,14 @@ class Database
      */
     private function connect()
     {
+        // Check for required configuration
+        if (empty($this->config['host']) || empty($this->config['database']) ||
+            empty($this->config['username'])) {
+            $errorMsg = "Database configuration error: Missing required environment variables (DB_HOST, DB_NAME, DB_USER)";
+            $this->logToFile($errorMsg);
+            throw new Exception("Database configuration error");
+        }
+
         try {
             $dsn = sprintf(
                 "%s:host=%s;port=%s;dbname=%s;charset=%s",
@@ -53,19 +61,49 @@ class Database
                 $this->config['password'],
                 $this->config['options']
             );
+
+            // Log successful connection
+            $this->logToFile("Database connection established successfully to {$this->config['host']}:{$this->config['port']}/{$this->config['database']}");
+
         } catch (PDOException $e) {
-            error_log("Database connection failed: " . $e->getMessage());
-            throw new Exception("Could not connect to database");
+            $errorMsg = "Database connection failed: " . $e->getMessage() . " (Host: {$this->config['host']}, Port: {$this->config['port']}, DB: {$this->config['database']})";
+            $this->logToFile($errorMsg);
+            error_log($errorMsg);
+            throw new Exception("Could not connect to database. Please check your database configuration and ensure the server is running.");
         }
     }
 
     /**
+     * Log message to database log file
+     *
+     * @param string $message
+     */
+    private function logToFile($message)
+    {
+        $logFile = __DIR__ . '/../logs/database.log';
+        $logDir = dirname($logFile);
+
+        // Create logs directory if it doesn't exist
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0755, true);
+        }
+
+        $timestamp = date('Y-m-d H:i:s');
+        $logEntry = "[$timestamp] $message" . PHP_EOL;
+
+        file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
+    }
+
+    /**
      * Get PDO instance
-     * 
+     *
      * @return PDO
      */
     public function getConnection()
     {
+        if ($this->pdo === null) {
+            $this->connect();
+        }
         return $this->pdo;
     }
 

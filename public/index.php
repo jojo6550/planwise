@@ -28,6 +28,23 @@ function errorHandler($errno, $errstr, $errfile, $errline) {
 // Set error handler
 set_error_handler('errorHandler');
 
+// Custom exception handler for graceful error handling
+function exceptionHandler($exception) {
+    $message = $exception->getMessage();
+    if (strpos($message, 'Could not connect to database') !== false ||
+        strpos($message, 'Database configuration error') !== false) {
+        http_response_code(503); // Service Unavailable
+        include __DIR__ . '/../views/errors/database.php';
+        exit();
+    } else {
+        // Default 500 error
+        http_response_code(500);
+        include __DIR__ . '/../views/errors/500.php';
+        exit();
+    }
+}
+set_exception_handler('exceptionHandler');
+
 // Fatal error handler
 function fatalErrorHandler() {
     $error = error_get_last();

@@ -62,9 +62,10 @@ class QRCodeTest extends TestCase
 
         // Assert
         $this->assertArrayHasKey('qr_data', $result);
-        $this->assertStringContainsString('/planwise/public/index.php', $result['qr_data']);
-        $this->assertStringContainsString('page=teacher/lesson-plans/view', $result['qr_data']);
+        $this->assertStringContainsString('/planwise/controllers/ExportController.php', $result['qr_data']);
+        $this->assertStringContainsString('action=exportPDF', $result['qr_data']);
         $this->assertStringContainsString('id=' . $this->testLessonId, $result['qr_data']);
+        $this->assertStringContainsString('inline=1', $result['qr_data']);
     }
 
     /**

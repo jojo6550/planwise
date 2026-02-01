@@ -18,6 +18,7 @@ class ExportController
 {
     private $auth;
     private $pdfExporter;
+    private $wordExporter;
     private $activityLog;
 
     /**
@@ -30,11 +31,15 @@ class ExportController
         $this->wordExporter = new WordExporter();
         $this->activityLog = new ActivityLog();
 
-        // Require authentication
-        if (!$this->auth->check()) {
-            http_response_code(401);
-            echo 'Unauthorized access';
-            exit();
+        // Allow unauthenticated access for inline PDF exports (QR code access)
+        $inline = isset($_GET['inline']) && $_GET['inline'] == '1';
+        if (!$inline) {
+            // Require authentication for non-inline requests
+            if (!$this->auth->check()) {
+                http_response_code(401);
+                echo 'Unauthorized access';
+                exit();
+            }
         }
     }
 
@@ -44,7 +49,8 @@ class ExportController
     public function exportPDF()
     {
         $lessonPlanId = (int)($_GET['id'] ?? 0);
-        $userId = $this->auth->id();
+        $inline = isset($_GET['inline']) && $_GET['inline'] == '1';
+        $userId = $inline ? null : $this->auth->id();
 
         if ($lessonPlanId <= 0) {
             http_response_code(400);
@@ -55,16 +61,18 @@ class ExportController
         // Start output buffering to prevent any previous output from interfering with PDF
         ob_start();
 
-        // Generate PDF (download mode)
-        $result = $this->pdfExporter->generateLessonPlanPDF($lessonPlanId, $userId, true);
+        // Generate PDF (inline or download mode)
+        $result = $this->pdfExporter->generateLessonPlanPDF($lessonPlanId, $userId, !$inline, $inline);
 
         if ($result['success']) {
-            // Log activity
-            $this->activityLog->log(
-                $userId,
-                'pdf_exported',
-                "Exported lesson plan ID: {$lessonPlanId} to PDF"
-            );
+            // Log activity only for authenticated users
+            if (!$inline) {
+                $this->activityLog->log(
+                    $userId,
+                    'pdf_exported',
+                    "Exported lesson plan ID: {$lessonPlanId} to PDF" . ($inline ? ' (inline)' : '')
+                );
+            }
         } else {
             http_response_code(500);
             echo 'Failed to generate PDF: ' . $result['message'];

@@ -40,9 +40,10 @@ class PDFExporter
      * @param int $lessonPlanId Lesson plan ID
      * @param int $userId User ID for authorization
      * @param bool $download Whether to download or save
+     * @param bool $inline Whether to display inline in browser
      * @return array Result with file path or download status
      */
-    public function generateLessonPlanPDF(int $lessonPlanId, int $userId, bool $download = true): array
+    public function generateLessonPlanPDF(int $lessonPlanId, int $userId, bool $download = true, bool $inline = false): array
     {
         try {
             // Get lesson plan data

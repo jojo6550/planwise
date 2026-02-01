@@ -37,8 +37,8 @@ class QRCode
                 ];
             }
 
-            // Generate QR code data (URL to view lesson plan)
-            $qrData = "/planwise/public/index.php?page=teacher/lesson-plans/view&id=" . $lessonPlanId;
+            // Generate QR code data (URL to export lesson plan as PDF inline)
+            $qrData = "/planwise/controllers/ExportController.php?action=exportPDF&id=" . $lessonPlanId . "&inline=1";
 
             // Generate unique filename for QR image
             $fileName = 'qr_' . $lessonPlanId . '_' . time() . '.png';

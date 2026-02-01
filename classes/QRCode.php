@@ -29,6 +29,14 @@ class QRCode
     public function generate(int $lessonPlanId): array
     {
         try {
+            // Validate lesson ID
+            if ($lessonPlanId <= 0) {
+                return [
+                    'success' => false,
+                    'message' => 'Invalid lesson plan ID'
+                ];
+            }
+
             // Generate QR code data (URL to view lesson plan)
             $qrData = "/planwise/public/index.php?page=teacher/lesson-plans/view&id=" . $lessonPlanId;
 

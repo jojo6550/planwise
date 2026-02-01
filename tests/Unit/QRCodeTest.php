@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../classes/Database.php';
 class QRCodeTest extends TestCase
 {
     private $qrCode;
-    private $testLessonId = 999; // Use a test ID that won't conflict
+    private $testLessonId = 1; // Use existing lesson ID from database
 
     protected function setUp(): void
     {

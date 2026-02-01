@@ -393,4 +393,38 @@ class File
             return null;
         }
     }
+
+    /**
+     * Check if file type is allowed
+     *
+     * @param string $extension File extension
+     * @return bool True if allowed
+     */
+    private function isAllowedFileType(string $extension): bool
+    {
+        $allowedExtensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif'];
+        return in_array(strtolower($extension), $allowedExtensions);
+    }
+
+    /**
+     * Check if file size is valid
+     *
+     * @param int $size File size in bytes
+     * @return bool True if valid
+     */
+    private function isValidFileSize(int $size): bool
+    {
+        return $size <= $this->maxFileSize;
+    }
+
+    /**
+     * Get file extension from filename
+     *
+     * @param string $filename Filename
+     * @return string File extension (lowercase)
+     */
+    private function getFileExtension(string $filename): string
+    {
+        return strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    }
 }

@@ -18,10 +18,10 @@ require_once ROOT_DIR . '/config/app.php';
 define('TEST_MODE', true);
 define('DEBUG_MODE', true);
 
-// Start session for tests that need it
+// Start session for tests that need it (must be before any output)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 // Clear test database before running tests
-echo "PHPUnit Bootstrap: Environment ready for testing\n";
+// Note: Removed echo to prevent "headers already sent" error

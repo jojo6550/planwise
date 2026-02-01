@@ -163,7 +163,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `email`, `password_hash`, `role_id`, `status`, `created_at`) VALUES
-(6, 'Jamin', 'Johnson', 'josiah.johnson6550@gmail.com', '$2y$10$iZYvlSig9fVl1N2FU.KFMu7SRZTY8HyI66fzdv1zBTpOKEABCVaUi', 2, 'active', '2026-01-22 16:37:22');
+(6, 'Jamin', 'Johnson', 'josiah.johnson6550@gmail.com', '$2y$10$U.m/Eckxhjvc0IJDbLCpBuu5GGWBG.WDyTLDrtlduqtW/Lsjsso4dK', 2, 'active', '2026-01-22 16:37:22');
 
 --
 -- Indexes for dumped tables

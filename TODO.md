@@ -1,7 +1,6 @@
-# QR Code Auto-Generation Implementation
+# Test Fixes TODO
 
-## Tasks
-- [ ] Fix QR code loading in LessonPlanController::getViewData()
-- [ ] Add automatic QR code generation in LessonPlanController::create()
-- [ ] Test QR code auto-generation for new lesson plans
-- [ ] Test QR code display for existing lesson plans
+- [ ] Remove echo from tests/bootstrap.php
+- [ ] Add missing methods to classes/File.php
+- [ ] Update password hash in database/planwise_db.sql
+- [ ] Run tests to verify fixes

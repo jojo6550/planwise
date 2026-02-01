@@ -13,7 +13,7 @@
     RewriteEngine On
     
     # Set base path for rewrites (adjust if deployed to different directory)
-    RewriteBase /planwise/
+    RewriteBase /
     
     #########################################################
     # 1. HTTPS ENFORCEMENT (Security)

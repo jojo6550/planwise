@@ -1,16 +1,22 @@
-# Fix Failing Tests
+# Deployment Tasks for Render with Docker
 
-## Auth Tests
-- [ ] Add output buffering in tests/bootstrap.php to prevent headers sent error
-- [ ] Ensure all session_start calls are wrapped in checks (already done)
+## Current Status
+- [x] Analyze application structure and existing configurations
+- [x] Create comprehensive deployment plan
+- [x] Get user approval for plan
 
-## QR Code Tests
-- [x] Add validation in QRCode::generate to reject lesson_id <= 0
-- [x] Seed test lesson with ID=999 in database
-- [x] Ensure QR directory exists and is writable
-- [x] Check GD extension is enabled
-- [x] Fix QR code generation to use correct library method
-- [x] Update test to use lesson_id=999 and expect false for zero ID
+## Pending Tasks
+- [ ] Create Dockerfile with PHP 8.2 + Apache, mod_rewrite, proper permissions
+- [ ] Update render.yaml for Docker environment and web service configuration
+- [ ] Update .htaccess RewriteBase from /planwise/ to / for root deployment
+- [ ] Test Docker build locally (optional but recommended)
+- [ ] Deploy to Render and verify functionality
 
-## Run Tests
-- [ ] Run PHPUnit to verify fixes
+## Notes
+- Dockerfile will use php:8.2-apache base image
+- Application will be copied to /var/www/html
+- mod_rewrite enabled for .htaccess support
+- File permissions set for www-data user
+- Port 80 exposed
+- render.yaml configured for free plan web service
+- .htaccess adjusted for root path deployment

@@ -1,22 +1,16 @@
-# Deployment Tasks for Render with Docker
+# PlanWise Deployment Fix - TODO
 
 ## Current Status
-- [x] Analyze application structure and existing configurations
-- [x] Create comprehensive deployment plan
-- [x] Get user approval for plan
+- [x] Analyze deployment errors (Apache 403/500 errors, internal redirects)
+- [x] Identify root cause (DocumentRoot mismatch, .htaccess location, hardcoded URLs)
 
-## Pending Tasks
-- [ ] Create Dockerfile with PHP 8.2 + Apache, mod_rewrite, proper permissions
-- [ ] Update render.yaml for Docker environment and web service configuration
-- [ ] Update .htaccess RewriteBase from /planwise/ to / for root deployment
-- [ ] Test Docker build locally (optional but recommended)
-- [ ] Deploy to Render and verify functionality
+## Implementation Plan
+- [ ] Update Dockerfile to configure Apache DocumentRoot to /var/www/html/public
+- [ ] Move .htaccess from root to public/ directory
+- [ ] Update hardcoded URLs in public/index.php for production deployment
+- [ ] Test deployment configuration
 
-## Notes
-- Dockerfile will use php:8.2-apache base image
-- Application will be copied to /var/www/html
-- mod_rewrite enabled for .htaccess support
-- File permissions set for www-data user
-- Port 80 exposed
-- render.yaml configured for free plan web service
-- .htaccess adjusted for root path deployment
+## Verification
+- [ ] Verify Apache serves from public/ directory
+- [ ] Confirm routing works without redirect loops
+- [ ] Ensure security rules (.htaccess) are applied correctly

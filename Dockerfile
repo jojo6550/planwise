@@ -22,6 +22,41 @@ RUN a2enmod rewrite headers expires deflate
 # Copy the entire application to the container
 COPY . /var/www/html/
 
+# Create custom Apache configuration for public directory as document root
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/html/public\n\
+    <Directory /var/www/html/public>\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+    \n\
+    # Protect sensitive directories\n\
+    <Directory /var/www/html/classes>\n\
+        Require all denied\n\
+    </Directory>\n\
+    <Directory /var/www/html/config>\n\
+        Require all denied\n\
+    </Directory>\n\
+    <Directory /var/www/html/helpers>\n\
+        Require all denied\n\
+    </Directory>\n\
+    <Directory /var/www/html/middleware>\n\
+        Require all denied\n\
+    </Directory>\n\
+    <Directory /var/www/html/tests>\n\
+        Require all denied\n\
+    </Directory>\n\
+    <Directory /var/www/html/views>\n\
+        Require all denied\n\
+    </Directory>\n\
+    <Directory /var/www/html/vendor>\n\
+        Require all denied\n\
+    </Directory>\n\
+    <Directory /var/www/html/database>\n\
+        Require all denied\n\
+    </Directory>\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
 # Set proper file permissions for Apache
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \

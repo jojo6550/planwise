@@ -1,0 +1,284 @@
+#########################################################
+# PlanWise - Main Apache .htaccess Configuration
+# CS334 Applied Web Programming Project
+#
+# Purpose: Security, Performance, and Clean URL Routing
+# Location: Root directory (c:/xampp/htdocs/planwise/)
+# Apache Version: 2.4+
+# Requires: mod_rewrite, mod_headers, mod_expires, mod_deflate
+#########################################################
+
+# Enable RewriteEngine for URL routing
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Set base path for rewrites (adjust if deployed to different directory)
+    RewriteBase /planwise/
+    
+    #########################################################
+    # 1. HTTPS ENFORCEMENT (Security)
+    #########################################################
+    # Redirect all HTTP traffic to HTTPS (disabled for local dev)
+    # Uncomment these lines when deploying to production with SSL certificate
+    # RewriteCond %{HTTPS} off
+    # RewriteCond %{HTTP_HOST} !^localhost [NC]
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    
+    #########################################################
+    # 2. DIRECTORY INDEX PROTECTION
+    #########################################################
+    # Prevent directory listing
+    Options -Indexes
+    
+    # Block access to hidden files and directories (., .git, .env, etc.)
+    RewriteCond %{REQUEST_URI} "!(^|/)\.well-known/([^./]+\.php|[^./]+/[^./]+\.php)(/.*)?$" [NC]
+    RewriteCond %{SCRIPT_FILENAME} -d [OR]
+    RewriteCond %{SCRIPT_FILENAME} -f
+    RewriteRule "(^|/)\." - [F]
+    
+    #########################################################
+    # 3. PROTECT SENSITIVE DIRECTORIES
+    #########################################################
+    # Block direct access to controllers, classes, config, views, tests
+    RewriteRule ^(classes|config|helpers|middleware|tests|views|vendor|database)(/.*)?$ - [F,L]
+    
+    # Allow specific controller access patterns (required for exports, auth, etc.)
+    RewriteCond %{REQUEST_URI} ^/planwise/controllers/[^/]+\.php$
+    RewriteRule ^ - [L]
+    
+    #########################################################
+    # 4. CLEAN URL ROUTING (Optional Enhancement)
+    #########################################################
+    # Note: Currently using query string routing (?page=...)
+    # Uncomment below for clean URLs like /teacher/dashboard
+    
+    # Skip rewrite for existing files and directories
+    # RewriteCond %{REQUEST_FILENAME} !-f
+    # RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Rewrite clean URLs to index.php with page parameter
+    # Examples:
+    #   /teacher/dashboard -> /public/index.php?page=teacher/dashboard
+    #   /admin/users -> /public/index.php?page=admin/users
+    # RewriteRule ^([a-zA-Z0-9\-/]+)/?$ public/index.php?page=$1 [L,QSA]
+    
+    #########################################################
+    # 5. PROTECT UPLOADED FILES FROM EXECUTION
+    #########################################################
+    # Prevent PHP execution in uploads directory
+    RewriteRule ^uploads/.*\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$ - [F,L]
+    
+    #########################################################
+    # 6. BLOCK COMMON EXPLOIT ATTEMPTS
+    #########################################################
+    # Block suspicious query strings
+    RewriteCond %{QUERY_STRING} (<|%3C).*script.*(>|%3E) [NC,OR]
+    RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+    RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2}) [OR]
+    RewriteCond %{QUERY_STRING} proc/self/environ [NC,OR]
+    RewriteCond %{QUERY_STRING} mosConfig_[a-zA-Z_]{1,21}(=|\%3D) [OR]
+    RewriteCond %{QUERY_STRING} base64_encode.*(.*) [NC,OR]
+    RewriteCond %{QUERY_STRING} (<|%3C).*iframe.*(>|%3E) [NC,OR]
+    RewriteCond %{QUERY_STRING} (<|%3C).*object.*(>|%3E) [NC]
+    RewriteRule ^(.*)$ - [F,L]
+    
+    # Block requests with suspicious user agents
+    RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+    RewriteCond %{HTTP_USER_AGENT} ^(-|\.|\s) [OR]
+    RewriteCond %{HTTP_USER_AGENT} (libwww-perl|python|nikto|scan|java|winhttp|clshttp|loader) [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} (;|<|>|'|"|\)|%0A|%0D|%27|%3C|%3E|%00) [NC]
+    RewriteRule ^(.*)$ - [F,L]
+    
+    # Block SQL injection attempts in URLs
+    RewriteCond %{REQUEST_URI} (;|\||`|<|>|'|"|\)|%0A|%0D|%27|%3C|%3E|%00) [NC,OR]
+    RewriteCond %{REQUEST_URI} (\.\.\/|\.\.\\) [NC,OR]
+    RewriteCond %{REQUEST_URI} (\/\~\~\~|\/\~\.\.\/|\/\.\.) [NC,OR]
+    RewriteCond %{REQUEST_URI} (union|select|insert|cast|declare|drop|update|md5|benchmark) [NC]
+    RewriteRule ^(.*)$ - [F,L]
+    
+    #########################################################
+    # 7. FILE TYPE RESTRICTIONS
+    #########################################################
+    # Block access to backup files and source code
+    RewriteRule \.(bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist|old|backup|~)$ - [F,L]
+    
+    # Block access to composer and package manager files
+    RewriteRule ^(composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|\.git.*|\.env.*)$ - [F,L]
+    
+</IfModule>
+
+#########################################################
+# 8. SECURITY HEADERS
+#########################################################
+<IfModule mod_headers.c>
+    # Prevent clickjacking attacks
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Enable XSS protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Remove server signature
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+    
+    # Content Security Policy (adjust as needed)
+    # Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' data: https://cdn.jsdelivr.net;"
+    
+    # HSTS (Strict Transport Security) - Enable only with valid SSL
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+</IfModule>
+
+#########################################################
+# 9. PERFORMANCE - BROWSER CACHING
+#########################################################
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Default expiration: 1 hour
+    ExpiresDefault "access plus 1 hour"
+    
+    # Images
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # CSS and JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    
+    # Fonts
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    
+    # Documents
+    ExpiresByType application/pdf "access plus 1 month"
+    ExpiresByType application/vnd.openxmlformats-officedocument.wordprocessingml.document "access plus 1 month"
+    
+    # Data interchange
+    ExpiresByType application/json "access plus 0 seconds"
+    ExpiresByType application/xml "access plus 0 seconds"
+    ExpiresByType text/xml "access plus 0 seconds"
+</IfModule>
+
+#########################################################
+# 10. PERFORMANCE - GZIP COMPRESSION
+#########################################################
+<IfModule mod_deflate.c>
+    # Compress HTML, CSS, JavaScript, Text, XML and fonts
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/x-web-app-manifest+json
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE font/otf
+    AddOutputFilterByType DEFLATE font/ttf
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+    
+    # Remove browser bugs (old browsers)
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+    Header append Vary User-Agent
+</IfModule>
+
+#########################################################
+# 11. MIME TYPE CONFIGURATION
+#########################################################
+<IfModule mod_mime.c>
+    # JavaScript
+    AddType application/javascript js
+    AddType text/javascript js
+    
+    # JSON
+    AddType application/json json
+    
+    # Images
+    AddType image/svg+xml svg svgz
+    AddType image/webp webp
+    
+    # Fonts
+    AddType application/font-woff woff
+    AddType application/font-woff2 woff2
+    AddType application/vnd.ms-fontobject eot
+    AddType font/ttf ttf
+    AddType font/otf otf
+    
+    # Documents
+    AddType application/pdf pdf
+    AddType application/vnd.openxmlformats-officedocument.wordprocessingml.document docx
+    
+    # Default charset for text files
+    AddDefaultCharset UTF-8
+    AddCharset UTF-8 .html .css .js .xml .json .rss .atom
+</IfModule>
+
+#########################################################
+# 12. CUSTOM ERROR PAGES
+#########################################################
+ErrorDocument 400 /planwise/public/index.php?page=400
+ErrorDocument 401 /planwise/public/index.php?page=401
+ErrorDocument 403 /planwise/public/index.php?page=403
+ErrorDocument 404 /planwise/public/index.php?page=404
+ErrorDocument 500 /planwise/public/index.php?page=500
+
+#########################################################
+# 13. PHP CONFIGURATION (if allowed by server)
+#########################################################
+<IfModule mod_php7.c>
+    # Security settings
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log logs/php_errors.log
+    
+    # Session security
+    php_flag session.cookie_httponly On
+    php_flag session.use_strict_mode On
+    
+    # File upload limits (adjust as needed)
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+#########################################################
+# 14. PREVENT ACCESS TO VERSION CONTROL
+#########################################################
+# Block .git, .svn, .hg directories
+RedirectMatch 404 /\.git
+RedirectMatch 404 /\.svn
+RedirectMatch 404 /\.hg
+
+#########################################################
+# END OF CONFIGURATION
+#########################################################
+# Last Updated: 2026-02-01
+# Maintainer: CS334 PlanWise Development Team
+#########################################################

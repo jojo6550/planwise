@@ -1,0 +1,45 @@
+#########################################################
+# PlanWise - Controllers Directory Protection
+# Location: /controllers/
+#
+# Purpose: Allow execution of controller PHP files but
+#          prevent directory listing and unauthorized access
+#########################################################
+
+# Prevent directory listing
+Options -Indexes
+
+# Allow PHP execution (controllers need to be executable)
+<FilesMatch "\.php$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Block direct access to non-controller files
+<FilesMatch "\.(txt|md|log|ini|conf|bak|sql)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Additional security headers for controllers
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+#########################################################
+# Controller Access Control
+#########################################################
+# Controllers are intentionally accessible for:
+# - Authentication (login, logout, register)
+# - Export operations (PDF, Word)
+# - File operations (upload, download)
+# - QR code generation
+# - AJAX requests from authenticated sessions
+#
+# Security is enforced at the PHP application layer:
+# - Session validation
+# - CSRF token verification
+# - User permission checks
+# - Activity logging
+#########################################################

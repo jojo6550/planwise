@@ -1,0 +1,28 @@
+#########################################################
+# PlanWise - Views Directory Protection
+# Location: /views/
+#
+# Purpose: Prevent direct access to view files
+#          Views should only be included by controllers/routers
+#########################################################
+
+# Deny all direct access
+Order Deny,Allow
+Deny from all
+
+# Prevent directory listing
+Options -Indexes
+
+#########################################################
+# Security Rationale:
+#########################################################
+# View files should never be accessed directly because:
+# 1. They may contain PHP code that expects certain variables
+# 2. They don't have authentication checks
+# 3. Direct access bypasses routing and middleware
+# 4. Can expose application structure
+#
+# Views are meant to be included by:
+# - public/index.php (main router)
+# - Controllers (after authentication/authorization)
+#########################################################

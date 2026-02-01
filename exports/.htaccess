@@ -1,0 +1,29 @@
+#########################################################
+# PlanWise - Exports Directory Protection
+# Location: /exports/
+#
+# Purpose: Protect generated PDF and Word exports
+#          Only allow access through authenticated controllers
+#########################################################
+
+# Deny all direct access
+Order Deny,Allow
+Deny from all
+
+# Prevent directory listing
+Options -Indexes
+
+#########################################################
+# Security Rationale:
+#########################################################
+# Exported files should never be directly accessible because:
+# 1. They contain potentially sensitive lesson plan data
+# 2. Access must be authenticated and authorized
+# 3. Downloads should go through ExportController
+# 4. Allows activity logging and access control
+#
+# Files should only be served by:
+# - ExportController.php (with authentication)
+# - After ownership verification
+# - With proper activity logging
+#########################################################

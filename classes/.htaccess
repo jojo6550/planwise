@@ -1,0 +1,28 @@
+#########################################################
+# PlanWise - Classes Directory Protection
+# Location: /classes/
+#
+# Purpose: Block all direct browser access to PHP classes
+#          Classes should only be included by controllers/views
+#########################################################
+
+# Deny all direct access
+Order Deny,Allow
+Deny from all
+
+# Prevent directory listing
+Options -Indexes
+
+#########################################################
+# Security Rationale:
+#########################################################
+# Classes contain sensitive business logic and should never
+# be accessed directly via browser. They are meant to be
+# included/required by controllers and views only.
+#
+# Blocking access prevents:
+# - Information disclosure
+# - Unauthorized execution
+# - Direct object manipulation
+# - Exposure of database connection logic
+#########################################################

@@ -1,0 +1,122 @@
+#########################################################
+# PlanWise - Uploads Directory Protection
+# Location: /uploads/
+#
+# Purpose: Allow file downloads but prevent PHP execution
+#          and other security threats from uploaded files
+#########################################################
+
+# Prevent directory listing
+Options -Indexes
+
+#########################################################
+# 1. PREVENT PHP EXECUTION
+#########################################################
+# Critical: Stop uploaded PHP files from executing
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|aspx|sh|cgi)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Additional protection: Remove PHP handler
+RemoveHandler .php .phtml .php3 .php4 .php5
+RemoveType .php .phtml .php3 .php4 .php5
+
+# Force download instead of execution
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+#########################################################
+# 2. ALLOW SAFE FILE TYPES
+#########################################################
+# Allow common image formats
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Allow document formats
+<FilesMatch "\.(pdf|doc|docx|xls|xlsx|ppt|pptx|txt)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Allow audio/video (if needed)
+<FilesMatch "\.(mp3|mp4|avi|mov|wmv|flv|webm)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Allow archives (if needed)
+<FilesMatch "\.(zip|rar|tar|gz)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+#########################################################
+# 3. SECURITY HEADERS
+#########################################################
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header set X-Content-Type-Options "nosniff"
+    
+    # Force download for executable extensions
+    <FilesMatch "\.(exe|dll|bat|cmd|com)$">
+        Header set Content-Disposition "attachment"
+    </FilesMatch>
+    
+    # Set proper content types for images
+    <FilesMatch "\.(jpg|jpeg)$">
+        Header set Content-Type "image/jpeg"
+    </FilesMatch>
+    <FilesMatch "\.png$">
+        Header set Content-Type "image/png"
+    </FilesMatch>
+    <FilesMatch "\.gif$">
+        Header set Content-Type "image/gif"
+    </FilesMatch>
+    <FilesMatch "\.svg$">
+        Header set Content-Type "image/svg+xml"
+    </FilesMatch>
+    
+    # Set proper content type for PDFs
+    <FilesMatch "\.pdf$">
+        Header set Content-Type "application/pdf"
+    </FilesMatch>
+</IfModule>
+
+#########################################################
+# 4. FILE SIZE AND REQUEST LIMITS
+#########################################################
+# Limit request size to prevent DoS attacks
+LimitRequestBody 10485760
+
+#########################################################
+# 5. HOTLINK PROTECTION (Optional)
+#########################################################
+# Prevent other sites from embedding your uploaded files
+# Uncomment if needed:
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTP_REFERER} !^$
+#     RewriteCond %{HTTP_REFERER} !^https?://(www\.)?yourdomain\.com [NC]
+#     RewriteRule \.(jpg|jpeg|png|gif|pdf)$ - [F,L]
+# </IfModule>
+
+#########################################################
+# Security Rationale:
+#########################################################
+# Uploaded files are the #1 attack vector in PHP applications
+#
+# This configuration:
+# ✓ Prevents uploaded PHP shells from executing
+# ✓ Blocks dangerous file extensions
+# ✓ Forces correct MIME types
+# ✓ Prevents MIME type confusion attacks
+# ✓ Limits file size to prevent DoS
+# ✓ Adds security headers
+#
+# Application-level validation (File.php class) provides
+# additional checks before files are even saved.
+#########################################################

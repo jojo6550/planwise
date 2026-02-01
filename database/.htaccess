@@ -1,0 +1,32 @@
+#########################################################
+# PlanWise - Database Directory Protection
+# Location: /database/
+#
+# Purpose: Block access to SQL files and database documentation
+#########################################################
+
+# Deny all access
+Order Deny,Allow
+Deny from all
+
+# Prevent directory listing
+Options -Indexes
+
+#########################################################
+# Security Rationale:
+#########################################################
+# Database directory contains:
+# - SQL schema files with table structure
+# - Migration files
+# - Seed data
+# - Database documentation
+# - MySQL Workbench models (.mwb)
+#
+# Exposing these files reveals:
+# - Database structure
+# - Table and column names
+# - Relationships
+# - Potential security vulnerabilities
+#
+# CRITICAL: Must never be accessible via browser
+#########################################################

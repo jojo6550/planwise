@@ -1,0 +1,26 @@
+#########################################################
+# PlanWise - Config Directory Protection
+# Location: /config/
+#
+# Purpose: Block all access to configuration files
+#          Contains sensitive database credentials and settings
+#########################################################
+
+# Deny all access
+Order Deny,Allow
+Deny from all
+
+# Prevent directory listing
+Options -Indexes
+
+#########################################################
+# Security Rationale:
+#########################################################
+# Configuration files contain:
+# - Database credentials (username, password, host)
+# - Mail server settings
+# - API keys and secrets
+# - Application settings
+#
+# CRITICAL: Must never be accessible via browser
+#########################################################

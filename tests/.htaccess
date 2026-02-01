@@ -1,0 +1,27 @@
+#########################################################
+# PlanWise - Tests Directory Protection
+# Location: /tests/
+#
+# Purpose: Block all access to test files
+#########################################################
+
+# Deny all access
+Order Deny,Allow
+Deny from all
+
+# Prevent directory listing
+Options -Indexes
+
+#########################################################
+# Security Rationale:
+#########################################################
+# Test files should never be accessible in production:
+# - May contain test credentials
+# - Expose application logic
+# - Reveal security testing methods
+# - Can be used to discover vulnerabilities
+#
+# Tests should only be run via CLI:
+# - php vendor/bin/phpunit
+# - From development environment only
+#########################################################

@@ -74,7 +74,8 @@ ini_set('error_log', 'php://stderr');
 // Start session with Render-friendly settings
 if (session_status() === PHP_SESSION_NONE) {
     // Configure session for better Render compatibility
-    ini_set('session.cookie_secure', 1);
+    $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+    ini_set('session.cookie_secure', $isSecure ? 1 : 0);
     ini_set('session.cookie_httponly', 1);
     ini_set('session.use_strict_mode', 1);
     ini_set('session.gc_maxlifetime', 3600); // 1 hour

@@ -4,6 +4,15 @@
  * Handles authentication-related requests (login, logout, registration)
  */
 
+// Load environment variables if not already loaded
+if (!isset($_ENV['DB_NAME'])) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+    if (file_exists(__DIR__ . '/../.env')) {
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv->load();
+    }
+}
+
 // Require necessary classes
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/User.php';

@@ -166,7 +166,11 @@ unset($_SESSION['success'], $_SESSION['error']);
                                                 <a href="/planwise/public/index.php?page=teacher/lesson-plans/view&id=<?php echo $plan['lesson_id'] ?? 0; ?>" class="btn btn-outline-primary">View</a>
                                                 <a href="/planwise/public/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_id'] ?? 0; ?>" class="btn btn-outline-secondary">Edit</a>
                                                 <a href="/planwise/controllers/ExportController.php?action=exportPDF&id=<?php echo $plan['lesson_id'] ?? 0; ?>" class="btn btn-outline-info">PDF</a>
-                                                <button onclick="deletePlan(<?php echo $plan['lesson_id'] ?? 0; ?>)" class="btn btn-outline-danger">Delete</button>
+                                                <form action="/planwise/controllers/LessonPlanController.php?action=delete" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this lesson plan?');">
+                                                    <input type="hidden" name="lesson_id" value="<?php echo $plan['lesson_id'] ?? 0; ?>">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                                                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -180,32 +184,5 @@ unset($_SESSION['success'], $_SESSION['error']);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function deletePlan(id) {
-            if (!confirm('Are you sure you want to delete this lesson plan? This action cannot be undone.')) {
-                return;
-            }
-
-            fetch('/planwise/controllers/LessonPlanController.php?action=delete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ lesson_id: id })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('An error occurred while deleting the lesson plan');
-                console.error(error);
-            });
-        }
-    </script>
 </body>
 </html>

@@ -28,7 +28,8 @@ if ($auth->check()) {
 // Get error and success messages from session
 $error = $_SESSION['error'] ?? '';
 $success = $_SESSION['success'] ?? '';
-unset($_SESSION['error'], $_SESSION['success']);
+$oldInput = $_SESSION['old_input'] ?? [];
+unset($_SESSION['error'], $_SESSION['success'], $_SESSION['old_input']);
 
 // Generate CSRF token
 require_once __DIR__ . '/../../controllers/AuthController.php';
@@ -102,12 +103,10 @@ $csrfToken = AuthController::generateCsrfToken();
                                     id="first_name" 
                                     name="first_name" 
                                     placeholder="Enter your first name"
+                                    value="<?php echo htmlspecialchars($oldInput['first_name'] ?? ''); ?>"
                                     required
                                     autofocus
                                 >
-                                <div class="invalid-feedback">
-                                    Please enter your first name.
-                                </div>
                             </div>
 
                             <!-- Last Name Field -->
@@ -119,11 +118,9 @@ $csrfToken = AuthController::generateCsrfToken();
                                     id="last_name" 
                                     name="last_name" 
                                     placeholder="Enter your last name"
+                                    value="<?php echo htmlspecialchars($oldInput['last_name'] ?? ''); ?>"
                                     required
                                 >
-                                <div class="invalid-feedback">
-                                    Please enter your last name.
-                                </div>
                             </div>
 
                             <!-- Email Field -->
@@ -135,11 +132,9 @@ $csrfToken = AuthController::generateCsrfToken();
                                     id="email" 
                                     name="email" 
                                     placeholder="Enter your email"
+                                    value="<?php echo htmlspecialchars($oldInput['email'] ?? ''); ?>"
                                     required
                                 >
-                                <div class="invalid-feedback">
-                                    Please enter a valid email address.
-                                </div>
                             </div>
 
                             <!-- Password Field -->
@@ -221,39 +216,6 @@ $csrfToken = AuthController::generateCsrfToken();
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Custom Validation Script -->
-    <script>
-        (function() {
-            'use strict';
-            
-            const form = document.getElementById('registerForm');
-            const password = document.getElementById('password');
-            const passwordConfirm = document.getElementById('password_confirm');
-            
-            // Custom password match validation
-            function validatePasswordMatch() {
-                if (password.value !== passwordConfirm.value) {
-                    passwordConfirm.setCustomValidity('Passwords do not match');
-                } else {
-                    passwordConfirm.setCustomValidity('');
-                }
-            }
-            
-            password.addEventListener('change', validatePasswordMatch);
-            passwordConfirm.addEventListener('keyup', validatePasswordMatch);
-            
-            // Form submission validation
-            form.addEventListener('submit', function(event) {
-                validatePasswordMatch();
-                
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                
-                form.classList.add('was-validated');
-            }, false);
-        })();
-    </script>
+
 </body>
 </html>

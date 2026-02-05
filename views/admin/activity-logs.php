@@ -171,9 +171,9 @@ unset($_SESSION['success'], $_SESSION['error']);
                     <h1 class="h2"><i class="fas fa-history me-2"></i>Activity Logs</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportLogs()">
+                            <a href="?<?php echo http_build_query(array_merge($_GET, ['export' => 'csv'])); ?>" class="btn btn-sm btn-outline-secondary">
                                 <i class="fas fa-download me-1"></i> Export
-                            </button>
+                            </a>
                             <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cleanupModal">
                                 <i class="fas fa-trash me-1"></i> Cleanup Old
                             </button>
@@ -388,58 +388,19 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <input type="number" class="form-control" id="cleanupDays" value="90" min="1" max="365">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" onclick="cleanupLogs()">Cleanup Now</button>
-                </div>
+                <form action="/planwise/controllers/ActivityLogController.php?action=cleanup" method="POST" onsubmit="return confirm('Are you sure? This cannot be undone.');">
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="cleanup" class="btn btn-danger">Cleanup Now</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
     
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- AJAX Handler -->
-    <script src="/planwise/public/js/ajax-handler.js"></script>
-    <script>
-        function cleanupLogs() {
-            const days = document.getElementById('cleanupDays').value;
-            
-            if (days < 1 || days > 365) {
-                alert('Please enter a value between 1 and 365');
-                return;
-            }
-            
-            if (!confirm('Are you sure you want to delete logs older than ' + days + ' days? This action cannot be undone.')) {
-                return;
-            }
-            
-            const formData = new FormData();
-            formData.append('days', days);
-            
-            fetch('/planwise/public/ActivityLogController.php?action=cleanup', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('An error occurred: ' + error.message);
-            });
-        }
-        
-        function exportLogs() {
-            const params = new URLSearchParams(window.location.search);
-            params.set('export', 'csv');
-            window.location.href = '?' + params.toString();
-        }
-    </script>
 </body>
 </html>
 

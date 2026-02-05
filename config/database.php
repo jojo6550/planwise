@@ -6,11 +6,11 @@
 
 return [
     'driver' => 'mysql',
-    'host' => $_ENV['DB_HOST'] ?? null,
+    'host' => $_ENV['DB_HOST'] ?? 'localhost',
     'port' => $_ENV['DB_PORT'] ?? '3306',
-    'database' => $_ENV['DB_NAME'] ?? null,
-    'username' => $_ENV['DB_USER'] ?? null,
-    'password' => $_ENV['DB_PASS'] ?? null,
+    'database' => $_ENV['DB_NAME'] ?? 'planwise_db',
+    'username' => $_ENV['DB_USER'] ?? 'root',
+    'password' => $_ENV['DB_PASS'] ?? '',
     'charset' => 'utf8mb4',
     'collation' => 'utf8mb4_unicode_ci',
     'options' => [

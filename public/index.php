@@ -4,6 +4,11 @@
  * Handles routing and includes appropriate views
  */
 
+// Load environment variables
+require_once __DIR__ . '/../vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
 // Global error handler for production
 function errorHandler($errno, $errstr, $errfile, $errline) {
     // Log error to stderr for Render visibility

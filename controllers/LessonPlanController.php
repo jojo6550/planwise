@@ -37,37 +37,31 @@ class LessonPlanController
     }
 
     /**
-     * Create a new lesson plan (supports both AJAX and regular POST)
+     * Create a new lesson plan
      */
     public function create()
     {
         if (!$this->auth->check()) {
-            if ($this->isAjaxRequest()) {
-                $this->jsonResponse(['success' => false, 'message' => 'Please login to create lesson plans'], 401);
-                return;
-            }
             $this->redirectWithError('Please login to create lesson plans', 'login');
             return;
         }
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            if ($this->isAjaxRequest()) {
-                $this->jsonResponse(['success' => false, 'message' => 'Invalid request method'], 400);
-                return;
-            }
             $this->redirectWithError('Invalid request method', 'teacher/lesson-plans');
             return;
         }
 
-        // Get input data (support both AJAX and form data)
-        $inputData = $this->isAjaxRequest() ? json_decode(file_get_contents('php://input'), true) : $_POST;
+        // Handle "Add Section" logic before processing save
+        if (isset($_POST['add_section'])) {
+            $this->handleSessionState($_POST);
+            header("Location: /planwise/public/index.php?page=teacher/lesson-plans/create");
+            exit();
+        }
 
-        // Validate CSRF token for non-AJAX requests
-        if (!$this->isAjaxRequest() && !$this->validateCsrfToken($inputData['csrf_token'] ?? '')) {
-            if ($this->isAjaxRequest()) {
-                $this->jsonResponse(['success' => false, 'message' => 'Invalid security token'], 403);
-                return;
-            }
+        $inputData = $_POST;
+
+        // Validate CSRF token
+        if (!$this->validateCsrfToken($inputData['csrf_token'] ?? '')) {
             $this->redirectWithError('Invalid security token', 'teacher/lesson-plans');
             return;
         }
@@ -106,10 +100,8 @@ class LessonPlanController
 
         if (!$validator->validate($data, $validationRules)) {
             $errors = $validator->getAllErrors();
-            if ($this->isAjaxRequest()) {
-                $this->jsonResponse(['success' => false, 'message' => 'Validation failed', 'errors' => $errors], 400);
-                return;
-            }
+            $_SESSION['errors'] = $errors;
+            $_SESSION['old_input'] = $inputData;
             $this->redirectWithError(implode(', ', $errors), 'teacher/lesson-plans/create');
             return;
         }
@@ -177,22 +169,35 @@ class LessonPlanController
                 "Created lesson plan: {$data['title']}"
             );
 
-            if ($this->isAjaxRequest()) {
-                $this->jsonResponse([
-                    'success' => true,
-                    'message' => 'Lesson plan created successfully',
-                    'lesson_id' => $lessonPlanId
-                ]);
-                return;
-            }
-
+            unset($_SESSION['old_input']);
             $this->redirectWithSuccess('Lesson plan created successfully', 'teacher/lesson-plans');
         } else {
-            if ($this->isAjaxRequest()) {
-                $this->jsonResponse(['success' => false, 'message' => $result['message']], 400);
-                return;
-            }
             $this->redirectWithError($result['message'], 'teacher/lesson-plans/create');
+        }
+    }
+
+    /**
+     * Handle Session State for non-JS dynamic forms
+     */
+    private function handleSessionState(array $data)
+    {
+        $_SESSION['old_input'] = $data;
+        if (isset($data['add_section'])) {
+            $sections = $data['sections'] ?? [];
+            $nextIndex = count($sections) + 1;
+            $_SESSION['old_input']['sections'][$nextIndex] = [
+                'section_type' => 'introduction',
+                'title' => '',
+                'content' => '',
+                'duration' => 0,
+                'order_position' => $nextIndex
+            ];
+        }
+        if (isset($data['remove_section'])) {
+            $indexToRemove = $data['remove_section'];
+            if (isset($_SESSION['old_input']['sections'][$indexToRemove])) {
+                unset($_SESSION['old_input']['sections'][$indexToRemove]);
+            }
         }
     }
 
@@ -252,27 +257,25 @@ class LessonPlanController
     }
 
     /**
-     * Delete a lesson plan (AJAX)
+     * Delete a lesson plan
      */
     public function delete()
     {
         if (!$this->auth->check()) {
-            $this->jsonResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+            $this->redirectWithError('Unauthorized', 'teacher/lesson-plans');
             return;
         }
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->jsonResponse(['success' => false, 'message' => 'Invalid request method'], 400);
+            $this->redirectWithError('Invalid request method', 'teacher/lesson-plans');
             return;
         }
 
-        // Get JSON input
-        $input = json_decode(file_get_contents('php://input'), true);
-        $lessonPlanId = (int)($input['lesson_id'] ?? 0);
+        $lessonPlanId = (int)($_POST['lesson_id'] ?? 0);
         $userId = $this->auth->id();
 
         if ($lessonPlanId <= 0) {
-            $this->jsonResponse(['success' => false, 'message' => 'Invalid lesson plan ID'], 400);
+            $this->redirectWithError('Invalid lesson plan ID', 'teacher/lesson-plans');
             return;
         }
 
@@ -281,14 +284,11 @@ class LessonPlanController
 
         if ($result['success']) {
             // Log activity
-            $this->activityLog->log(
-                $userId,
-                'lesson_plan_deleted',
-                "Deleted lesson plan ID: {$lessonPlanId}"
-            );
+            $this->activityLog->log($userId, 'lesson_plan_deleted', "Deleted lesson plan ID: {$lessonPlanId}");
+            $this->redirectWithSuccess('Lesson plan deleted successfully', 'teacher/lesson-plans');
+        } else {
+            $this->redirectWithError($result['message'], 'teacher/lesson-plans');
         }
-
-        $this->jsonResponse($result);
     }
 
     /**

@@ -254,7 +254,19 @@ $qr = $qrCode->getByLessonPlanId($lessonPlanId);
                 },
                 body: JSON.stringify({ lesson_id: lessonId })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        try {
+                            const data = JSON.parse(text);
+                            throw new Error(data.message || 'Unauthorized access');
+                        } catch (e) {
+                            throw new Error('Server returned error: ' + text);
+                        }
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     // Reload the page to show the new QR code
@@ -264,7 +276,7 @@ $qr = $qrCode->getByLessonPlanId($lessonPlanId);
                 }
             })
             .catch(error => {
-                alert('An error occurred while generating the QR code');
+                alert('Error: ' + error.message);
                 console.error(error);
             })
             .finally(() => {
@@ -289,7 +301,19 @@ $qr = $qrCode->getByLessonPlanId($lessonPlanId);
                 },
                 body: JSON.stringify({ lesson_id: lessonId })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        try {
+                            const data = JSON.parse(text);
+                            throw new Error(data.message || 'Unauthorized access');
+                        } catch (e) {
+                            throw new Error('Server returned error: ' + text);
+                        }
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     // Reload the page to show the new QR code
@@ -299,7 +323,7 @@ $qr = $qrCode->getByLessonPlanId($lessonPlanId);
                 }
             })
             .catch(error => {
-                alert('An error occurred while regenerating the QR code');
+                alert('Error: ' + error.message);
                 console.error(error);
             })
             .finally(() => {

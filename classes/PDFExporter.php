@@ -38,12 +38,12 @@ class PDFExporter
      * Generate PDF for a lesson plan
      *
      * @param int $lessonPlanId Lesson plan ID
-     * @param int $userId User ID for authorization
+     * @param int|null $userId User ID for authorization (null for public access via QR)
      * @param bool $download Whether to download or save
      * @param bool $inline Whether to display inline in browser
      * @return array Result with file path or download status
      */
-    public function generateLessonPlanPDF(int $lessonPlanId, int $userId, bool $download = true, bool $inline = false): array
+    public function generateLessonPlanPDF(int $lessonPlanId, ?int $userId, bool $download = true, bool $inline = false): array
     {
         try {
             // Get lesson plan data
@@ -104,6 +104,14 @@ class PDFExporter
             if ($download) {
                 // Output PDF for download
                 $pdf->Output($fileName, 'D');
+                return [
+                    'success' => true,
+                    'message' => 'PDF generated successfully'
+                ];
+            } elseif ($inline) {
+                // Output PDF for inline display in browser
+                // This is used for QR code access
+                $pdf->Output($fileName, 'I');
                 return [
                     'success' => true,
                     'message' => 'PDF generated successfully'

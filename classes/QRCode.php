@@ -37,8 +37,9 @@ class QRCode
                 ];
             }
 
-            // Generate QR code data (URL to export lesson plan as PDF inline)
-            $qrData = "/planwise/controllers/ExportController.php?action=exportPDF&id=" . $lessonPlanId . "&inline=1";
+            // Generate QR code data (Absolute URL to export lesson plan as PDF inline)
+            // Scanners require an absolute URL to navigate correctly
+            $qrData = $this->getBaseUrl() . "/planwise/controllers/ExportController.php?action=exportPDF&id=" . $lessonPlanId . "&inline=1";
 
             // Generate unique filename for QR image
             $fileName = 'qr_' . $lessonPlanId . '_' . time() . '.png';
@@ -125,5 +126,15 @@ class QRCode
             error_log("Get QR code failed: " . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * Helper to get base URL
+     */
+    private function getBaseUrl(): string
+    {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        return "{$protocol}://{$host}";
     }
 }

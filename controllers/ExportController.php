@@ -50,6 +50,9 @@ class ExportController
     {
         $lessonPlanId = (int)($_GET['id'] ?? 0);
         $inline = isset($_GET['inline']) && $_GET['inline'] == '1';
+        
+        // If it's an inline export (accessed via QR code), we allow null userId
+        // Authorization is handled inside the exporter by checking the lesson plan
         $userId = $inline ? null : $this->auth->id();
 
         if ($lessonPlanId <= 0) {

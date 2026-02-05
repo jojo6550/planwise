@@ -113,6 +113,10 @@ class LessonPlan
             if ($userId !== null) {
                 $sql .= " AND lp.user_id = :user_id";
                 $params[':user_id'] = $userId;
+            } else {
+                // If no userId is provided (public access), ensure the plan is published
+                // This prevents scanning QR codes for draft or archived plans
+                $sql .= " AND lp.status = 'published'";
             }
 
             $result = $this->db->fetch($sql, $params);

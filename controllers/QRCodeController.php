@@ -4,7 +4,17 @@
  * Handles QR code generation and management for lesson plans
  */
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    // Configure session for better Render compatibility
+    $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+    ini_set('session.cookie_secure', $isSecure ? 1 : 0);
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.gc_maxlifetime', 3600); // 1 hour
+    ini_set('session.cookie_lifetime', 0); // Session cookie
+
+    session_start();
+}
 
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/Auth.php';
@@ -27,11 +37,12 @@ class QRCodeController
         $this->qrCode = new QRCode();
         $this->activityLog = new ActivityLog();
 
-        // Require authentication
-        if (!$this->auth->check()) {
-            http_response_code(401);
-            echo 'Unauthorized access';
-            exit();
+        // Require authentication for all actions except 'display'
+        $action = $_GET['action'] ?? '';
+        if ($action !== 'display') {
+            if (!$this->auth->check()) {
+                $this->jsonResponse(['success' => false, 'message' => 'Unauthorized access'], 401);
+            }
         }
     }
 

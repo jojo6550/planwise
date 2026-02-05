@@ -127,17 +127,24 @@ class LessonPlanController
             $this->qrCode->generate($lessonPlanId);
 
             // Create sections if provided - demonstrate foreach loop
-            if (isset($inputData['sections']) && is_array($inputData['sections'])) {
+            if (isset($inputData['sections']) && is_array($inputData['sections']) && count($inputData['sections']) > 0) {
                 $sectionCount = 0;
-                foreach ($inputData['sections'] as $sectionData) {
+                foreach ($inputData['sections'] as $sectionKey => $sectionData) {
+                    // Ensure sectionData is an array
+                    if (!is_array($sectionData)) {
+                        error_log("Section data is not an array for key: {$sectionKey}");
+                        continue;
+                    }
+                    
+                    // Only create section if it has a title
                     if (!empty($sectionData['title'])) {
                         $sectionResult = $this->lessonSection->create([
                             'lesson_id' => $lessonPlanId,
-                            'section_type' => $sectionData['section_type'] ?? 'introduction',
+                            'section_type' => isset($sectionData['section_type']) ? $sectionData['section_type'] : 'introduction',
                             'title' => $this->sanitize($sectionData['title']),
-                            'content' => $this->sanitize($sectionData['content'] ?? ''),
-                            'duration' => $sectionData['duration'] ?? null,
-                            'order_position' => $sectionData['order_position'] ?? 0
+                            'content' => isset($sectionData['content']) ? $this->sanitize($sectionData['content']) : '',
+                            'duration' => isset($sectionData['duration']) && $sectionData['duration'] !== '' ? (int)$sectionData['duration'] : null,
+                            'order_position' => isset($sectionData['order_position']) && $sectionData['order_position'] !== '' ? (int)$sectionData['order_position'] : 0
                         ]);
                         if (!$sectionResult['success']) {
                             // Log error but continue
@@ -149,16 +156,18 @@ class LessonPlanController
                 }
 
                 // Demonstrate while loop - log section creation count
-                $logMessage = "Created lesson plan with {$sectionCount} sections";
-                $i = 0;
-                while ($i < $sectionCount && $i < 5) { // Log up to 5 sections
-                    $logMessage .= " (section " . ($i + 1) . ")";
-                    $i++;
+                if ($sectionCount > 0) {
+                    $logMessage = "Created lesson plan with {$sectionCount} sections";
+                    $i = 0;
+                    while ($i < $sectionCount && $i < 5) { // Log up to 5 sections
+                        $logMessage .= " (section " . ($i + 1) . ")";
+                        $i++;
+                    }
+                    if ($sectionCount > 5) {
+                        $logMessage .= " and " . ($sectionCount - 5) . " more";
+                    }
+                    $this->activityLog->log($userId, 'lesson_plan_sections_created', $logMessage);
                 }
-                if ($sectionCount > 5) {
-                    $logMessage .= " and " . ($sectionCount - 5) . " more";
-                }
-                $this->activityLog->log($userId, 'lesson_plan_sections_created', $logMessage);
             }
 
             // Log activity

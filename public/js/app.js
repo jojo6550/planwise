@@ -236,7 +236,7 @@ const PlanWise = {
      */
     handleAjaxFormSubmit: function(form) {
         const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
+        const data = this.formDataToObject(formData);
         const url = form.action;
         const method = form.method.toUpperCase();
 
@@ -270,6 +270,48 @@ const PlanWise = {
             .catch(error => {
                 this.showError('An error occurred. Please try again.');
             });
+    },
+
+    /**
+     * Convert FormData to nested object (handles array notation)
+     */
+    formDataToObject: function(formData) {
+        const object = {};
+        
+        formData.forEach((value, key) => {
+            // Handle array notation like sections[0][title]
+            const matches = key.match(/^([^\[]+)(\[.+\])$/);
+            
+            if (matches) {
+                const baseName = matches[1];
+                const keys = matches[2].match(/\[([^\]]+)\]/g).map(k => k.slice(1, -1));
+                
+                // Initialize base object/array if needed
+                if (!object[baseName]) {
+                    object[baseName] = isNaN(keys[0]) ? {} : [];
+                }
+                
+                // Navigate through nested structure
+                let current = object[baseName];
+                for (let i = 0; i < keys.length - 1; i++) {
+                    const currentKey = keys[i];
+                    const nextKey = keys[i + 1];
+                    
+                    if (!current[currentKey]) {
+                        current[currentKey] = isNaN(nextKey) ? {} : [];
+                    }
+                    current = current[currentKey];
+                }
+                
+                // Set the final value
+                current[keys[keys.length - 1]] = value;
+            } else {
+                // Simple key-value pair
+                object[key] = value;
+            }
+        });
+        
+        return object;
     },
 
     /**

@@ -1,0 +1,12 @@
+[2026-02-05 03:02:02] Database connection established successfully to localhost:3306/planwise_db
+[2026-02-05 03:02:02] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:02] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:12] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:13] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:13] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:15] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:15] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:21] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:21] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:24] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)
+[2026-02-05 03:02:24] Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'planwise' (Host: localhost, Port: 3306, DB: planwise)

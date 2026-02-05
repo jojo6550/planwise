@@ -117,7 +117,8 @@ class Database
     public function query($sql, $params = [])
     {
         try {
-            $stmt = $this->pdo->prepare($sql);
+            $conn = $this->getConnection();
+            $stmt = $conn->prepare($sql);
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
@@ -164,7 +165,8 @@ class Database
         error_log("Database::insert - SQL: " . $sql);
         error_log("Database::insert - Params: " . json_encode($params));
         $this->query($sql, $params);
-        $lastId = $this->pdo->lastInsertId();
+        $conn = $this->getConnection();
+        $lastId = $conn->lastInsertId();
         error_log("Database::insert - Last insert ID: " . $lastId);
         return $lastId;
     }
@@ -200,7 +202,8 @@ class Database
      */
     public function beginTransaction()
     {
-        return $this->pdo->beginTransaction();
+        $conn = $this->getConnection();
+        return $conn->beginTransaction();
     }
 
     /**
@@ -208,7 +211,8 @@ class Database
      */
     public function commit()
     {
-        return $this->pdo->commit();
+        $conn = $this->getConnection();
+        return $conn->commit();
     }
 
     /**
@@ -216,7 +220,8 @@ class Database
      */
     public function rollback()
     {
-        return $this->pdo->rollBack();
+        $conn = $this->getConnection();
+        return $conn->rollBack();
     }
 
     /**

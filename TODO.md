@@ -5,4 +5,4 @@
 - [x] Add custom exception handler in public/index.php
 - [x] Create views/errors/database.php for user-friendly error page
 - [ ] Test changes locally
-- [ ] Provide Render deployment instructions
+- [x] Removed Docker and Render deployment files (XAMPP native deployment)

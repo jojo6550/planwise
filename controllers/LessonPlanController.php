@@ -24,6 +24,7 @@ require_once __DIR__ . '/../classes/LessonSection.php';
 require_once __DIR__ . '/../classes/ActivityLog.php';
 require_once __DIR__ . '/../classes/Validator.php';
 require_once __DIR__ . '/../classes/QRCode.php';
+require_once __DIR__ . '/../classes/Mail.php';
 
 class LessonPlanController
 {
@@ -32,6 +33,7 @@ class LessonPlanController
     private $lessonSection;
     private $activityLog;
     private $qrCode;
+    private $mail;
 
     /**
      * Constructor
@@ -43,6 +45,7 @@ class LessonPlanController
         $this->lessonSection = new LessonSection();
         $this->activityLog = new ActivityLog();
         $this->qrCode = new QRCode();
+        $this->mail = new Mail();
     }
 
     /**
@@ -625,6 +628,166 @@ class LessonPlanController
     }
 
     /**
+     * Email a lesson plan to a single recipient
+     * POST request with: lesson_id, recipient_email, recipient_name, message
+     * CS334 Module 2 - PHP Mail (10 marks)
+     */
+    public function emailLesson()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->jsonResponse(['success' => false, 'message' => 'Invalid request method'], 400);
+            return;
+        }
+
+        if (!$this->auth->check()) {
+            $this->jsonResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+            return;
+        }
+
+        try {
+            // Get JSON input
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            // Validate input
+            $lessonId = (int)($input['lesson_id'] ?? 0);
+            $recipientEmail = trim($input['recipient_email'] ?? '');
+            $recipientName = trim($input['recipient_name'] ?? 'Colleague');
+            $message = trim($input['message'] ?? '');
+
+            if ($lessonId <= 0) {
+                $this->jsonResponse(['success' => false, 'message' => 'Invalid lesson ID'], 400);
+                return;
+            }
+
+            if (empty($recipientEmail) || !filter_var($recipientEmail, FILTER_VALIDATE_EMAIL)) {
+                $this->jsonResponse(['success' => false, 'message' => 'Invalid recipient email'], 400);
+                return;
+            }
+
+            // Get lesson plan (with user authorization check)
+            $lessonData = $this->lessonPlan->getById($lessonId, $this->auth->id());
+            if (!$lessonData) {
+                $this->jsonResponse(['success' => false, 'message' => 'Lesson plan not found or unauthorized'], 404);
+                return;
+            }
+
+            // Get sender information
+            $sender = $this->auth->user();
+
+            // Send email
+            $result = $this->mail->sendLessonPlanEmail(
+                $lessonData,
+                $sender,
+                $recipientEmail,
+                $recipientName,
+                $message
+            );
+
+            // Log activity
+            $this->activityLog->log(
+                $this->auth->id(),
+                'lesson_plan_emailed',
+                "Sent lesson plan '{$lessonData['title']}' to {$recipientEmail}"
+            );
+
+            if ($result['success']) {
+                $this->jsonResponse(['success' => true, 'message' => 'Lesson plan sent successfully']);
+            } else {
+                $this->jsonResponse(['success' => false, 'message' => $result['message']], 500);
+            }
+
+        } catch (Exception $e) {
+            error_log("Email lesson plan failed: " . $e->getMessage());
+            $this->jsonResponse(['success' => false, 'message' => 'Failed to send lesson plan'], 500);
+        }
+    }
+
+    /**
+     * Email a lesson plan to multiple recipients
+     * POST request with: lesson_id, recipients (array), message
+     * CS334 Module 2 - PHP Mail (10 marks)
+     */
+    public function emailLessonMultiple()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->jsonResponse(['success' => false, 'message' => 'Invalid request method'], 400);
+            return;
+        }
+
+        if (!$this->auth->check()) {
+            $this->jsonResponse(['success' => false, 'message' => 'Unauthorized'], 401);
+            return;
+        }
+
+        try {
+            // Get JSON input
+            $input = json_decode(file_get_contents('php://input'), true);
+
+            // Validate input
+            $lessonId = (int)($input['lesson_id'] ?? 0);
+            $recipients = $input['recipients'] ?? [];
+            $message = trim($input['message'] ?? '');
+
+            if ($lessonId <= 0) {
+                $this->jsonResponse(['success' => false, 'message' => 'Invalid lesson ID'], 400);
+                return;
+            }
+
+            if (!is_array($recipients) || empty($recipients)) {
+                $this->jsonResponse(['success' => false, 'message' => 'No recipients specified'], 400);
+                return;
+            }
+
+            // Get lesson plan (with user authorization check)
+            $lessonData = $this->lessonPlan->getById($lessonId, $this->auth->id());
+            if (!$lessonData) {
+                $this->jsonResponse(['success' => false, 'message' => 'Lesson plan not found or unauthorized'], 404);
+                return;
+            }
+
+            // Get sender information
+            $sender = $this->auth->user();
+
+            // Validate and sanitize recipients
+            $validRecipients = [];
+            foreach ($recipients as $recipient) {
+                if (isset($recipient['email']) && filter_var($recipient['email'], FILTER_VALIDATE_EMAIL)) {
+                    $validRecipients[] = [
+                        'email' => $recipient['email'],
+                        'name' => htmlspecialchars($recipient['name'] ?? 'Colleague')
+                    ];
+                }
+            }
+
+            if (empty($validRecipients)) {
+                $this->jsonResponse(['success' => false, 'message' => 'No valid recipients'], 400);
+                return;
+            }
+
+            // Send to multiple recipients
+            $result = $this->mail->sendLessonPlanToMultiple(
+                $lessonData,
+                $sender,
+                $validRecipients,
+                $message
+            );
+
+            // Log activity
+            $this->activityLog->log(
+                $this->auth->id(),
+                'lesson_plan_emailed_multiple',
+                "Sent lesson plan '{$lessonData['title']}' to {$result['success_count']} recipient(s)"
+            );
+
+            $this->jsonResponse($result);
+
+        } catch (Exception $e) {
+            error_log("Email lesson plan to multiple recipients failed: " . $e->getMessage());
+            $this->jsonResponse(['success' => false, 'message' => 'Failed to send lesson plan'], 500);
+        }
+    }
+
+    /**
      * Send JSON response
      */
     private function jsonResponse(array $data, int $statusCode = 200)
@@ -676,6 +839,12 @@ if (basename($_SERVER['PHP_SELF']) === 'LessonPlanController.php') {
                 http_response_code(400);
                 echo json_encode(['success' => false, 'message' => 'Invalid ID']);
             }
+            break;
+        case 'emailLesson':
+            $controller->emailLesson();
+            break;
+        case 'emailLessonMultiple':
+            $controller->emailLessonMultiple();
             break;
         default:
             http_response_code(404);

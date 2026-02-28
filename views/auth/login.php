@@ -137,7 +137,7 @@ $csrfToken = AuthController::generateCsrfToken();
 
                             <!-- Forgot Password Link -->
                             <div class="text-center mb-3">
-                                <a href="/public/index.php?page=forgot-password" class="text-decoration-none">
+                                <a href="/planwise/public/index.php?page=forgot-password" class="text-decoration-none">
                                     Forgot your password?
                                 </a>
                             </div>

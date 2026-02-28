@@ -19,6 +19,7 @@ require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/ActivityLog.php';
 require_once __DIR__ . '/../classes/PasswordReset.php';
+require_once __DIR__ . '/../classes/Mail.php';
 
 class AuthController
 {
@@ -318,6 +319,8 @@ class AuthController
      */
     public function forgotPassword()
     {
+        error_log("=== FORGOT PASSWORD REQUEST START ===");
+        
         // Check if request method is POST
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirectWithError('Invalid request method', 'forgot-password');
@@ -332,6 +335,7 @@ class AuthController
 
         // Get and sanitize email
         $email = $this->sanitizeInput($_POST['email'] ?? '');
+        error_log("FORGOT PASSWORD: Email input: " . $email);
 
         if (empty($email)) {
             $this->redirectWithError('Email is required', 'forgot-password');
@@ -344,17 +348,59 @@ class AuthController
         }
 
         // Generate reset token
+        error_log("FORGOT PASSWORD: Generating token for: " . $email);
         $result = $this->passwordReset->generateToken($email);
 
         if ($result['success']) {
-            // In a real application, send email with reset link
-            // For now, store token in session for demo purposes
+            error_log("FORGOT PASSWORD: Token generated successfully");
+            error_log("FORGOT PASSWORD: Token: " . substr($result['token'], 0, 10) . "...");
+            
+            // Send password reset email
+            $mail = new Mail();
+            
+            // Get user info for the email
+            $user = new User();
+            $userData = $user->findByEmail($email);
+            
+            if ($userData) {
+                error_log("FORGOT PASSWORD: User found, sending email...");
+                
+                // Send the password reset email
+                $mailResult = $mail->sendPasswordResetEmail($userData, $result['token']);
+                
+                error_log("FORGOT PASSWORD: Mail result: " . json_encode($mailResult));
+                
+                if (!$mailResult['success']) {
+                    // Log the error but don't reveal to user (security)
+                    error_log("FORGOT PASSWORD: FAILED TO SEND EMAIL - " . $mailResult['message']);
+                    // For debugging - show error in development mode
+                    if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                        $_SESSION['debug'] = "Email sending failed: " . $mailResult['message'];
+                    }
+                }
+            } else {
+                error_log("FORGOT PASSWORD: User not found for email: " . $email);
+            }
+
+            // Still store in session for demo purposes (but email should work now)
             $_SESSION['reset_token'] = $result['token'];
             $_SESSION['reset_email'] = $result['email'];
+            
+            // For DEBUG MODE - show the reset link directly (for testing)
+            if (defined('DEBUG_MODE') && DEBUG_MODE) {
+                $resetUrl = ($_ENV['APP_URL'] ?? 'http://localhost/planwise/public/') . 'index.php?page=reset-password&token=' . $result['token'];
+                $_SESSION['debug_reset_link'] = $resetUrl;
+                error_log("FORGOT PASSWORD: DEBUG MODE - Reset URL: " . $resetUrl);
+            }
 
+            error_log("FORGOT PASSWORD REQUEST END ===");
+            
+            // Always show success message to prevent email enumeration
             $this->redirectWithSuccess('Password reset link has been sent to your email. Check your email for the reset link.', 'login');
         } else {
-            $this->redirectWithError($result['message'], 'forgot-password');
+            error_log("FORGOT PASSWORD: Token generation failed - " . ($result['message'] ?? 'Unknown error'));
+            // Show same message to prevent email enumeration
+            $this->redirectWithSuccess('If that email exists in our system, a password reset link has been sent to it.', 'login');
         }
     }
 

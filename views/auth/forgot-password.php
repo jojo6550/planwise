@@ -1,0 +1,152 @@
+<?php
+/**
+ * Forgot Password Page
+ * Password reset request form
+ */
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Redirect if already authenticated
+require_once __DIR__ . '/../../classes/Database.php';
+require_once __DIR__ . '/../../classes/User.php';
+require_once __DIR__ . '/../../classes/Auth.php';
+
+$auth = new Auth();
+if ($auth->check()) {
+    $user = $auth->user();
+    if ($user['role_id'] == 1) {
+        header('Location: /planwise/public/index.php?page=admin/dashboard');
+    } else {
+        header('Location: /planwise/public/index.php?page=teacher/dashboard');
+    }
+    exit();
+}
+
+// Get error and success messages from session
+$error = $_SESSION['error'] ?? '';
+$success = $_SESSION['success'] ?? '';
+unset($_SESSION['error'], $_SESSION['success']);
+
+// Generate CSRF token
+require_once __DIR__ . '/../../controllers/AuthController.php';
+$csrfToken = AuthController::generateCsrfToken();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password - PlanWise</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/planwise/public/css/style.css">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-5 col-lg-4">
+                <!-- Forgot Password Card -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <!-- Logo/Brand -->
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold text-primary">PlanWise</h2>
+                            <p class="text-muted">Lesson Plan Builder</p>
+                        </div>
+
+                        <!-- Heading -->
+                        <h4 class="text-center mb-4">Forgot Password</h4>
+                        <p class="text-center text-muted mb-4">
+                            Enter your email address and we'll send you a link to reset your password.
+                        </p>
+
+                        <!-- Success Alert -->
+                        <?php if (!empty($success)): ?>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <?php echo htmlspecialchars($success); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Error Alert -->
+                        <?php if (!empty($error)): ?>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <?php echo htmlspecialchars($error); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Forgot Password Form -->
+                        <form method="POST" action="/planwise/controllers/AuthController.php?action=forgot-password" id="forgotPasswordForm">
+                            <!-- CSRF Token -->
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
+
+                            <!-- Email Field -->
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input 
+                                    type="email" 
+                                    class="form-control" 
+                                    id="email" 
+                                    name="email" 
+                                    placeholder="Enter your email"
+                                    required
+                                    autofocus
+                                >
+                                <div class="invalid-feedback">
+                                    Please enter a valid email address.
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    Send Reset Link
+                                </button>
+                            </div>
+
+                            <!-- Back to Login Link -->
+                            <div class="text-center">
+                                <a href="/planwise/public/index.php?page=login" class="text-decoration-none">
+                                    Back to Login
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Footer Text -->
+                <p class="text-center text-muted mt-4">
+                    &copy; <?php echo date('Y'); ?> PlanWise. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom Validation Script -->
+    <script>
+        // Form validation
+        (function() {
+            'use strict';
+            
+            const form = document.getElementById('forgotPasswordForm');
+            
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        })();
+    </script>
+</body>
+</html>

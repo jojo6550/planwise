@@ -48,12 +48,12 @@ class PasswordReset
             $this->cleanupExpiredTokens($user['user_id']);
 
             // Insert new reset token
-            $sql = "INSERT INTO password_resets (user_id, reset_token, expires_at, created_at)
-                    VALUES (:user_id, :reset_token, :expires_at, NOW())";
+            $sql = "INSERT INTO password_resets (user_id, token, expires_at, created_at)
+                    VALUES (:user_id, :token, :expires_at, NOW())";
 
             $params = [
                 ':user_id' => $user['user_id'],
-                ':reset_token' => $token,
+                ':token' => $token,
                 ':expires_at' => $expiresAt
             ];
 
@@ -88,8 +88,7 @@ class PasswordReset
             $sql = "SELECT pr.*, u.email, u.first_name, u.last_name
                     FROM password_resets pr
                     JOIN users u ON pr.user_id = u.user_id
-                    WHERE pr.reset_token = :token
-                    AND pr.used = FALSE
+                    WHERE pr.token = :token
                     AND pr.expires_at > NOW()
                     LIMIT 1";
 
@@ -150,9 +149,9 @@ class PasswordReset
                 ':user_id' => $userId
             ]);
 
-            // Mark token as used
-            $sql = "UPDATE password_resets SET used = TRUE WHERE reset_token = :token";
-            $this->db->update($sql, [':token' => $token]);
+            // Mark token as used (delete it instead since there's no used column)
+            $sql = "DELETE FROM password_resets WHERE token = :token";
+            $this->db->delete($sql, [':token' => $token]);
 
             // Clean up expired tokens
             $this->cleanupExpiredTokens($userId);
@@ -182,7 +181,7 @@ class PasswordReset
         try {
             $sql = "DELETE FROM password_resets
                     WHERE user_id = :user_id
-                    AND (expires_at < NOW() OR used = TRUE)";
+                    AND expires_at < NOW()";
 
             $this->db->delete($sql, [':user_id' => $userId]);
 

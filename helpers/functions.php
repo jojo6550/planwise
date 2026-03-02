@@ -52,15 +52,17 @@ function is_logged_in(): bool
  *
  * @return array|null User data or null if not logged in
  */
-function get_current_user(): ?array
-{
-    if (!is_logged_in()) {
-        return null;
+if (!function_exists('get_current_user')) {
+    function get_current_user(): ?array
+    {
+        if (!is_logged_in()) {
+            return null;
+        }
+        
+        require_once __DIR__ . '/../classes/Auth.php';
+        $auth = new Auth();
+        return $auth->user();
     }
-    
-    require_once __DIR__ . '/../classes/Auth.php';
-    $auth = new Auth();
-    return $auth->user();
 }
 
 /**

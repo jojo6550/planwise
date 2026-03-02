@@ -5,14 +5,17 @@
  * CS334 Module 3 - Different access levels (13), Registered users only (12), Custom classes (10)
  */
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+require_once __DIR__ . '/../classes/BaseController.php';
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/ActivityLog.php';
 
-class UserController
+class UserController extends BaseController
 {
     private $auth;
     private $user;
@@ -210,53 +213,8 @@ class UserController
         $this->jsonResponse($result);
     }
 
-    /**
-     * Sanitize input
-     */
-    private function sanitize(string $input): string
-    {
-        return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
-    }
-
-    /**
-     * Validate CSRF token
-     */
-    private function validateCsrfToken(string $token): bool
-    {
-        return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
-    }
-
-    /**
-     * Redirect with error message
-     */
-    private function redirectWithError(string $message, string $page)
-    {
-        $_SESSION['error'] = $message;
-        header("Location: /planwise/public/index.php?page={$page}");
-        exit();
-    }
-
-    /**
-     * Redirect with success message
-     */
-    private function redirectWithSuccess(string $message, string $page)
-    {
-        $_SESSION['success'] = $message;
-        header("Location: /planwise/public/index.php?page={$page}");
-        exit();
-    }
-
-    /**
-     * Send JSON response
-     */
-    private function jsonResponse(array $data, int $statusCode = 200)
-    {
-        http_response_code($statusCode);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit();
-    }
 }
+
 
 // Handle direct requests
 if (basename($_SERVER['PHP_SELF']) === 'UserController.php') {

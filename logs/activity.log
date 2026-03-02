@@ -1,1 +1,5 @@
 [2026-03-02 17:52:47] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-02 18:03:50] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-02 18:03:52] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-02 18:04:37] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-02 18:04:39] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com

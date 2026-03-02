@@ -120,9 +120,10 @@ class ActivityLog
                 }
             }
 
-            // Filter by date range - validate date format
+            // Filter by date range - validate date format (YYYY-MM-DD)
+            // Note: FILTER_SANITIZE_STRING was removed in PHP 8.1; use trim() + regex instead.
             if (!empty($filters['date_from'])) {
-                $dateFrom = filter_var($filters['date_from'], FILTER_SANITIZE_STRING);
+                $dateFrom = trim($filters['date_from']);
                 if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
                     $where[] = "al.created_at >= :date_from";
                     $params[':date_from'] = $dateFrom;
@@ -130,7 +131,7 @@ class ActivityLog
             }
 
             if (!empty($filters['date_to'])) {
-                $dateTo = filter_var($filters['date_to'], FILTER_SANITIZE_STRING);
+                $dateTo = trim($filters['date_to']);
                 if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
                     $where[] = "al.created_at <= :date_to";
                     $params[':date_to'] = $dateTo;

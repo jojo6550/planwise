@@ -5,14 +5,17 @@
  * CS334 Module 3 - Activity logs (10), Different access levels (13)
  */
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+require_once __DIR__ . '/../classes/BaseController.php';
 require_once __DIR__ . '/../classes/Database.php';
 require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/ActivityLog.php';
 
-class ActivityLogController
+class ActivityLogController extends BaseController
 {
     private $auth;
     private $activityLog;
@@ -175,17 +178,8 @@ class ActivityLogController
         ]);
     }
 
-    /**
-     * Send JSON response
-     */
-    private function jsonResponse(array $data, int $statusCode = 200)
-    {
-        http_response_code($statusCode);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit();
-    }
 }
+
 
 // Handle direct requests
 if (basename($_SERVER['PHP_SELF']) === 'ActivityLogController.php') {

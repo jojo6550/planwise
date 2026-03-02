@@ -106,6 +106,7 @@ $validPages = [
     'admin/users/edit' => 'views/admin/users/edit.php',
     'admin/users/view' => 'views/admin/users/view.php',
     'admin/activity-logs' => 'views/admin/activity-logs.php',
+    'admin/import' => 'views/admin/import.php',
     'admin/system-settings' => 'views/admin/system-settings.php',
     '403' => 'views/errors/403.php',
     '404' => 'views/errors/404.php',

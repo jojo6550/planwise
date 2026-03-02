@@ -30,9 +30,8 @@ class DashboardController
     {
         // Check if user is authenticated
         if (!$this->auth->check()) {
-            // Redirect to login if not authenticated
             $_SESSION['error'] = 'Please login to access the dashboard';
-            header('Location: /public/index.php?page=login');
+            header('Location: /planwise/public/index.php?page=login');
             exit();
         }
 
@@ -57,7 +56,7 @@ class DashboardController
     public function teacher()
     {
         // Require authentication
-        $this->auth->requireAuth('/public/index.php?page=login');
+        $this->auth->requireAuth('/planwise/public/index.php?page=login');
 
         // Get current user data
         $user = $this->auth->user();
@@ -77,16 +76,16 @@ class DashboardController
 
     /**
      * Display admin dashboard
-     * 
+     *
      * @return void
      */
     public function admin()
     {
         // Require authentication
-        $this->auth->requireAuth('/public/index.php?page=login');
+        $this->auth->requireAuth('/planwise/public/index.php?page=login');
 
         // Require admin role
-        $this->auth->requireRole(1, '/public/index.php?page=403');
+        $this->auth->requireRole(1, '/planwise/public/index.php?page=403');
 
         // Get current user data
         $user = $this->auth->user();

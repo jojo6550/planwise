@@ -6,9 +6,11 @@
  */
 
 /**
- * Sanitize a string value for safe database use
- * This is a supplementary function - the primary defense is using parameterized queries
- * 
+ * Sanitize a string value for safe database use.
+ * Primary defense against SQL injection is parameterized queries; this is defense-in-depth.
+ * NOTE: Do NOT apply htmlspecialchars here — that causes double-encoding when data is later
+ *       displayed through h() / escapeOutput(). HTML-escaping belongs at the view layer only.
+ *
  * @param mixed $value The value to sanitize
  * @return string Sanitized string
  */
@@ -17,13 +19,12 @@ function sanitizeString($value): string
     if ($value === null) {
         return '';
     }
-    
-    $value = trim($value);
+
+    $value = trim((string)$value);
     $value = stripslashes($value);
-    
-    // Convert special characters to HTML entities
-    $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-    
+    // Remove null bytes that could bypass string comparisons
+    $value = str_replace("\0", '', $value);
+
     return $value;
 }
 

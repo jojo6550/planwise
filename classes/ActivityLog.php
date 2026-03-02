@@ -62,13 +62,14 @@ class ActivityLog
                 ':action' => $action,
                 ':description' => $description,
                 ':ip_address' => $this->getIpAddress(),
-                ':user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown'
+                ':user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ''
             ];
 
             $this->db->insert($sql, $params);
             
-            // Also log to file for backup
-            $this->logToFile($userId, $action, $description);
+            // Also log to file for backup (include description if provided)
+            $logDescription = $description ?: $action;
+            $this->logToFile($userId, $action, $logDescription);
             
             return true;
 
@@ -254,6 +255,13 @@ class ActivityLog
     public function getRecentActivity(int $limit = 10): array
     {
         try {
+            // First check if activity_logs table exists and has required columns
+            $tableCheck = $this->db->fetch("SHOW TABLES LIKE 'activity_logs'");
+            if (!$tableCheck) {
+                error_log("ActivityLog: activity_logs table does not exist");
+                return [];
+            }
+
             $sql = "SELECT al.*, u.first_name, u.last_name, u.email
                     FROM activity_logs al
                     JOIN users u ON al.user_id = u.user_id

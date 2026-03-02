@@ -189,3 +189,21 @@
   Params: {":lesson_id":1001}
   User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
 
+[2026-03-02 16:07:36] [QUERY_FAILED] IP:::1
+  SQL: INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent, created_at)
+                    VALUES (:user_id, :action, :description, :ip_address, :user_agent, NOW())
+  Params: {":user_id":6,":action":"user_logout",":description":"User logged out: josiah.johnson6550@gmail.com",":ip_address":"::1",":user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/143.0.0.0 Safari\/537.36 OPR\/127.0.0.0"}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-02 16:07:37] [QUERY_FAILED] IP:::1
+  SQL: INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent, created_at)
+                    VALUES (:user_id, :action, :description, :ip_address, :user_agent, NOW())
+  Params: {":user_id":6,":action":"user_login",":description":"User logged in: josiah.johnson6550@gmail.com",":ip_address":"::1",":user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/143.0.0.0 Safari\/537.36 OPR\/127.0.0.0"}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-02 17:39:41] [QUERY_FAILED] IP:::1
+  SQL: INSERT INTO activity_logs (user_id, action, description, ip_address, user_agent, created_at)
+                    VALUES (:user_id, :action, :description, :ip_address, :user_agent, NOW())
+  Params: {":user_id":6,":action":"user_login",":description":"User logged in: josiah.johnson6550@gmail.com",":ip_address":"::1",":user_agent":"Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/143.0.0.0 Safari\/537.36 OPR\/127.0.0.0"}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+

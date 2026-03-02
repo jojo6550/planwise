@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/Database.php';
+require_once __DIR__ . '/../helpers/sanitize.php';
 
 class ActivityLog
 {
@@ -91,36 +92,64 @@ class ActivityLog
             $where = [];
             $params = [];
 
-            // Filter by user ID
+            // Filter by user ID - sanitize as integer
             if (!empty($filters['user_id'])) {
-                $where[] = "al.user_id = :user_id";
-                $params[':user_id'] = (int)$filters['user_id'];
+                $userId = Database::castInt($filters['user_id'], 0);
+                if ($userId > 0) {
+                    $where[] = "al.user_id = :user_id";
+                    $params[':user_id'] = $userId;
+                }
             }
 
-            // Filter by action type
+            // Filter by action type - sanitize as string and use whitelist
             if (!empty($filters['action'])) {
-                $where[] = "al.action = :action";
-                $params[':action'] = $filters['action'];
+                $action = Database::castString($filters['action']);
+                // Whitelist allowed actions for security
+                $allowedActions = [
+                    'user_login', 'user_logout', 'user_registered', 'user_created',
+                    'user_updated', 'user_deleted', 'user_status_updated',
+                    'password_reset_completed', 'lesson_plan_created', 'lesson_plan_updated',
+                    'lesson_plan_deleted', 'lesson_plan_viewed', 'pdf_exported',
+                    'word_exported', 'pdf_saved', 'word_saved', 'lesson_plan_imported',
+                    'qr_code_generated', 'file_uploaded', 'file_downloaded', 'file_deleted'
+                ];
+                if (in_array($action, $allowedActions, true)) {
+                    $where[] = "al.action = :action";
+                    $params[':action'] = $action;
+                }
             }
 
-            // Filter by date range
+            // Filter by date range - validate date format
             if (!empty($filters['date_from'])) {
-                $where[] = "al.created_at >= :date_from";
-                $params[':date_from'] = $filters['date_from'];
+                $dateFrom = filter_var($filters['date_from'], FILTER_SANITIZE_STRING);
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
+                    $where[] = "al.created_at >= :date_from";
+                    $params[':date_from'] = $dateFrom;
+                }
             }
 
             if (!empty($filters['date_to'])) {
-                $where[] = "al.created_at <= :date_to";
-                $params[':date_to'] = $filters['date_to'];
+                $dateTo = filter_var($filters['date_to'], FILTER_SANITIZE_STRING);
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateTo)) {
+                    $where[] = "al.created_at <= :date_to";
+                    $params[':date_to'] = $dateTo;
+                }
             }
 
-            // Search in action or description
+            // Search in action or description - sanitize properly
             if (!empty($filters['search'])) {
-                $where[] = "(al.action LIKE :search OR al.description LIKE :search)";
-                $params[':search'] = '%' . $filters['search'] . '%';
+                $search = sanitizeSearchQuery($filters['search']);
+                if (!empty($search)) {
+                    $where[] = "(al.action LIKE :search OR al.description LIKE :search)";
+                    $params[':search'] = '%' . $search . '%';
+                }
             }
 
             $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
+
+            // Enforce maximum limit
+            $limit = min(max($limit, 1), 100);
+            $offset = max($offset, 0);
 
             $sql = "SELECT al.*, u.first_name, u.last_name, u.email
                     FROM activity_logs al

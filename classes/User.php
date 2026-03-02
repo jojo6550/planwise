@@ -289,4 +289,62 @@ class User
             ];
         }
     }
+
+    /**
+     * Get all teachers (role_id = 2)
+     *
+     * @return array All teacher users
+     */
+    public function getTeachers(): array
+    {
+        try {
+            $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    WHERE u.role_id = 2
+                    ORDER BY u.created_at DESC";
+
+            return $this->db->fetchAll($sql);
+
+        } catch (Exception $e) {
+            error_log("Get teachers failed: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get specific teachers by IDs
+     *
+     * @param array $userIds Array of user IDs
+     * @return array Teacher users
+     */
+    public function getTeachersByIds(array $userIds): array
+    {
+        try {
+            if (empty($userIds)) {
+                return [];
+            }
+
+            // Create placeholders for the IN clause
+            $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+            
+            $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    WHERE u.role_id = 2 AND u.user_id IN ({$placeholders})
+                    ORDER BY u.created_at DESC";
+
+            // Note: PDO doesn't directly support IN clause with named parameters in a loop
+            // We'll use manual query building instead
+            $conn = $this->db->getConnection();
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($userIds);
+
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+
+        } catch (Exception $e) {
+            error_log("Get teachers by IDs failed: " . $e->getMessage());
+            return [];
+        }
+    }
 }

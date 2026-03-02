@@ -12,13 +12,16 @@ require_once __DIR__ . '/../classes/Auth.php';
 require_once __DIR__ . '/../classes/User.php';
 require_once __DIR__ . '/../classes/PDFExporter.php';
 require_once __DIR__ . '/../classes/WordExporter.php';
+require_once __DIR__ . '/../classes/DataExporter.php';
 require_once __DIR__ . '/../classes/ActivityLog.php';
 
 class ExportController
 {
     private $auth;
+    private $user;
     private $pdfExporter;
     private $wordExporter;
+    private $dataExporter;
     private $activityLog;
 
     /**
@@ -27,8 +30,10 @@ class ExportController
     public function __construct()
     {
         $this->auth = new Auth();
+        $this->user = new User();
         $this->pdfExporter = new PDFExporter();
         $this->wordExporter = new WordExporter();
+        $this->dataExporter = new DataExporter();
         $this->activityLog = new ActivityLog();
 
         // Allow unauthenticated access for inline PDF exports (QR code access)
@@ -185,6 +190,110 @@ class ExportController
     }
 
     /**
+     * Export teachers to CSV or XLS
+     * GET parameters:
+     * - format: 'csv' or 'xls' (default: csv)
+     * - type: 'all', 'single', or 'multiple' (default: all)
+     * - user_id: specific user ID (for single export)
+     * - user_ids: comma-separated user IDs (for multiple export)
+     */
+    public function exportTeachers()
+    {
+        try {
+            // Require admin role for teacher exports
+            if (!$this->auth->hasRole(1)) {
+                $this->jsonResponse(['success' => false, 'message' => 'Access denied. Admin privileges required.'], 403);
+            }
+
+            $format = $_GET['format'] ?? 'csv';
+            $type = $_GET['type'] ?? 'all';
+
+            // Validate format
+            if (!in_array($format, ['csv', 'xls'])) {
+                $this->jsonResponse(['success' => false, 'message' => 'Invalid export format'], 400);
+            }
+
+            // Get teachers based on export type
+            $teachers = [];
+
+            switch ($type) {
+                case 'single':
+                    $userId = (int)($_GET['user_id'] ?? 0);
+                    if ($userId <= 0) {
+                        $this->jsonResponse(['success' => false, 'message' => 'Invalid user ID'], 400);
+                    }
+                    $userData = $this->user->findById($userId);
+                    if ($userData && $userData['role_id'] == 2) {
+                        $teachers = [$userData];
+                    }
+                    break;
+
+                case 'multiple':
+                    $userIds = $_GET['user_ids'] ?? '';
+                    if (empty($userIds)) {
+                        $this->jsonResponse(['success' => false, 'message' => 'No user IDs provided'], 400);
+                    }
+                    $ids = array_filter(array_map('intval', explode(',', $userIds)));
+                    if (!empty($ids)) {
+                        $teachers = $this->user->getTeachersByIds($ids);
+                    }
+                    break;
+
+                case 'all':
+                default:
+                    $teachers = $this->user->getTeachers();
+                    break;
+            }
+
+            if (empty($teachers)) {
+                $this->jsonResponse(['success' => false, 'message' => 'No teachers found to export'], 404);
+            }
+
+            // Prepare export data
+            $headers = ['User ID', 'First Name', 'Last Name', 'Email', 'Role', 'Status', 'Created At', 'Updated At'];
+            $data = [];
+
+            foreach ($teachers as $teacher) {
+                $data[] = [
+                    $teacher['user_id'],
+                    $teacher['first_name'],
+                    $teacher['last_name'],
+                    $teacher['email'],
+                    $teacher['role_name'] ?? 'Teacher',
+                    $teacher['status'],
+                    $teacher['created_at'],
+                    $teacher['updated_at'] ?? ''
+                ];
+            }
+
+            // Generate filename
+            $filename = 'teachers_export_' . date('Y-m-d');
+
+            // Export based on format
+            $result = [];
+            if ($format === 'csv') {
+                $result = $this->dataExporter->exportToCSV($filename, $headers, $data, true);
+            } else {
+                $result = $this->dataExporter->exportToXLS($filename, $headers, $data, true);
+            }
+
+            // Log the export activity
+            $this->activityLog->log(
+                $this->auth->id(),
+                'teachers_exported',
+                "Exported {$type} teachers to {$format}: " . count($teachers) . " records"
+            );
+
+            // Note: exportToCSV/XLS calls exit() if download=true, so this won't execute
+            $this->jsonResponse($result);
+
+        } catch (Exception $e) {
+            error_log("Export teachers failed: " . $e->getMessage());
+            $this->jsonResponse(['success' => false, 'message' => 'Export failed: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Send JSON response
      */
     private function jsonResponse(array $data, int $statusCode = 200)
@@ -213,6 +322,9 @@ if (basename($_SERVER['PHP_SELF']) === 'ExportController.php') {
             break;
         case 'saveWord':
             $controller->saveWord();
+            break;
+        case 'exportTeachers':
+            $controller->exportTeachers();
             break;
         default:
             http_response_code(404);

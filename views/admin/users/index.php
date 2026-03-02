@@ -194,6 +194,43 @@ require __DIR__ . '/../../layouts/admin-start.php';
     </div>
 </form>
 
+<!-- Export Section -->
+<div class="data-card mb-4">
+    <div class="data-card-header">
+        <h3 class="data-card-title" style="font-size: 1rem; margin: 0;">
+            <i class="fas fa-download me-2"></i>Export Teacher Accounts
+        </h3>
+    </div>
+    <div class="p-3">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-auto">
+                <label class="form-label fw-semibold" style="font-size:0.85rem; margin-bottom: 0;">Export Type:</label>
+            </div>
+            <div class="col-md-auto">
+                <select id="exportType" class="form-select form-select-sm" style="width: 150px;">
+                    <option value="all">All Teachers</option>
+                    <option value="filtered">Filtered Results</option>
+                    <option value="selected">Selected Only</option>
+                </select>
+            </div>
+            <div class="col-md-auto">
+                <label class="form-label fw-semibold" style="font-size:0.85rem; margin-bottom: 0;">Format:</label>
+            </div>
+            <div class="col-md-auto d-flex gap-2">
+                <button type="button" id="exportCSV" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-file-csv me-1"></i>CSV
+                </button>
+                <button type="button" id="exportXLS" class="btn btn-outline-info btn-sm">
+                    <i class="fas fa-file-excel me-1"></i>XLS
+                </button>
+            </div>
+            <div class="col-md-auto ms-auto">
+                <small class="text-muted">Select checkbox to export specific teachers</small>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Users Table -->
 <div class="data-card">
     <div class="data-card-header">
@@ -209,6 +246,9 @@ require __DIR__ . '/../../layouts/admin-start.php';
         <table class="admin-table" id="usersTable">
             <thead>
                 <tr>
+                    <th style="width: 40px;">
+                        <input type="checkbox" id="selectAllCheckbox" class="form-check-input" title="Select all teachers" style="cursor: pointer;">
+                    </th>
                     <th>User</th>
                     <th>Email</th>
                     <th>Role</th>
@@ -220,14 +260,19 @@ require __DIR__ . '/../../layouts/admin-start.php';
             <tbody>
             <?php if (empty($filteredUsers)): ?>
                 <tr>
-                    <td colspan="6" class="text-center py-5 text-muted">
+                    <td colspan="7" class="text-center py-5 text-muted">
                         <i class="fas fa-users fa-2x mb-2 d-block" style="opacity:0.3;"></i>
                         No users found
                     </td>
                 </tr>
             <?php else: ?>
                 <?php foreach ($filteredUsers as $u): ?>
-                <tr>
+                <tr data-user-role="<?= (int)$u['role_id'] ?>">
+                    <td class="text-center">
+                        <?php if ((int)$u['role_id'] === 2): ?>
+                        <input type="checkbox" class="form-check-input user-checkbox" data-user-id="<?= $u['user_id'] ?>" data-user-name="<?= h($u['first_name'] . ' ' . $u['last_name']) ?>" style="cursor: pointer;">
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             <div class="user-avatar size-sm">
@@ -298,6 +343,64 @@ require __DIR__ . '/../../layouts/admin-start.php';
 $extraScripts = <<<JS
 <script>
 const CSRF_TOKEN = <?= json_encode($csrfToken) ?>;
+
+/* ---- Select All Checkbox ---- */
+const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener('change', function() {
+        const isChecked = this.checked;
+        document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+            checkbox.checked = isChecked;
+        });
+    });
+}
+
+/* ---- Update Select All Status ---- */
+document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        const allCheckboxes = document.querySelectorAll('.user-checkbox');
+        const checkedCount = document.querySelectorAll('.user-checkbox:checked').length;
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = checkedCount === allCheckboxes.length && allCheckboxes.length > 0;
+        }
+    });
+});
+
+/* ---- Export Functions ---- */
+function getSelectedTeachers() {
+    const checkboxes = document.querySelectorAll('.user-checkbox:checked');
+    return Array.from(checkboxes).map(cb => parseInt(cb.dataset.userId));
+}
+
+function handleExport(format) {
+    const exportType = document.getElementById('exportType').value;
+    const selectedTeachers = getSelectedTeachers();
+
+    if (exportType === 'selected' && selectedTeachers.length === 0) {
+        alert('Please select at least one teacher to export.');
+        return;
+    }
+
+    let url = '/planwise/controllers/ExportController.php?action=exportTeachers&format=' + format;
+
+    if (exportType === 'all') {
+        url += '&type=all';
+    } else if (exportType === 'filtered') {
+        url += '&type=all';
+    } else if (exportType === 'selected') {
+        url += '&type=multiple&user_ids=' + selectedTeachers.join(',');
+    }
+
+    window.location.href = url;
+}
+
+document.getElementById('exportCSV').addEventListener('click', function() {
+    handleExport('csv');
+});
+
+document.getElementById('exportXLS').addEventListener('click', function() {
+    handleExport('xls');
+});
 
 /* ---- Status Toggle ---- */
 document.querySelectorAll('.status-toggle-btn').forEach(btn => {

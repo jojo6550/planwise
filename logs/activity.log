@@ -3,3 +3,35 @@
 [2026-03-02 18:03:52] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
 [2026-03-02 18:04:37] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
 [2026-03-02 18:04:39] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-02 18:12:03] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-02 18:12:08] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-02 18:13:20] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-02 18:13:22] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-02 18:13:47] User:6 Action:pdf_exported IP:::1 - Exported lesson plan ID: 1001 to PDF
+[2026-03-02 18:13:48] User:6 Action:pdf_exported IP:::1 - Exported lesson plan ID: 1001 to PDF
+[2026-03-02 22:15:25] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-09 15:21:40] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-09 15:21:53] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-09 15:22:03] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-09 15:22:08] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-09 15:54:21] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-09 15:54:34] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-09 15:55:06] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-16 16:15:40] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-16 16:17:09] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-16 16:17:14] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-16 16:17:20] User:6 Action:lesson_plan_deleted IP:::1 - Deleted lesson plan ID: 1001
+[2026-03-16 16:17:58] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-16 16:18:10] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-16 16:19:28] User:6 Action:pdf_exported IP:::1 - Exported lesson plan ID: 1000 to PDF
+[2026-03-16 16:19:32] User:6 Action:pdf_exported IP:::1 - Exported lesson plan ID: 1000 to PDF
+[2026-03-16 16:22:11] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-16 16:22:15] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-16 16:23:03] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-16 16:23:27] User:7 Action:user_registered IP:::1 - New user registered: josiahsdigitalservices@gmail.com
+[2026-03-16 16:23:38] User:7 Action:user_login IP:::1 - User logged in: josiahsdigitalservices@gmail.com
+[2026-03-22 00:09:35] User:6 Action:user_login IP:127.0.0.1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-22 00:09:57] User:6 Action:user_logout IP:127.0.0.1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-22 00:10:01] User:7 Action:user_login IP:127.0.0.1 - User logged in: josiahsdigitalservices@gmail.com
+[2026-03-22 00:10:03] User:7 Action:user_logout IP:127.0.0.1 - User logged out: josiahsdigitalservices@gmail.com
+[2026-03-22 00:10:05] User:6 Action:user_login IP:127.0.0.1 - User logged in: josiah.johnson6550@gmail.com

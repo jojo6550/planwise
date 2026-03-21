@@ -346,3 +346,400 @@
   Params: {":lesson_id":1001}
   User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
 
+[2026-03-02 18:12:08] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-02 18:12:43] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-02 18:13:22] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-02 18:13:26] [QUERY_FAILED] IP:::1
+  SQL: SELECT * FROM lesson_sections
+                    WHERE lesson_id = :lesson_id
+                    ORDER BY order_position ASC
+  Params: {":lesson_id":1001}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-02 18:13:46] [QUERY_FAILED] IP:::1
+  SQL: SELECT * FROM lesson_sections
+                    WHERE lesson_id = :lesson_id
+                    ORDER BY order_position ASC
+  Params: {":lesson_id":1001}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-02 18:13:47] [QUERY_FAILED] IP:::1
+  SQL: SELECT * FROM lesson_sections
+                    WHERE lesson_id = :lesson_id
+                    ORDER BY order_position ASC
+  Params: {":lesson_id":1001}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-02 22:15:26] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-02 22:15:32] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 OPR/127.0.0.0
+
+[2026-03-09 15:21:40] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:21:46] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:21:51] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    WHERE u.user_id = :user_id
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:22:04] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:22:05] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    WHERE u.user_id = :user_id
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:22:07] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:54:21] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:54:27] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    WHERE u.user_id = :user_id
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:55:07] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:55:13] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:55:15] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:55:17] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:56:13] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:57:01] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:58:47] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-09 15:59:00] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:15:41] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:16:58] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:17:02] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:17:06] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:17:14] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:17:22] [QUERY_FAILED] IP:::1
+  SQL: SELECT * FROM lesson_sections
+                    WHERE lesson_id = :lesson_id
+                    ORDER BY order_position ASC
+  Params: {":lesson_id":1000}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:17:26] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:18:10] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:18:33] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:18:37] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    WHERE u.user_id = :user_id
+  Params: {":user_id":6}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:19:27] [QUERY_FAILED] IP:::1
+  SQL: SELECT * FROM lesson_sections
+                    WHERE lesson_id = :lesson_id
+                    ORDER BY order_position ASC
+  Params: {":lesson_id":1000}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:19:32] [QUERY_FAILED] IP:::1
+  SQL: SELECT * FROM lesson_sections
+                    WHERE lesson_id = :lesson_id
+                    ORDER BY order_position ASC
+  Params: {":lesson_id":1000}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:21:55] [QUERY_FAILED] IP:::1
+  SQL: SELECT * FROM lesson_sections
+                    WHERE lesson_id = :lesson_id
+                    ORDER BY order_position ASC
+  Params: {":lesson_id":1000}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:22:15] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:22:29] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:23:38] [QUERY_FAILED] IP:::1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":7}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-16 16:24:00] [QUERY_FAILED] IP:::1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    WHERE u.user_id = :user_id
+  Params: {":user_id":7}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36
+
+[2026-03-22 00:09:35] [QUERY_FAILED] IP:127.0.0.1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0
+
+[2026-03-22 00:09:51] [QUERY_FAILED] IP:127.0.0.1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0
+
+[2026-03-22 00:10:01] [QUERY_FAILED] IP:127.0.0.1
+  SQL: SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+                            FROM lesson_sections ls
+                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
+                            WHERE lp.user_id = :user_id
+                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY ls.updated_at DESC
+  Params: {":user_id":7}
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0
+
+[2026-03-22 00:10:05] [QUERY_FAILED] IP:127.0.0.1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0
+
+[2026-03-22 00:12:52] [QUERY_FAILED] IP:127.0.0.1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0
+
+[2026-03-22 00:13:03] [QUERY_FAILED] IP:127.0.0.1
+  SQL: SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    ORDER BY u.created_at DESC
+  Params: []
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0
+

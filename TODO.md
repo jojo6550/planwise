@@ -1,9 +1,12 @@
-# SQL Injection Sanitization Implementation
+# Admin Dashboard Accurate Counts Task
+## Status: ✅ In Progress
 
-## Tasks
-- [ ] 1. Update helpers/sanitize.php with comprehensive input sanitization functions
-- [ ] 2. Enhance Database.php with strict type casting and input validation
-- [ ] 3. Fix ActivityLog.php search functionality vulnerability
-- [ ] 4. Add input validation to controllers
+### Steps:
+- [x] **Step 1**: Create TODO.md with plan breakdown
+- [x] **Step 2**: Add count methods to classes/User.php
+- [x] **Step 3**: Update views/admin/dashboard.php to use new methods
+- [x] **Step 4**: Verify changes (read updated files, check logic)
+- [ ] **Step 5**: Test dashboard accuracy (manual check or SQL verify)
+- [ ] **Step 6**: Complete task with attempt_completion
 
-## Status: In Progress
+**Details**: Implement active-only counts for admins/teachers using efficient SQL COUNT queries.

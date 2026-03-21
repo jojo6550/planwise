@@ -36,11 +36,12 @@ $userModel   = new User();
 $activityLog = new ActivityLog();
 
 /* ---- Stats ---- */
-$allUsers     = $userModel->getAll();
-$totalUsers   = count($allUsers);
-$activeUsers  = count(array_filter($allUsers, fn($u) => $u['status'] === 'active'));
-$adminCount   = count(array_filter($allUsers, fn($u) => (int)$u['role_id'] === 1));
-$teacherCount = count(array_filter($allUsers, fn($u) => (int)$u['role_id'] === 2));
+$totalUsers   = $userModel->getTotalUsersCount();
+$activeUsers  = $userModel->getActiveUsersCount();
+$adminCount   = $userModel->getActiveAdminsCount();
+$teacherCount = $userModel->getActiveTeachersCount();
+$allUsers     = $userModel->getAll(); // Keep for recentUsers
+
 
 try {
     $lpRow      = $db->fetch("SELECT COUNT(*) as c FROM lesson_plans");

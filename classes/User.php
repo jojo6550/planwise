@@ -347,4 +347,61 @@ class User
             return [];
         }
     }
+
+    /**
+     * Get total users count (all statuses)
+     */
+    public function getTotalUsersCount(): int
+    {
+        try {
+            $row = $this->db->fetch("SELECT COUNT(*) as c FROM users");
+            return (int)($row['c'] ?? 0);
+        } catch (Exception $e) {
+            error_log("Get total users count failed: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Get active users count
+     */
+    public function getActiveUsersCount(): int
+    {
+        try {
+            $row = $this->db->fetch("SELECT COUNT(*) as c FROM users WHERE status = 'active'");
+            return (int)($row['c'] ?? 0);
+        } catch (Exception $e) {
+            error_log("Get active users count failed: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Get active admins count (role_id = 1, status = 'active')
+     */
+    public function getActiveAdminsCount(): int
+    {
+        try {
+            $row = $this->db->fetch("SELECT COUNT(*) as c FROM users WHERE status = 'active' AND role_id = 1");
+            return (int)($row['c'] ?? 0);
+        } catch (Exception $e) {
+            error_log("Get active admins count failed: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Get active teachers count (role_id = 2, status = 'active')
+     */
+    public function getActiveTeachersCount(): int
+    {
+        try {
+            $row = $this->db->fetch("SELECT COUNT(*) as c FROM users WHERE status = 'active' AND role_id = 2");
+            return (int)($row['c'] ?? 0);
+        } catch (Exception $e) {
+            error_log("Get active teachers count failed: " . $e->getMessage());
+            return 0;
+        }
+    }
 }
+

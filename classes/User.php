@@ -27,7 +27,7 @@ class User
     public function findByEmail(string $email)
     {
         try {
-            $sql = "SELECT user_id, first_name, last_name, email, password_hash, role_id, status, created_at
+        $sql = "SELECT user_id, first_name, last_name, email, password_hash, role_id, status, profile_picture, profile_thumbnail, created_at
                     FROM users WHERE email = :email LIMIT 1";
 
             $stmt = $this->db->query($sql, [':email' => strtolower($email)]);
@@ -85,8 +85,8 @@ class User
             $status = $data['status'] ?? 'active';
 
             // Insert user into database
-            $sql = "INSERT INTO users (first_name, last_name, email, password_hash, role_id, status, created_at)
-                    VALUES (:first_name, :last_name, :email, :password_hash, :role_id, :status, NOW())";
+$sql = "INSERT INTO users (first_name, last_name, email, password_hash, role_id, status, profile_picture, profile_thumbnail, created_at)
+                    VALUES (:first_name, :last_name, :email, :password_hash, :role_id, :status, :profile_picture, :profile_thumbnail, NOW())";
 
             $params = [
                 ':first_name' => trim($data['first_name']),
@@ -94,7 +94,9 @@ class User
                 ':email' => trim(strtolower($data['email'])),
                 ':password_hash' => $passwordHash,
                 ':role_id' => $roleId,
-                ':status' => $status
+                ':status' => $status,
+                ':profile_picture' => $data['profile_picture'] ?? null,
+                ':profile_thumbnail' => $data['profile_thumbnail'] ?? null
             ];
 
             $userId = $this->db->insert($sql, $params);
@@ -122,7 +124,7 @@ class User
     public function getAll(): array
     {
         try {
-            $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, r.role_name
                     FROM users u
                     JOIN roles r ON u.role_id = r.role_id
                     ORDER BY u.created_at DESC";
@@ -144,7 +146,7 @@ class User
     public function findById(int $userId): ?array
     {
         try {
-            $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, r.role_name
                     FROM users u
                     JOIN roles r ON u.role_id = r.role_id
                     WHERE u.user_id = :user_id";
@@ -196,12 +198,14 @@ class User
                 }
             }
 
-            $sql = "UPDATE users SET
+$sql = "UPDATE users SET
                     first_name = :first_name,
                     last_name = :last_name,
                     email = :email,
                     role_id = :role_id,
                     status = :status,
+                    profile_picture = :profile_picture,
+                    profile_thumbnail = :profile_thumbnail,
                     updated_at = NOW()
                     WHERE user_id = :user_id";
 
@@ -211,7 +215,9 @@ class User
                 ':last_name' => trim($data['last_name'] ?? $existing['last_name']),
                 ':email' => trim(strtolower($data['email'] ?? $existing['email'])),
                 ':role_id' => $data['role_id'] ?? $existing['role_id'],
-                ':status' => $data['status'] ?? $existing['status']
+                ':status' => $data['status'] ?? $existing['status'],
+                ':profile_picture' => $data['profile_picture'] ?? $existing['profile_picture'] ?? null,
+                ':profile_thumbnail' => $data['profile_thumbnail'] ?? $existing['profile_thumbnail'] ?? null
             ];
 
             $this->db->update($sql, $params);
@@ -298,7 +304,7 @@ class User
     public function getTeachers(): array
     {
         try {
-            $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, r.role_name
                     FROM users u
                     JOIN roles r ON u.role_id = r.role_id
                     WHERE u.role_id = 2
@@ -328,7 +334,7 @@ class User
             // Create placeholders for the IN clause
             $placeholders = implode(',', array_fill(0, count($userIds), '?'));
             
-            $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.created_at, u.updated_at, r.role_name
+$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, r.role_name
                     FROM users u
                     JOIN roles r ON u.role_id = r.role_id
                     WHERE u.role_id = 2 AND u.user_id IN ({$placeholders})
@@ -402,6 +408,27 @@ class User
             error_log("Get active teachers count failed: " . $e->getMessage());
             return 0;
         }
+    }
+
+    /**
+     * Get profile image path (thumbnail preferred, fallback to full or default)
+     * @param int $userId
+     * @param bool $thumbnail
+     * @return string
+     */
+    public function getProfileImage(int $userId, bool $thumbnail = true): string
+    {
+        $user = $this->findById($userId);
+        if (!$user) return '/public/css/default-avatar.png';
+
+        if ($thumbnail) {
+            if (!empty($user['profile_thumbnail'])) return $user['profile_thumbnail'];
+            if (!empty($user['profile_picture'])) return $user['profile_picture'];
+        } else {
+            if (!empty($user['profile_picture'])) return $user['profile_picture'];
+            if (!empty($user['profile_thumbnail'])) return $user['profile_thumbnail'];
+        }
+        return '/public/css/default-avatar.png';
     }
 }
 

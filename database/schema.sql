@@ -223,6 +223,12 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Profile picture support
+--
+ALTER TABLE `users` ADD COLUMN IF NOT EXISTS `profile_picture` VARCHAR(255) NULL AFTER `status`;
+ALTER TABLE `users` ADD COLUMN IF NOT EXISTS `profile_thumbnail` VARCHAR(255) NULL AFTER `profile_picture`;
+
+--
 -- Dumping data for table `users`
 --
 

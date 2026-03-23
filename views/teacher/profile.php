@@ -27,6 +27,17 @@ if (!$auth->check()) {
 $user = $auth->user();
 $userModel = new User();
 $userDetails = $userModel->findById($user['user_id']);
+if (!$userDetails) {
+    error_log("Profile page: userDetails fetch failed for user_id {$user['user_id']}, using session data");
+    $userDetails = [
+        'first_name' => $user['first_name'] ?? '',
+        'last_name' => $user['last_name'] ?? '',
+        'email' => $user['email'] ?? '',
+        'status' => 'active',
+        'created_at' => date('Y-m-d'),
+        'role_name' => 'Teacher (Role_' . ($_SESSION['role_id'] ?? '?') . ')'
+    ];
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

@@ -146,16 +146,23 @@ $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.statu
     public function findById(int $userId): ?array
     {
         try {
-$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, r.role_name
+$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, COALESCE(r.role_name, CONCAT('Role_', u.role_id)) as role_name
                     FROM users u
-                    JOIN roles r ON u.role_id = r.role_id
+                    LEFT JOIN roles r ON u.role_id = r.role_id
                     WHERE u.user_id = :user_id";
 
             $result = $this->db->fetch($sql, [':user_id' => $userId]);
             return $result ?: null;
 
         } catch (Exception $e) {
-            error_log("Find user by ID failed: " . $e->getMessage());
+            error_log("Find user by ID {$userId} failed: " . $e->getMessage());
+            // Fallback: try without JOIN
+            $fallback = $this->db->fetch("SELECT * FROM users WHERE user_id = :user_id", [':user_id' => $userId]);
+            if ($fallback) {
+                $fallback['role_name'] = 'Role_' . $fallback['role_id'];
+                error_log("findById fallback success for user {$userId}");
+                return $fallback;
+            }
             return null;
         }
     }
@@ -171,13 +178,17 @@ $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.statu
     {
         try {
             // Check if user exists
-            $existing = $this->findById($userId);
+            $existing = $this->db->fetch("SELECT * FROM users WHERE user_id = :user_id", [':user_id' => $userId]);
             if (!$existing) {
+                error_log("User update failed: User ID {$userId} does not exist in users table");
                 return [
                     'success' => false,
                     'message' => 'User not found'
                 ];
             }
+            // Check roles separately if needed
+            $roleCheck = $this->db->fetch("SELECT role_name FROM roles WHERE role_id = :role_id", [':role_id' => $existing['role_id']]);
+            error_log("User {$userId} update check - Role exists: " . ($roleCheck ? 'yes' : 'no'));
 
             // Validate email format if provided
             if (isset($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {

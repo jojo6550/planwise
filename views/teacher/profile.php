@@ -52,7 +52,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        // Update user profile
+        // Handle profile picture upload
+        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+            require_once __DIR__ . '/../../classes/File.php';
+            $fileHandler = new File();
+            $uploadResult = $fileHandler->profileUpload($_FILES['profile_picture'], $user['user_id']);
+            if ($uploadResult['success']) {
+                $updateData['profile_picture'] = $uploadResult['profile_picture'];
+                $updateData['profile_thumbnail'] = $uploadResult['profile_thumbnail'];
+            } else {
+                $errors[] = $uploadResult['message'];
+                $_SESSION['error'] = implode('<br>', $errors);
+            }
+        }
+
         $updateData = [
             'first_name' => $firstName,
             'last_name' => $lastName,
@@ -148,12 +161,10 @@ unset($_SESSION['success'], $_SESSION['error']);
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-4">
                         <div class="d-flex align-items-center">
-                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="text-primary" viewBox="0 0 16 16">
-                                    <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                                    <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
-                                </svg>
-                            </div>
+                            <img id="profileAvatar" src="<?= htmlspecialchars($userModel->getProfileImage($user['user_id'], true)) ?>" 
+                                 alt="Profile Picture" width="64" height="64" class="rounded-circle object-fit-cover me-3 border border-2 border-primary" 
+                                 style="object-fit: cover; width: 64px; height: 64px;">
+
                             <div>
                                 <h2 class="mb-1">
                                     <?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>
@@ -177,7 +188,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <h5 class="mb-0">Profile Information</h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="">
+<form method="POST" action="" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="first_name" class="form-label">First Name *</label>
@@ -194,6 +205,12 @@ unset($_SESSION['success'], $_SESSION['error']);
                                 <label for="email" class="form-label">Email Address *</label>
                                 <input type="email" class="form-control" id="email" name="email"
                                        value="<?php echo htmlspecialchars($userDetails['email'] ?? $user['email']); ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Profile Picture</label>
+                                <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/jpeg,image/png,image/gif,image/webp">
+                                <div class="form-text">Upload JPEG, PNG, GIF or WebP (max 2MB). Square images recommended.</div>
+                                <img id="imagePreview" class="mt-2 rounded-circle border p-1" src="" width="80" height="80" style="display:none; object-fit: cover;">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Role</label>
@@ -275,5 +292,23 @@ unset($_SESSION['success'], $_SESSION['error']);
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Profile picture preview
+        document.getElementById('profile_picture').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    </script>
 </body>
+
 </html>

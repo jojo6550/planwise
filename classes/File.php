@@ -395,6 +395,76 @@ class File
     }
 
     /**
+     * Upload profile picture for user
+     *
+     * @param array $file $_FILES array
+     * @param int $userId User ID
+     * @return array Paths or error
+     */
+    public function profileUpload(array $file, int $userId): array
+    {
+        $validation = $this->validateImageUpload($file);
+        if (!$validation['success']) {
+            return $validation;
+        }
+
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $timestamp = time();
+        $baseName = "user_{$userId}_{$timestamp}";
+        $fullName = $baseName . '.' . $extension;
+        $avatarDir = __DIR__ . '/../uploads/avatars/';
+        $picturePath = $avatarDir . $fullName;
+
+        // Ensure avatar dir exists
+        if (!file_exists($avatarDir)) {
+            mkdir($avatarDir, 0755, true);
+        }
+
+        if (!move_uploaded_file($file['tmp_name'], $picturePath)) {
+            return ['success' => false, 'message' => 'Failed to save image'];
+        }
+
+        // Generate thumbnail
+        $thumbPath = $this->generateThumbnail($picturePath, $fullName);
+        $thumbName = $thumbPath ? basename($thumbPath) : null;
+
+        // Relative paths for DB
+        $relPicture = 'uploads/avatars/' . $fullName;
+        $relThumb = $thumbPath ? 'uploads/thumbnails/' . $thumbName : null;
+
+        return [
+            'success' => true,
+            'profile_picture' => $relPicture,
+            'profile_thumbnail' => $relThumb
+        ];
+    }
+
+    /**
+     * Validate image upload for profile (images only)
+     */
+    private function validateImageUpload(array $file): array
+    {
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return ['success' => false, 'message' => $this->getUploadErrorMessage($file['error'])];
+        }
+
+        if ($file['size'] > 2 * 1024 * 1024) { // 2MB for profile
+            return ['success' => false, 'message' => 'Image too large (max 2MB)'];
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        $imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!in_array($mime, $imageTypes)) {
+            return ['success' => false, 'message' => 'Only JPEG, PNG, GIF, WebP allowed'];
+        }
+
+        return ['success' => true];
+    }
+
+    /**
      * Check if file type is allowed
      *
      * @param string $extension File extension

@@ -207,11 +207,18 @@ require __DIR__ . '/../../layouts/admin-start.php';
                 <label class="form-label fw-semibold" style="font-size:0.85rem; margin-bottom: 0;">Export Type:</label>
             </div>
             <div class="col-md-auto">
-                <select id="exportType" class="form-select form-select-sm" style="width: 150px;">
+                <select id="exportType" class="form-select form-select-sm" style="width: 160px;">
                     <option value="all">All Teachers</option>
                     <option value="filtered">Filtered Results</option>
                     <option value="selected">Selected Only</option>
+                    <option value="pattern">Pattern / Regex</option>
                 </select>
+            </div>
+            <div class="col-md-auto" id="patternInputWrapper" style="display:none;">
+                <input type="text" id="exportPattern" class="form-control form-control-sm"
+                       style="width: 220px;"
+                       placeholder="e.g. john* or *@school.edu or /^j/i"
+                       title="Wildcards: * = any chars, ? = one char. Regex: wrap in /.../ e.g. /^john/i">
             </div>
             <div class="col-md-auto">
                 <label class="form-label fw-semibold" style="font-size:0.85rem; margin-bottom: 0;">Format:</label>
@@ -225,7 +232,7 @@ require __DIR__ . '/../../layouts/admin-start.php';
                 </button>
             </div>
             <div class="col-md-auto ms-auto">
-                <small class="text-muted">Select checkbox to export specific teachers</small>
+                <small class="text-muted" id="exportHint">Select checkbox to export specific teachers</small>
             </div>
         </div>
     </div>
@@ -345,6 +352,27 @@ $extraScripts = <<<JS
 <script>
 const CSRF_TOKEN = {$csrfTokenJson};
 
+/* ---- Export type toggle: show pattern input ---- */
+const exportTypeSelect = document.getElementById('exportType');
+const patternWrapper    = document.getElementById('patternInputWrapper');
+const exportHint        = document.getElementById('exportHint');
+
+const exportHints = {
+    all:      'Exports every teacher account',
+    filtered: 'Exports teachers matching the current filter',
+    selected: 'Check boxes in the table to pick teachers',
+    pattern:  'Wildcards: * = any chars, ? = one char &nbsp;|&nbsp; Regex: /pattern/flags',
+};
+
+function syncExportUI() {
+    const val = exportTypeSelect.value;
+    patternWrapper.style.display = val === 'pattern' ? '' : 'none';
+    exportHint.innerHTML = exportHints[val] || '';
+}
+
+exportTypeSelect.addEventListener('change', syncExportUI);
+syncExportUI();
+
 /* ---- Select All Checkbox ---- */
 const selectAllCheckbox = document.getElementById('selectAllCheckbox');
 if (selectAllCheckbox) {
@@ -382,14 +410,24 @@ function handleExport(format) {
         return;
     }
 
+    if (exportType === 'pattern') {
+        const pattern = document.getElementById('exportPattern').value.trim();
+        if (!pattern) {
+            alert('Please enter a pattern to filter by.');
+            document.getElementById('exportPattern').focus();
+            return;
+        }
+    }
+
     let url = '/planwise/controllers/ExportController.php?action=exportTeachers&format=' + format;
 
-    if (exportType === 'all') {
-        url += '&type=all';
-    } else if (exportType === 'filtered') {
+    if (exportType === 'all' || exportType === 'filtered') {
         url += '&type=all';
     } else if (exportType === 'selected') {
         url += '&type=multiple&user_ids=' + selectedTeachers.join(',');
+    } else if (exportType === 'pattern') {
+        const pattern = document.getElementById('exportPattern').value.trim();
+        url += '&type=pattern&pattern=' + encodeURIComponent(pattern);
     }
 
     window.location.href = url;

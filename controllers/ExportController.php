@@ -242,6 +242,11 @@ class ExportController extends BaseController
                     }
                     break;
 
+                case 'pattern':
+                    $pattern = trim($_GET['pattern'] ?? '*');
+                    $teachers = $this->user->getTeachersByPattern($pattern);
+                    break;
+
                 case 'all':
                 default:
                     $teachers = $this->user->getTeachers();
@@ -253,7 +258,7 @@ class ExportController extends BaseController
             }
 
             // Prepare export data
-            $headers = ['User ID', 'First Name', 'Last Name', 'Email', 'Role', 'Status', 'Created At', 'Updated At'];
+            $headers = ['User ID', 'First Name', 'Last Name', 'Email', 'Role', 'Status', 'Created At'];
             $data = [];
 
             foreach ($teachers as $teacher) {
@@ -265,7 +270,6 @@ class ExportController extends BaseController
                     $teacher['role_name'] ?? 'Teacher',
                     $teacher['status'],
                     $teacher['created_at'],
-                    $teacher['updated_at'] ?? ''
                 ];
             }
 

@@ -318,7 +318,7 @@ $sql = "UPDATE users SET
                 ];
             }
 
-            $sql = "UPDATE users SET status = :status, updated_at = NOW() WHERE user_id = :user_id";
+            $sql = "UPDATE users SET status = :status WHERE user_id = :user_id";
             $this->db->update($sql, [':user_id' => $userId, ':status' => $status]);
 
             return [
@@ -343,7 +343,7 @@ $sql = "UPDATE users SET
     public function getTeachers(): array
     {
         try {
-$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, r.role_name
+$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, r.role_name
                     FROM users u
                     JOIN roles r ON u.role_id = r.role_id
                     WHERE u.role_id = 2
@@ -373,7 +373,7 @@ $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.statu
             // Create placeholders for the IN clause
             $placeholders = implode(',', array_fill(0, count($userIds), '?'));
             
-$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, r.role_name
+$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, r.role_name
                     FROM users u
                     JOIN roles r ON u.role_id = r.role_id
                     WHERE u.role_id = 2 AND u.user_id IN ({$placeholders})
@@ -389,6 +389,55 @@ $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.statu
 
         } catch (Exception $e) {
             error_log("Get teachers by IDs failed: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Get teachers matching a wildcard or regex pattern
+     * Wildcards: * = any chars, ? = single char
+     * Regex: pattern starting with / (e.g. /^john/i)
+     * Matched against full name and email
+     *
+     * @param string $pattern Wildcard or regex pattern
+     * @return array Matching teacher users
+     */
+    public function getTeachersByPattern(string $pattern): array
+    {
+        try {
+            $pattern = trim($pattern);
+            if ($pattern === '' || $pattern === '*') {
+                return $this->getTeachers();
+            }
+
+            // Regex mode: pattern starts with /
+            if (str_starts_with($pattern, '/')) {
+                $all = $this->getTeachers();
+                return array_values(array_filter($all, function ($t) use ($pattern) {
+                    $name = $t['first_name'] . ' ' . $t['last_name'];
+                    return @preg_match($pattern, $name) === 1
+                        || @preg_match($pattern, $t['email'] ?? '') === 1;
+                }));
+            }
+
+            // Wildcard mode: convert * → % and ? → _ for SQL LIKE
+            // Escape existing SQL wildcards first
+            $like = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $pattern);
+            $like = str_replace(['*', '?'], ['%', '_'], $like);
+
+            $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status,
+                           u.profile_picture, u.profile_thumbnail, u.created_at, r.role_name
+                    FROM users u
+                    JOIN roles r ON u.role_id = r.role_id
+                    WHERE u.role_id = 2
+                      AND (CONCAT(u.first_name, ' ', u.last_name) LIKE ?
+                           OR u.email LIKE ?)
+                    ORDER BY u.created_at DESC";
+
+            return $this->db->fetchAll($sql, [$like, $like]);
+
+        } catch (Exception $e) {
+            error_log("Get teachers by pattern failed: " . $e->getMessage());
             return [];
         }
     }

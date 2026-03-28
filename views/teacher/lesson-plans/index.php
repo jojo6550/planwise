@@ -131,8 +131,12 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">Create Lesson Plan</a>
                     </div>
                 <?php else: ?>
+                    <div class="mb-3">
+                        <input type="text" id="lessonPlanSearchInput" class="form-control"
+                               placeholder="Search lesson plans by title or subject...">
+                    </div>
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="lessonPlansTable">
                             <thead>
                                 <tr>
                                     <th>Title</th>
@@ -184,5 +188,6 @@ unset($_SESSION['success'], $_SESSION['error']);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/planwise/public/js/app.js"></script>
 </body>
 </html>

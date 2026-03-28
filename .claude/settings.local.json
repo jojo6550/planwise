@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\planwise\\\\views\\\\admin\\\\import.php\")",
+      "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\planwise\\\\views\\\\layouts\\\\admin-start.php\")",
+      "Bash(php:*)"
+    ]
+  }
+}

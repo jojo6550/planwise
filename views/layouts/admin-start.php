@@ -25,6 +25,7 @@ $_navLinks = [
     'users'           => ['label' => 'User Management', 'icon' => 'fas fa-users',           'url' => '/planwise/public/index.php?page=admin/users',           'group' => ['users','users-create','users-edit','users-view']],
     'activity-logs'   => ['label' => 'Activity Logs',   'icon' => 'fas fa-history',         'url' => '/planwise/public/index.php?page=admin/activity-logs',   'group' => ['activity-logs']],
     'system-settings' => ['label' => 'System Settings', 'icon' => 'fas fa-cog',             'url' => '/planwise/public/index.php?page=admin/system-settings', 'group' => ['system-settings']],
+    'import'          => ['label' => 'Data Import',     'icon' => 'fas fa-file-import',     'url' => '/planwise/public/index.php?page=admin/import',           'group' => ['import']],
 ];
 ?>
 <!DOCTYPE html>
@@ -81,6 +82,17 @@ $_navLinks = [
 
         <?php
         $link = $_navLinks['system-settings'];
+        $isActive = in_array($_active, $link['group']);
+        ?>
+        <a href="<?= $link['url'] ?>" class="sidebar-link <?= $isActive ? 'active' : '' ?>">
+            <i class="<?= $link['icon'] ?>"></i>
+            <span><?= $link['label'] ?></span>
+        </a>
+
+        <div class="sidebar-section-title">Data</div>
+
+        <?php
+        $link = $_navLinks['import'];
         $isActive = in_array($_active, $link['group']);
         ?>
         <a href="<?= $link['url'] ?>" class="sidebar-link <?= $isActive ? 'active' : '' ?>">
@@ -168,3 +180,58 @@ $_navLinks = [
 
     <!-- Content area -->
     <main class="admin-content">
+<script>
+/* === Admin Topbar Search (AJAX) === */
+(function () {
+    const input = document.getElementById('adminSearchInput');
+    if (!input) return;
+
+    let debounceTimer;
+    const wrap = input.closest('.topbar-search');
+    wrap.style.position = 'relative';
+
+    const dropdown = document.createElement('div');
+    dropdown.id = 'searchDropdown';
+    dropdown.style.cssText = 'position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:1050;' +
+        'background:#fff;border:1px solid #dee2e6;border-radius:8px;' +
+        'box-shadow:0 4px 12px rgba(0,0,0,.12);max-height:300px;overflow-y:auto;display:none;';
+    wrap.appendChild(dropdown);
+
+    input.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        const q = this.value.trim();
+        if (!q) { dropdown.style.display = 'none'; return; }
+
+        debounceTimer = setTimeout(async function () {
+            try {
+                const res = await fetch(
+                    '/planwise/controllers/AjaxController.php?action=searchUsers&q=' + encodeURIComponent(q)
+                );
+                const data = await res.json();
+                if (!data.success) { dropdown.style.display = 'none'; return; }
+
+                if (data.data.length === 0) {
+                    dropdown.innerHTML = '<div style="padding:10px 14px;color:#6c757d;font-size:.83rem;">No users found</div>';
+                } else {
+                    dropdown.innerHTML = data.data.slice(0, 8).map(function (u) {
+                        const initials = ((u.first_name || '?')[0] + (u.last_name || '?')[0]).toUpperCase();
+                        return '<a href="/planwise/public/index.php?page=admin/users/view&id=' + u.user_id + '"' +
+                            ' style="display:flex;align-items:center;gap:10px;padding:8px 14px;text-decoration:none;' +
+                            'color:#1a2535;border-bottom:1px solid #f5f5f5;">' +
+                            '<div class="user-avatar size-sm">' + initials + '</div>' +
+                            '<div>' +
+                            '<div style="font-size:.83rem;font-weight:600;">' + u.first_name + ' ' + u.last_name + '</div>' +
+                            '<div style="font-size:.73rem;color:#9ca3af;">' + u.email + '</div>' +
+                            '</div></a>';
+                    }).join('');
+                }
+                dropdown.style.display = 'block';
+            } catch (e) { /* silent fail on network error */ }
+        }, 300);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!wrap.contains(e.target)) dropdown.style.display = 'none';
+    });
+})();
+</script>

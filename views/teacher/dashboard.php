@@ -4,80 +4,38 @@
  * Main dashboard page for authenticated teachers
  */
 
-// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Require authentication
 require_once __DIR__ . '/../../classes/Database.php';
 require_once __DIR__ . '/../../classes/User.php';
 require_once __DIR__ . '/../../classes/Auth.php';
 
 $auth = new Auth();
 
-// Redirect to login if not authenticated
 if (!$auth->check()) {
     $_SESSION['error'] = 'Please login to access the dashboard';
     header('Location: /planwise/public/index.php?page=login');
     exit();
 }
 
-// Get current user data
 $user = $auth->user();
 
-// Get lesson plan statistics for the user
 require_once __DIR__ . '/../../classes/LessonPlan.php';
 $lessonPlan = new LessonPlan();
 $stats = $lessonPlan->getStats($user['user_id']);
-
-// Get recent activity
 $recentActivity = $lessonPlan->getRecentActivity($user['user_id']);
 
-// Get success message from session if any
 $success = $_SESSION['success'] ?? '';
 unset($_SESSION['success']);
+
+$pageTitle  = 'Dashboard';
+$activePage = 'dashboard';
+require __DIR__ . '/../layouts/teacher-start.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - PlanWise</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/planwise/public/css/style.css">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/planwise/public/index.php?page=teacher/profile">
-                PlanWise
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/planwise/public/index.php?page=teacher/dashboard">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/planwise/public/index.php?page=teacher/lesson-plans">Lesson Plans</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/planwise/public/index.php?page=teacher/profile">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/planwise/controllers/AuthController.php?action=logout">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
     <div class="container mt-5">
-        <!-- Success Alert -->
         <?php if (!empty($success)): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <?php echo htmlspecialchars($success); ?>
@@ -103,7 +61,6 @@ unset($_SESSION['success']);
 
         <!-- Dashboard Stats -->
         <div class="row g-4 mb-4">
-            <!-- Total Lesson Plans -->
             <div class="col-md-4">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body">
@@ -122,7 +79,6 @@ unset($_SESSION['success']);
                 </div>
             </div>
 
-            <!-- Active Plans -->
             <div class="col-md-4">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body">
@@ -141,7 +97,6 @@ unset($_SESSION['success']);
                 </div>
             </div>
 
-            <!-- Drafts -->
             <div class="col-md-4">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body">
@@ -207,32 +162,58 @@ unset($_SESSION['success']);
                         <h5 class="mb-0">Recent Activity</h5>
                     </div>
                     <div class="card-body">
-                        <div class="text-center py-5">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="text-muted mb-3" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                            </svg>
-                            <p class="text-muted">No recent activity. Start by creating your first lesson plan!</p>
-                            <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">
-                                Create Lesson Plan
-                            </a>
-                        </div>
+                        <?php if (!empty($recentActivity)): ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Subject</th>
+                                            <th>Status</th>
+                                            <th>Updated</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach (array_slice($recentActivity, 0, 10) as $activity): ?>
+                                            <?php
+                                            $statusClass = [
+                                                'draft'     => 'bg-warning text-dark',
+                                                'published' => 'bg-success',
+                                                'archived'  => 'bg-secondary',
+                                            ];
+                                            $badgeClass = $statusClass[$activity['status'] ?? ''] ?? 'bg-secondary';
+                                            ?>
+                                            <tr>
+                                                <td><strong><?php echo htmlspecialchars($activity['title'] ?? ''); ?></strong></td>
+                                                <td><?php echo htmlspecialchars($activity['subject'] ?? 'N/A'); ?></td>
+                                                <td><span class="badge <?php echo $badgeClass; ?>"><?php echo ucfirst($activity['status'] ?? ''); ?></span></td>
+                                                <td class="text-muted small"><?php echo date('M j, Y', strtotime($activity['updated_at'] ?? '')); ?></td>
+                                                <td>
+                                                    <a href="/planwise/public/index.php?page=teacher/lesson-plans/view&id=<?php echo $activity['lesson_id']; ?>"
+                                                       class="btn btn-sm btn-outline-primary">View</a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-center py-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="text-muted mb-3" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                </svg>
+                                <p class="text-muted">No recent activity. Start by creating your first lesson plan!</p>
+                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">
+                                    Create Lesson Plan
+                                </a>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="mt-5 py-4 bg-light">
-        <div class="container text-center">
-            <p class="text-muted mb-0">
-                &copy; <?php echo date('Y'); ?> PlanWise. All rights reserved.
-            </p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<?php require __DIR__ . '/../layouts/teacher-end.php'; ?>

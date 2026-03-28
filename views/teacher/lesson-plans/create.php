@@ -25,41 +25,18 @@ if (!$auth->check()) {
 $user = $auth->user();
 $csrfToken = AuthController::generateCsrfToken();
 
-$error = $_SESSION['error'] ?? '';
-$success = $_SESSION['success'] ?? '';
+$error    = $_SESSION['error'] ?? '';
+$success  = $_SESSION['success'] ?? '';
 $oldInput = $_SESSION['old_input'] ?? [];
-$errors = $_SESSION['errors'] ?? [];
+$errors   = $_SESSION['errors'] ?? [];
 
 unset($_SESSION['error'], $_SESSION['success'], $_SESSION['errors']);
 
-$sections = $oldInput['sections'] ?? [];
+$sections   = $oldInput['sections'] ?? [];
+$pageTitle  = 'Create Lesson Plan';
+$activePage = 'lesson-plans';
+require __DIR__ . '/../../layouts/teacher-start.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Lesson Plan - PlanWise</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/planwise/public/index.php?page=teacher/dashboard">PlanWise</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/planwise/public/index.php?page=teacher/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/planwise/public/index.php?page=teacher/lesson-plans">Lesson Plans</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/planwise/public/index.php?page=teacher/profile">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/planwise/controllers/AuthController.php?action=logout">Logout</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
     <div class="container mt-4">
         <?php if ($error): ?>
@@ -207,6 +184,4 @@ $sections = $oldInput['sections'] ?? [];
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<?php require __DIR__ . '/../../layouts/teacher-end.php'; ?>

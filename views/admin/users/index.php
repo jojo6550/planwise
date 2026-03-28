@@ -340,9 +340,10 @@ require __DIR__ . '/../../layouts/admin-start.php';
 </div>
 
 <?php
+$csrfTokenJson = json_encode($csrfToken);
 $extraScripts = <<<JS
 <script>
-const CSRF_TOKEN = <?= json_encode($csrfToken) ?>;
+const CSRF_TOKEN = {$csrfTokenJson};
 
 /* ---- Select All Checkbox ---- */
 const selectAllCheckbox = document.getElementById('selectAllCheckbox');

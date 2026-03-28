@@ -45,36 +45,72 @@ if (!$plan) {
 }
 
 $sections = $lessonSection->getByLessonPlan($lessonPlanId);
-$files = $fileHandler->getByLessonPlan($lessonPlanId);
-$qrCode = new QRCode();
-$qr = $qrCode->getByLessonPlanId($lessonPlanId);
+$files    = $fileHandler->getByLessonPlan($lessonPlanId);
+$qrCode   = new QRCode();
+$qr       = $qrCode->getByLessonPlanId($lessonPlanId);
+
+$pageTitle    = htmlspecialchars($plan['title']);
+$activePage   = 'lesson-plans';
+$extraScripts = <<<'JS'
+<script>
+function generateQRCode(lessonId) {
+    const btn = document.getElementById('generate-qr-btn');
+    const spinner = btn.querySelector('.spinner-border');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+    fetch('/planwise/controllers/QRCodeController.php?action=generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson_id: lessonId })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                try { const data = JSON.parse(text); throw new Error(data.message || 'Unauthorized access'); }
+                catch (e) { throw new Error('Server returned error: ' + text); }
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) { window.location.reload(); }
+        else { alert('Error: ' + data.message); }
+    })
+    .catch(error => { alert('Error: ' + error.message); })
+    .finally(() => { btn.disabled = false; spinner.classList.add('d-none'); });
+}
+
+function regenerateQRCode(lessonId) {
+    const btn = document.getElementById('regenerate-qr-btn');
+    const spinner = btn.querySelector('.spinner-border');
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+    fetch('/planwise/controllers/QRCodeController.php?action=generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lesson_id: lessonId })
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                try { const data = JSON.parse(text); throw new Error(data.message || 'Unauthorized access'); }
+                catch (e) { throw new Error('Server returned error: ' + text); }
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) { window.location.reload(); }
+        else { alert('Error: ' + data.message); }
+    })
+    .catch(error => { alert('Error: ' + error.message); })
+    .finally(() => { btn.disabled = false; spinner.classList.add('d-none'); });
+}
+</script>
+JS;
+
+require __DIR__ . '/../../layouts/teacher-start.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($plan['title']); ?> - PlanWise</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="/planwise/public/index.php?page=teacher/dashboard">PlanWise</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/planwise/public/index.php?page=teacher/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/planwise/public/index.php?page=teacher/lesson-plans">Lesson Plans</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/planwise/public/index.php?page=teacher/profile">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/planwise/controllers/AuthController.php?action=logout">Logout</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
     <div class="container mt-4">
         <!-- Header -->
@@ -237,101 +273,4 @@ $qr = $qrCode->getByLessonPlanId($lessonPlanId);
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function generateQRCode(lessonId) {
-            const btn = document.getElementById('generate-qr-btn');
-            const spinner = btn.querySelector('.spinner-border');
-
-            // Show loading state
-            btn.disabled = true;
-            spinner.classList.remove('d-none');
-
-            fetch('/planwise/controllers/QRCodeController.php?action=generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ lesson_id: lessonId })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        try {
-                            const data = JSON.parse(text);
-                            throw new Error(data.message || 'Unauthorized access');
-                        } catch (e) {
-                            throw new Error('Server returned error: ' + text);
-                        }
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Reload the page to show the new QR code
-                    window.location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('Error: ' + error.message);
-                console.error(error);
-            })
-            .finally(() => {
-                // Hide loading state
-                btn.disabled = false;
-                spinner.classList.add('d-none');
-            });
-        }
-
-        function regenerateQRCode(lessonId) {
-            const btn = document.getElementById('regenerate-qr-btn');
-            const spinner = btn.querySelector('.spinner-border');
-
-            // Show loading state
-            btn.disabled = true;
-            spinner.classList.remove('d-none');
-
-            fetch('/planwise/controllers/QRCodeController.php?action=generate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ lesson_id: lessonId })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        try {
-                            const data = JSON.parse(text);
-                            throw new Error(data.message || 'Unauthorized access');
-                        } catch (e) {
-                            throw new Error('Server returned error: ' + text);
-                        }
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Reload the page to show the new QR code
-                    window.location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert('Error: ' + error.message);
-                console.error(error);
-            })
-            .finally(() => {
-                // Hide loading state
-                btn.disabled = false;
-                spinner.classList.add('d-none');
-            });
-        }
-    </script>
-</body>
-</html>
+<?php require __DIR__ . '/../../layouts/teacher-end.php'; ?>

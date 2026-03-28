@@ -36,3 +36,10 @@
 [2026-03-22 00:10:03] User:7 Action:user_logout IP:127.0.0.1 - User logged out: josiahsdigitalservices@gmail.com
 [2026-03-22 00:10:05] User:6 Action:user_login IP:127.0.0.1 - User logged in: josiah.johnson6550@gmail.com
 [2026-03-28 14:39:54] User:7 Action:user_login IP:::1 - User logged in: josiahsdigitalservices@gmail.com
+[2026-03-28 14:40:35] User:7 Action:user_logout IP:::1 - User logged out: josiahsdigitalservices@gmail.com
+[2026-03-28 14:40:39] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-28 14:41:54] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-28 14:41:59] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-03-28 14:42:05] User:6 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-03-28 14:42:08] User:7 Action:user_login IP:::1 - User logged in: josiahsdigitalservices@gmail.com
+[2026-03-28 14:43:40] User:7 Action:user_logout IP:::1 - User logged out: josiahsdigitalservices@gmail.com

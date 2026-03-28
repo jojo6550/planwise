@@ -216,8 +216,7 @@ $sql = "UPDATE users SET
                     role_id = :role_id,
                     status = :status,
                     profile_picture = :profile_picture,
-                    profile_thumbnail = :profile_thumbnail,
-                    updated_at = NOW()
+                    profile_thumbnail = :profile_thumbnail
                     WHERE user_id = :user_id";
 
             // Validate profile image paths if provided
@@ -509,14 +508,15 @@ $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.statu
         $user = $this->findById($userId);
         if (!$user) return '/public/css/default-avatar.png';
 
+        $base = '/planwise/';
         if ($thumbnail) {
-            if (!empty($user['profile_thumbnail'])) return $user['profile_thumbnail'];
-            if (!empty($user['profile_picture'])) return $user['profile_picture'];
+            if (!empty($user['profile_thumbnail'])) return $base . $user['profile_thumbnail'];
+            if (!empty($user['profile_picture'])) return $base . $user['profile_picture'];
         } else {
-            if (!empty($user['profile_picture'])) return $user['profile_picture'];
-            if (!empty($user['profile_thumbnail'])) return $user['profile_thumbnail'];
+            if (!empty($user['profile_picture'])) return $base . $user['profile_picture'];
+            if (!empty($user['profile_thumbnail'])) return $base . $user['profile_thumbnail'];
         }
-        return '/public/css/default-avatar.png';
+        return '/planwise/public/css/default-avatar.png';
     }
 }
 

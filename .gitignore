@@ -1,3 +1,4 @@
 .env
 vendor/
 public/qr/
+uploads/avatars/

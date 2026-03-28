@@ -30,6 +30,10 @@ class Mail
      */
     public function send(string $to, string $subject, string $body, array $headers = []): array
     {
+        if ($this->config['driver'] === 'smtp') {
+            return $this->sendViaSMTP($to, $subject, $body);
+        }
+
         try {
             // Set default headers
             $defaultHeaders = [
@@ -44,14 +48,6 @@ class Mail
             $allHeaders = array_merge($defaultHeaders, $headers);
             $headersString = implode("\r\n", $allHeaders);
 
-            // Log email attempt
-            error_log("=== EMAIL DEBUG START ===");
-            error_log("To: " . $to);
-            error_log("Subject: " . $subject);
-            error_log("From: " . $this->config['from']['name'] . ' <' . $this->config['from']['email'] . '>');
-            error_log("Headers: " . $headersString);
-            error_log("Body preview: " . substr($body, 0, 200) . "...");
-            
             // Check if mail() function is available
             if (!function_exists('mail')) {
                 error_log("ERROR: mail() function is not available!");
@@ -61,34 +57,48 @@ class Mail
                 ];
             }
 
-            // Send email using PHP mail function
             $result = mail($to, $subject, $body, $headersString);
 
-            error_log("mail() returned: " . ($result ? 'true' : 'false'));
-            error_log("=== EMAIL DEBUG END ===");
-
             if ($result) {
-                return [
-                    'success' => true,
-                    'message' => 'Email sent successfully'
-                ];
+                return ['success' => true, 'message' => 'Email sent successfully'];
             } else {
-                // Get additional error info
                 $error = error_get_last();
                 error_log("mail() failed. Last error: " . ($error ? $error['message'] : 'Unknown error'));
-                return [
-                    'success' => false,
-                    'message' => 'Failed to send email. Check server logs for details.'
-                ];
+                return ['success' => false, 'message' => 'Failed to send email. Check server logs for details.'];
             }
 
         } catch (Exception $e) {
             error_log("Mail send EXCEPTION: " . $e->getMessage());
-            error_log("Stack trace: " . $e->getTraceAsString());
-            return [
-                'success' => false,
-                'message' => 'Email sending failed: ' . $e->getMessage()
-            ];
+            return ['success' => false, 'message' => 'Email sending failed: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Send email via SMTP using PHPMailer
+     */
+    private function sendViaSMTP(string $to, string $subject, string $body): array
+    {
+        try {
+            $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host       = $this->config['host'];
+            $mail->SMTPAuth   = !empty($this->config['username']);
+            $mail->Username   = $this->config['username'];
+            $mail->Password   = $this->config['password'];
+            $mail->SMTPSecure = $this->config['encryption'] === 'ssl'
+                ? PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS
+                : PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = (int)$this->config['port'];
+            $mail->setFrom($this->config['from']['email'], $this->config['from']['name']);
+            $mail->addAddress($to);
+            $mail->isHTML(false);
+            $mail->Subject = $subject;
+            $mail->Body    = $body;
+            $mail->send();
+            return ['success' => true, 'message' => 'Email sent successfully'];
+        } catch (Exception $e) {
+            error_log("SMTP send failed: " . $e->getMessage());
+            return ['success' => false, 'message' => 'SMTP error: ' . $e->getMessage()];
         }
     }
 

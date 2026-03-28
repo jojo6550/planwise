@@ -10,6 +10,7 @@ return [
     'port' => $_ENV['MAIL_PORT'] ?? 25,
     'username' => $_ENV['MAIL_USERNAME'] ?? '',
     'password' => $_ENV['MAIL_PASSWORD'] ?? '',
+    'encryption' => $_ENV['MAIL_ENCRYPTION'] ?? 'tls',
     'from' => [
         'name' => $_ENV['MAIL_FROM_NAME'] ?? 'PlanWise',
         'email' => $_ENV['MAIL_FROM_EMAIL'] ?? 'noreply@planwise.local'

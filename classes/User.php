@@ -220,15 +220,26 @@ $sql = "UPDATE users SET
                     updated_at = NOW()
                     WHERE user_id = :user_id";
 
+            // Validate profile image paths if provided
+            $profilePicture = $data['profile_picture'] ?? $existing['profile_picture'] ?? null;
+            $profileThumbnail = $data['profile_thumbnail'] ?? $existing['profile_thumbnail'] ?? null;
+            
+            if ($profilePicture && !file_exists(__DIR__ . '/../' . $profilePicture)) {
+                return ['success' => false, 'message' => 'Profile image file not found'];
+            }
+            if ($profileThumbnail && !file_exists(__DIR__ . '/../' . $profileThumbnail)) {
+                return ['success' => false, 'message' => 'Profile thumbnail not found'];
+            }
+            
             $params = [
                 ':user_id' => $userId,
                 ':first_name' => trim($data['first_name'] ?? $existing['first_name']),
                 ':last_name' => trim($data['last_name'] ?? $existing['last_name']),
                 ':email' => trim(strtolower($data['email'] ?? $existing['email'])),
-                ':role_id' => $data['role_id'] ?? $existing['role_id'],
+                ':role_id' => (int)($data['role_id'] ?? $existing['role_id']),
                 ':status' => $data['status'] ?? $existing['status'],
-                ':profile_picture' => $data['profile_picture'] ?? $existing['profile_picture'] ?? null,
-                ':profile_thumbnail' => $data['profile_thumbnail'] ?? $existing['profile_thumbnail'] ?? null
+                ':profile_picture' => $profilePicture,
+                ':profile_thumbnail' => $profileThumbnail
             ];
 
             $this->db->update($sql, $params);
@@ -238,11 +249,28 @@ $sql = "UPDATE users SET
                 'message' => 'User updated successfully'
             ];
 
+        } catch (PDOException $e) {
+            error_log("User update failed (PDO): " . $e->getMessage());
+            $errorCode = $e->getCode();
+            $errorInfo = $e->errorInfo[1] ?? 0; // MySQL error code
+            
+            if ($errorCode === '23000' || $errorInfo === 1062) { // Duplicate entry
+                if (stripos($e->getMessage(), 'email') !== false) {
+                    return ['success' => false, 'message' => 'Email address already in use'];
+                }
+                return ['success' => false, 'message' => 'Data already exists. Please check your inputs'];
+            } elseif ($errorInfo === 1452) { // Foreign key constraint
+                return ['success' => false, 'message' => 'Invalid role selected'];
+            }
+            return [
+                'success' => false,
+                'message' => 'Database error. Please try again or contact support'
+            ];
         } catch (Exception $e) {
             error_log("User update failed: " . $e->getMessage());
             return [
                 'success' => false,
-                'message' => 'Failed to update user'
+                'message' => 'Update failed. Please try again'
             ];
         }
     }

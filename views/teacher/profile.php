@@ -41,15 +41,36 @@ if (!$userDetails) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate CSRF token (if implemented)
-    // For now, we'll proceed without CSRF for simplicity
+    // Generate CSRF token if not exists
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    
+    // Validate CSRF token
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $_SESSION['error'] = 'Invalid security token';
+        header('Location: /planwise/public/index.php?page=teacher/profile');
+        exit();
+    }
 
     $firstName = trim($_POST['first_name'] ?? '');
     $lastName = trim($_POST['last_name'] ?? '');
     $email = trim($_POST['email'] ?? '');
-
-    // Basic validation
+    
+    // Enhanced validation
+    // Validation (keep only enhanced version)
     $errors = [];
+    if (empty($firstName) || strlen($firstName) > 50) {
+        $errors[] = 'First name is required and must be 50 characters or less';
+    }
+    if (empty($lastName) || strlen($lastName) > 50) {
+        $errors[] = 'Last name is required and must be 50 characters or less';
+    }
+    if (empty($email)) {
+        $errors[] = 'Email is required';
+    } elseif (strlen($email) > 100 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Invalid email format (max 100 characters)';
+    }
     if (empty($firstName)) {
         $errors[] = 'First name is required';
     }
@@ -63,27 +84,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        // Handle profile picture upload
-        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-            require_once __DIR__ . '/../../classes/File.php';
-            $fileHandler = new File();
-            $uploadResult = $fileHandler->profileUpload($_FILES['profile_picture'], $user['user_id']);
-            if ($uploadResult['success']) {
-                $updateData['profile_picture'] = $uploadResult['profile_picture'];
-                $updateData['profile_thumbnail'] = $uploadResult['profile_thumbnail'];
-            } else {
-                $errors[] = $uploadResult['message'];
-                $_SESSION['error'] = implode('<br>', $errors);
+            $updateData = [
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'email' => strtolower($email)
+            ];
+
+            // Handle profile picture upload
+            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+                require_once __DIR__ . '/../../classes/File.php';
+                $fileHandler = new File();
+                $uploadResult = $fileHandler->profileUpload($_FILES['profile_picture'], $user['user_id']);
+                if ($uploadResult['success']) {
+                    $updateData['profile_picture'] = $uploadResult['profile_picture'];
+                    $updateData['profile_thumbnail'] = $uploadResult['profile_thumbnail'];
+                } else {
+                    $errors[] = $uploadResult['message'];
+                }
             }
-        }
 
-        $updateData = [
-            'first_name' => $firstName,
-            'last_name' => $lastName,
-            'email' => $email
-        ];
+            $result = $userModel->update($user['user_id'], $updateData);
 
-        $result = $userModel->update($user['user_id'], $updateData);
+            if ($result['success']) {
 
         if ($result['success']) {
             // Update session data
@@ -217,8 +239,9 @@ unset($_SESSION['success'], $_SESSION['error']);
                                 <input type="email" class="form-control" id="email" name="email"
                                        value="<?php echo htmlspecialchars($userDetails['email'] ?? $user['email']); ?>" required>
                             </div>
-                            <div class="mb-3">
+    <div class="mb-3">
                                 <label class="form-label">Profile Picture</label>
+                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                 <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/jpeg,image/png,image/gif,image/webp">
                                 <div class="form-text">Upload JPEG, PNG, GIF or WebP (max 2MB). Square images recommended.</div>
                                 <img id="imagePreview" class="mt-2 rounded-circle border p-1" src="" width="80" height="80" style="display:none; object-fit: cover;">

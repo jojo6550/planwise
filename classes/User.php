@@ -124,7 +124,7 @@ $sql = "INSERT INTO users (first_name, last_name, email, password_hash, role_id,
     public function getAll(): array
     {
         try {
-$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, r.role_name
+$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, r.role_name
                     FROM users u
                     JOIN roles r ON u.role_id = r.role_id
                     ORDER BY u.created_at DESC";

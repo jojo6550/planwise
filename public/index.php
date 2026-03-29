@@ -89,7 +89,8 @@ $page = $_GET['page'] ?? 'home';
 
 // Define valid pages and their corresponding view files
 $validPages = [
-    'home' => null, // Show landing page
+    'home'            => null, // Show landing page
+    'lesson-plan/pdf' => null, // Public inline PDF for QR code scans (no auth required)
     'login' => 'views/auth/login.php',
     'register' => 'views/auth/register.php',
     'forgot-password' => 'views/auth/forgot-password.php',
@@ -121,7 +122,14 @@ if (array_key_exists($page, $validPages)) {
         include __DIR__ . '/../' . $viewFile;
         exit();
     } elseif ($viewFile === null) {
-        // Show landing page
+        // Handle special null-view routes
+        if ($page === 'lesson-plan/pdf') {
+            require_once __DIR__ . '/../controllers/ExportController.php';
+            $controller = new ExportController();
+            $controller->exportPDF();
+            exit();
+        }
+        // else: fall through to landing page HTML for 'home'
     } else {
         // View file not found, show 404
         include __DIR__ . '/../views/errors/404.php';
@@ -138,34 +146,190 @@ if (array_key_exists($page, $validPages)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PlanWise - Lesson Plan Builder</title>
+    <title>PlanWise &ndash; Lesson Plan Builder for Jamaican Teachers</title>
+    <meta name="description" content="Create, export, and share professional lesson plans with QR codes. Built for Jamaican teachers.">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="container-fluid d-flex align-items-center justify-content-center min-vh-100">
-        <div class="text-center">
-            <header>
-                <h1 class="display-4 mb-4">Welcome to PlanWise – Lesson Plan Builder</h1>
-            </header>
-            <main>
-                <div class="mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-book-half" viewBox="0 0 16 16">
-                        <path d="M8.5 2.687c.654-.689 1.782-.886 3.112-.532 1.234.292 4.005 1.475 4.005 4.594 0 2.39-1.384 4.09-3.083 5.204-.518.282-1.063.454-1.643.542-.509.082-1.021.077-1.522-.02-.99-.188-1.792-.48-2.45-.83-.672-.354-1.187-.806-1.187-1.605 0-.81.544-1.41 1.187-1.805.66-.406 1.518-.674 2.45-.83.502-.103 1.014-.108 1.522-.02.58.088 1.125.26 1.643.542C12.116 8.59 13.5 10.29 13.5 12.69c0 2.119-2.771 3.302-4.005 3.594-1.33.354-2.458.157-3.112-.532-.654-.689-.654-1.805 0-2.494.654-.689 1.782-.886 3.112-.532 1.234.292 4.005 1.475 4.005 4.594 0 2.39-1.384 4.09-3.083 5.204-.518.282-1.063.454-1.643.542-.509.082-1.021.077-1.522-.02-.99-.188-1.792-.48-2.45-.83-.672-.354-1.187-.806-1.187-1.605 0-.81.544-1.41 1.187-1.805.66-.406 1.518-.674 2.45-.83.502-.103 1.014-.108 1.522-.02.58.088 1.125.26 1.643.542C12.116 13.59 13.5 15.29 13.5 17.69c0 2.119-2.771 3.302-4.005 3.594-1.33.354-2.458.157-3.112-.532-.654-.689-.654-1.805 0-2.494z"/>
-                    </svg>
+
+    <!-- ============================================================
+         NAVBAR
+    ============================================================ -->
+    <nav class="navbar navbar-expand-lg lp-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/planwise/public/index.php?page=home">
+                <i class="fas fa-book-open me-2"></i>PlanWise
+            </a>
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#lpNavbar"
+                    aria-controls="lpNavbar" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="lpNavbar">
+                <div class="ms-auto d-flex align-items-center gap-2 pt-2 pt-lg-0">
+                    <a href="/planwise/public/index.php?page=login"
+                       class="btn btn-outline-primary btn-sm px-3">Login</a>
+                    <a href="/planwise/public/index.php?page=register"
+                       class="btn btn-primary btn-sm px-3">Register</a>
                 </div>
-                <div class="d-grid gap-3 d-md-flex justify-content-md-center">
-                    <a href="/planwise/public/index.php?page=login" class="btn btn-primary btn-lg">Login</a>
-                    <a href="/planwise/public/index.php?page=register" class="btn btn-secondary btn-lg">Register</a>
-                </div>
-            </main>
-            <footer class="mt-5">
-                <p class="text-muted">&copy; 2023 PlanWise. All rights reserved.</p>
-            </footer>
+            </div>
         </div>
-    </div>
+    </nav>
+
+    <!-- ============================================================
+         HERO SECTION
+    ============================================================ -->
+    <section class="lp-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1>Build Better Lesson Plans, Effortlessly</h1>
+                    <p class="lead">
+                        Create structured digital lesson plans, export them to PDF or Word,
+                        and share instantly with students and colleagues via QR codes.
+                        Designed for Jamaican teachers.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="/planwise/public/index.php?page=register"
+                           class="btn btn-light btn-lg">
+                            <i class="fas fa-rocket me-2"></i>Get Started Free
+                        </a>
+                        <a href="/planwise/public/index.php?page=login"
+                           class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 lp-hero-illustration">
+                    <div class="lp-hero-card">
+                        <i class="fas fa-file-alt fa-4x mb-3"></i>
+                        <p class="fw-semibold fs-6 mb-1">Lesson Plan Ready</p>
+                        <p class="small mb-3 opacity-75">Mathematics &ndash; Grade 7<br>Fractions &amp; Decimals</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <span class="badge bg-white text-primary px-3 py-2">
+                                <i class="fas fa-file-pdf me-1"></i>PDF
+                            </span>
+                            <span class="badge bg-white text-success px-3 py-2">
+                                <i class="fas fa-qrcode me-1"></i>QR Code
+                            </span>
+                            <span class="badge bg-white text-secondary px-3 py-2">
+                                <i class="fas fa-file-word me-1"></i>Word
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         FEATURES SECTION
+    ============================================================ -->
+    <section class="lp-features">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2>Everything You Need</h2>
+                <p class="section-subtitle">Powerful tools designed around how teachers work</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="lp-feature-card">
+                        <div class="lp-feature-icon blue">
+                            <i class="fas fa-pencil-alt"></i>
+                        </div>
+                        <h3>Create Lesson Plans</h3>
+                        <p>Build structured, professional lesson plans with sections for
+                           objectives, resources, activities, and assessments &mdash; all in one place.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="lp-feature-card">
+                        <div class="lp-feature-icon green">
+                            <i class="fas fa-file-export"></i>
+                        </div>
+                        <h3>Export to PDF &amp; Word</h3>
+                        <p>One-click export to professionally formatted PDF or Word documents,
+                           ready for printing, submission, or archiving.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="lp-feature-card">
+                        <div class="lp-feature-icon purple">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <h3>QR Code Sharing</h3>
+                        <p>Generate a QR code for any lesson plan. Students scan it with their
+                           phone to view the PDF instantly &mdash; no login required.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         HOW IT WORKS SECTION
+    ============================================================ -->
+    <section class="lp-how">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2>How It Works</h2>
+                <p class="section-subtitle">Up and running in minutes</p>
+            </div>
+            <div class="row g-4 justify-content-center">
+                <div class="col-sm-4">
+                    <div class="lp-step">
+                        <div class="lp-step-number">1</div>
+                        <h3>Create Your Account</h3>
+                        <p>Register for free in under a minute. No credit card required.</p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="lp-step">
+                        <div class="lp-step-number">2</div>
+                        <h3>Build Your Lesson Plan</h3>
+                        <p>Fill in your structured plan with objectives, resources, and activities.</p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="lp-step">
+                        <div class="lp-step-number">3</div>
+                        <h3>Export or Share</h3>
+                        <p>Download as PDF or Word, or share a QR code directly with students.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         CTA BANNER
+    ============================================================ -->
+    <section class="lp-cta">
+        <div class="container">
+            <h2>Start Building Better Lesson Plans Today</h2>
+            <p>Join teachers across Jamaica who use PlanWise to save time and teach smarter.</p>
+            <a href="/planwise/public/index.php?page=register" class="btn btn-light btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Sign Up Free
+            </a>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         FOOTER
+    ============================================================ -->
+    <footer class="lp-footer">
+        <div class="container">
+            <p>&copy; 2026 <strong>PlanWise</strong>. All rights reserved.
+               &nbsp;&mdash;&nbsp; Empowering Jamaican teachers, one plan at a time.</p>
+        </div>
+    </footer>
+
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

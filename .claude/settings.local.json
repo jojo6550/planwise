@@ -5,7 +5,8 @@
       "Bash(php -l \"C:\\\\xampp\\\\htdocs\\\\planwise\\\\views\\\\layouts\\\\admin-start.php\")",
       "Bash(php:*)",
       "Bash(composer install:*)",
-      "Bash(composer require:*)"
+      "Bash(composer require:*)",
+      "Bash(grep:*)"
     ]
   }
 }

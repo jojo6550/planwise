@@ -37,9 +37,10 @@ class QRCode
                 ];
             }
 
-            // Generate QR code data (Absolute URL to export lesson plan as PDF inline)
-            // Scanners require an absolute URL to navigate correctly
-            $qrData = $this->getBaseUrl() . "/planwise/controllers/ExportController.php?action=exportPDF&id=" . $lessonPlanId . "&inline=1";
+            // Generate QR code data — routes through the public front controller
+            // Uses APP_URL from .env so the URL works when scanned from any device on the network
+            $appUrl = rtrim($_ENV['APP_URL'] ?? 'http://localhost/planwise/public/', '/');
+            $qrData = $appUrl . '/?page=lesson-plan/pdf&id=' . $lessonPlanId . '&inline=1';
 
             // Generate unique filename for QR image
             $fileName = 'qr_' . $lessonPlanId . '_' . time() . '.png';

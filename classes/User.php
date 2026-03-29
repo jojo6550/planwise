@@ -146,7 +146,7 @@ $sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.statu
     public function findById(int $userId): ?array
     {
         try {
-$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, u.updated_at, COALESCE(r.role_name, CONCAT('Role_', u.role_id)) as role_name
+$sql = "SELECT u.user_id, u.first_name, u.last_name, u.email, u.role_id, u.status, u.profile_picture, u.profile_thumbnail, u.created_at, COALESCE(r.role_name, CONCAT('Role_', u.role_id)) as role_name
                     FROM users u
                     LEFT JOIN roles r ON u.role_id = r.role_id
                     WHERE u.user_id = :user_id";

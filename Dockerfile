@@ -32,6 +32,16 @@ RUN { \
     echo 'session.use_strict_mode=On'; \
 } > /usr/local/etc/php/conf.d/planwise.ini
 
+# Apache VirtualHost — document root set to public/
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/html/public\n\
+    <Directory /var/www/html/public>\n\
+        AllowOverride All\n\
+        Require all granted\n\
+        Options -Indexes +FollowSymLinks\n\
+    </Directory>\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+
 # Install Composer 2
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -47,18 +57,5 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 RUN mkdir -p public/qr exports uploads logs \
     && chown -R www-data:www-data public/qr exports uploads logs \
     && chmod -R 775 public/qr exports uploads logs
-
-# Point Apache document root at public/
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-        /etc/apache2/sites-available/*.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
-        /etc/apache2/apache2.conf \
-        /etc/apache2/conf-available/*.conf
-
-# Allow .htaccess overrides
-RUN sed -i 's/AllowOverride None/AllowOverride All/g' \
-    /etc/apache2/apache2.conf
 
 EXPOSE 80

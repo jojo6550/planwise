@@ -7,7 +7,7 @@
 // Load environment variables
 require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+$dotenv->safeLoad(); // safeLoad() skips missing .env files (Railway uses dashboard env vars)
 
 // Global error handler for production
 function errorHandler($errno, $errstr, $errfile, $errline) {

@@ -3,7 +3,7 @@
     "description": "Lesson Plan Builder",
     "type": "project",
     "require": {
-        "php": ">=7.4",
+        "php": "^8.2",
         "vlucas/phpdotenv": "^5.5",
         "tecnickcom/tcpdf": "^6.6",
         "chillerlan/php-qrcode": "^5.0",

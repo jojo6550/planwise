@@ -1,8 +1,7 @@
 #########################################################
-# PlanWise - Render-ready Apache .htaccess Configuration
-# CS334 Applied Web Programming Project
-# Location: /var/www/html
-# Apache Version: 2.4+ (Docker)
+# PlanWise - Apache Configuration
+# Location: /public/  (web root)
+# Apache 2.4+ | PHP 8.2 | Docker / XAMPP
 # Requires: mod_rewrite, mod_headers, mod_expires, mod_deflate
 #########################################################
 
@@ -13,21 +12,12 @@
     RewriteEngine On
     RewriteBase /
 
-    # Prevent infinite loops: skip existing files/directories and index.php requests
+    # Skip real files and directories (CSS, JS, images, etc.)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # Prevent rewriting index.php itself to avoid loops
-    RewriteCond %{REQUEST_URI} !^/index\.php
-
-    # Protect sensitive directories
-    RewriteRule ^(classes|config|helpers|middleware|tests|views|vendor|database)(/.*)?$ - [F,L]
-
-    # Prevent PHP execution in uploads
-    RewriteRule ^uploads/.*\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$ - [F,L]
-
-    # Route all other requests to front-controller (fixed: remove 'public/' since .htaccess is in public/)
+    # Route everything else through the front controller
     RewriteRule ^(.*)$ index.php?page=$1 [QSA,L]
 </IfModule>
 
@@ -43,68 +33,61 @@
 </IfModule>
 
 # ------------------------------
-# 3. PERFORMANCE: BROWSER CACHING
+# 3. BROWSER CACHING
 # ------------------------------
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault "access plus 1 hour"
 
     # Images
-    ExpiresByType image/jpg "access plus 1 year"
     ExpiresByType image/jpeg "access plus 1 year"
-    ExpiresByType image/gif "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/png  "access plus 1 year"
+    ExpiresByType image/gif  "access plus 1 year"
     ExpiresByType image/svg+xml "access plus 1 year"
     ExpiresByType image/webp "access plus 1 year"
     ExpiresByType image/x-icon "access plus 1 year"
 
-    # CSS/JS
+    # CSS / JS
     ExpiresByType text/css "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
     ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
 
     # Fonts
-    ExpiresByType font/ttf "access plus 1 year"
-    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/ttf  "access plus 1 year"
+    ExpiresByType font/otf  "access plus 1 year"
     ExpiresByType font/woff "access plus 1 year"
     ExpiresByType font/woff2 "access plus 1 year"
-    
+
     # Documents
     ExpiresByType application/pdf "access plus 1 month"
-    ExpiresByType application/vnd.openxmlformats-officedocument.wordprocessingml.document "access plus 1 month"
-    
-    # Data
+
+    # Never cache dynamic data
     ExpiresByType application/json "access plus 0 seconds"
-    ExpiresByType application/xml "access plus 0 seconds"
-    ExpiresByType text/xml "access plus 0 seconds"
+    ExpiresByType text/xml        "access plus 0 seconds"
 </IfModule>
 
 # ------------------------------
-# 4. PERFORMANCE: GZIP COMPRESSION
+# 4. GZIP COMPRESSION
 # ------------------------------
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/xml application/rss+xml application/x-javascript application/font-woff application/font-woff2 application/vnd.ms-fontobject font/ttf font/otf image/svg+xml image/x-icon
-
-    BrowserMatch ^Mozilla/4 gzip-only-text/html
-    BrowserMatch ^Mozilla/4\.0[678] no-gzip
-    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
-    Header append Vary User-Agent
+    AddOutputFilterByType DEFLATE \
+        text/html text/plain text/css text/javascript text/xml \
+        application/javascript application/json application/xml \
+        image/svg+xml font/ttf font/otf font/woff font/woff2
 </IfModule>
 
 # ------------------------------
 # 5. MIME TYPES
 # ------------------------------
 <IfModule mod_mime.c>
-    AddType application/javascript js
     AddType text/javascript js
     AddType application/json json
     AddType image/svg+xml svg svgz
     AddType image/webp webp
-    AddType application/font-woff woff
-    AddType application/font-woff2 woff2
-    AddType application/vnd.ms-fontobject eot
-    AddType font/ttf ttf
-    AddType font/otf otf
+    AddType font/woff  woff
+    AddType font/woff2 woff2
+    AddType font/ttf   ttf
+    AddType font/otf   otf
     AddType application/pdf pdf
     AddType application/vnd.openxmlformats-officedocument.wordprocessingml.document docx
     AddDefaultCharset UTF-8
@@ -113,38 +96,17 @@
 # ------------------------------
 # 6. CUSTOM ERROR PAGES
 # ------------------------------
-ErrorDocument 400 /public/index.php?page=400
-ErrorDocument 401 /public/index.php?page=401
-ErrorDocument 403 /public/index.php?page=403
-ErrorDocument 404 /public/index.php?page=404
-ErrorDocument 500 /public/index.php?page=500
+ErrorDocument 403 /index.php?page=403
+ErrorDocument 404 /index.php?page=404
+ErrorDocument 500 /index.php?page=500
 
 # ------------------------------
-# 7. PHP CONFIGURATION (if allowed)
-# ------------------------------
-<IfModule mod_php7.c>
-    php_flag display_errors Off
-    php_flag log_errors On
-    php_value error_log logs/php_errors.log
-    php_flag session.cookie_httponly On
-    php_flag session.use_strict_mode On
-    php_value upload_max_filesize 10M
-    php_value post_max_size 12M
-    php_value max_execution_time 300
-    php_value max_input_time 300
-    php_value memory_limit 256M
-</IfModule>
-
-# ------------------------------
-# 8. VERSION CONTROL PROTECTION
+# 7. VERSION CONTROL PROTECTION
 # ------------------------------
 RedirectMatch 404 /\.git
-RedirectMatch 404 /\.svn
-RedirectMatch 404 /\.hg
+RedirectMatch 404 /\.env
 
 #########################################################
-# END OF RENDER-READY CONFIGURATION
-#########################################################
-# Last Updated: 2026-02-01
-# Maintainer: CS334 PlanWise Dev Team
+# END OF CONFIGURATION
+# Last Updated: 2026-03-29
 #########################################################

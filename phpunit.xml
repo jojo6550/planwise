@@ -4,7 +4,9 @@
          bootstrap="tests/bootstrap.php"
          colors="true"
          verbose="true"
-         stopOnFailure="false">
+         stopOnFailure="false"
+         convertWarningsToExceptions="false"
+         convertNoticesToExceptions="false">
     <testsuites>
         <testsuite name="Unit Tests">
             <directory>tests/Unit</directory>

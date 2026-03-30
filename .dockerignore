@@ -1,8 +1,24 @@
+# Git history — not needed in image
 .git
+.gitignore
+
+# Secrets — env vars come from Render/Railway dashboard
 .env
-vendor
+
+# Installed at build time by Composer
+vendor/
+
+# Runtime-generated, created fresh by Dockerfile
+public/qr/*
 uploads/*
 exports/*
-public/qr/*
 logs/*
 *.log
+
+# Dev/docs — not needed in production image
+.github
+docs/
+tests/
+*.md
+railway.toml
+render.yaml

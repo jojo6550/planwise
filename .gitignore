@@ -1,4 +1,19 @@
+# Environment — never commit secrets
 .env
+
+# Composer dependencies — installed at build time
 vendor/
-public/qr/
-uploads/avatars/
+
+# Runtime-generated files — created by Dockerfile, not tracked
+public/qr/*
+uploads/*
+exports/*
+logs/*
+*.log
+
+# Keep directory structure in repo
+!public/qr/.gitkeep
+!uploads/.gitkeep
+!exports/.gitkeep
+!logs/.gitkeep
+/node_modules/

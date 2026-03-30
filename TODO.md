@@ -1,3 +1,1 @@
-  To configure email, open .env and replace the Mailtrap placeholder values with your actual credentials. Options:
-  - Mailtrap (easiest for dev, free): sign up at mailtrap.io → go to your inbox → SMTP settings → copy host/port/username/password   
-  - Gmail: use smtp.gmail.com, port 587, your Gmail, and a https://myaccount.google.com/apppasswords (2FA required)
+You are a senior php and testing engineer. please create appropriate, functioning unit tests to verify the backend and frontend services are working as intended then create technical documentation to explain what they do, how to use them and why they are needed. please output the document to a new file called "unit-tests.md"

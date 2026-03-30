@@ -6,7 +6,10 @@
       "Bash(php:*)",
       "Bash(composer install:*)",
       "Bash(composer require:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(vendor/bin/phpunit --testdox)",
+      "Bash(npm install:*)",
+      "Bash(npm test:*)"
     ]
   }
 }

@@ -7,9 +7,11 @@
     "jest-environment-jsdom": "^29.0.0"
   },
   "scripts": {
-    "test": "jest",
+    "test": "vendor\\bin\\phpunit.bat --testdox && jest",
+    "test:php": "vendor\\bin\\phpunit.bat --testdox",
+    "test:js": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "vendor\\bin\\phpunit.bat --coverage-text && jest --coverage"
   },
   "jest": {
     "testEnvironment": "jsdom",

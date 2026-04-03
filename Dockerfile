@@ -34,9 +34,11 @@ RUN npm install && npm run build || true
 # Run composer post scripts
 RUN composer run-script post-install-cmd || true
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+# Create and set permissions for writable directories
+RUN mkdir -p uploads exports public/qr logs \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 777 uploads exports public/qr logs
 
 # Apache config
 RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf \

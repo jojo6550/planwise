@@ -6,8 +6,7 @@
 #########################################################
 
 # Deny all access
-Order Deny,Allow
-Deny from all
+Require all denied
 
 # Prevent directory listing
 Options -Indexes

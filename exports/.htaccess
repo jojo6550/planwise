@@ -7,8 +7,7 @@
 #########################################################
 
 # Deny all direct access
-Order Deny,Allow
-Deny from all
+Require all denied
 
 # Prevent directory listing
 Options -Indexes

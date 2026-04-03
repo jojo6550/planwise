@@ -43,7 +43,9 @@ RUN mkdir -p uploads exports public/qr logs \
 # Apache config
 RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf \
     && a2enmod rewrite \
-    && a2enmod headers
+    && a2enmod headers \
+    && a2enmod dir \
+    && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 80
 

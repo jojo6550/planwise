@@ -17,8 +17,7 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Optional: Install Node deps if present
-RUN if [ -f package.json ]; then npm ci --only=production && npm run build; fi
+
 
 # Ensure writable directories
 RUN mkdir -p uploads exports public/qr logs \

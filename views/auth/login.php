@@ -37,7 +37,7 @@ $csrfToken = AuthController::generateCsrfToken();
     <title>Login - PlanWise</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS with BASE_URL -->
-    <link rel="stylesheet" href="<?php echo htmlspecialchars(BASE_URL . '/css/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(BASE_URL); ?>/css/style.css">
 </head>
 <body class="bg-light">
     <div class="container">

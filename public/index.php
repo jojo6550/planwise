@@ -176,7 +176,7 @@ if (array_key_exists($page, $validPages)) {
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS with BASE_URL -->
-    <link rel="stylesheet" href="<?php echo htmlspecialchars(BASE_URL . '/css/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(BASE_URL); ?>/css/style.css">
 </head>
 <body>
 

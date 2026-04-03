@@ -3,36 +3,9 @@
 # Redirects all traffic to public/ directory
 #########################################################
 
-# Deny access to sensitive directories
+# Protect sensitive files
 <FilesMatch "^\.env$">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-<Directory "classes">
-    Order Deny,Allow
-    Deny from all
-</Directory>
-
-<Directory "controllers">
-    Order Deny,Allow
-    Deny from all
-</Directory>
-
-<Directory "config">
-    Order Deny,Allow
-    Deny from all
-</Directory>
-
-<Directory "database">
-    Order Deny,Allow
-    Deny from all
-</Directory>
-
-# Deny PHP execution in uploads
-<FilesMatch "\.php$">
-    Order Deny,Allow
-    Deny from all
+    Require all denied
 </FilesMatch>
 
 # Version control protection

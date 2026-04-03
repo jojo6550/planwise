@@ -120,7 +120,7 @@ class AuthController extends BaseController
 
         // Redirect to login page with success message via session
         $_SESSION['success'] = $result['message'];
-        header('Location: /planwise/public/index.php?page=login');
+        header('Location: ' . BASE_URL . '/index.php?page=login');
         exit();
     }
 
@@ -281,8 +281,8 @@ class AuthController extends BaseController
 
             // In DEBUG MODE, expose the reset URL in session only (never in logs)
             if (defined('DEBUG_MODE') && DEBUG_MODE) {
-                $resetUrl = ($_ENV['APP_URL'] ?? 'http://localhost/planwise/public/')
-                    . 'index.php?page=reset-password&token=' . $result['token'];
+                $resetUrl = (BASE_URL ?? ($_ENV['APP_URL'] ?? 'http://localhost'))
+                    . '/index.php?page=reset-password&token=' . $result['token'];
                 $_SESSION['debug_reset_link'] = $resetUrl;
             }
 
@@ -395,8 +395,7 @@ if (basename($_SERVER['PHP_SELF']) === 'AuthController.php') {
         case 'reset-password':
             $controller->resetPassword();
             break;
-        default:
-            header('Location: /planwise/public/index.php');
-            exit();
     }
 }
+
+?>// Direct access handler removed - use index.php router only

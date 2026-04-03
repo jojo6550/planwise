@@ -1,0 +1,62 @@
+#########################################################
+# PlanWise - Root .htaccess (protects non-public files)
+# Redirects all traffic to public/ directory
+#########################################################
+
+# Deny access to sensitive directories
+<FilesMatch "^\.env$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<Directory "classes">
+    Order Deny,Allow
+    Deny from all
+</Directory>
+
+<Directory "controllers">
+    Order Deny,Allow
+    Deny from all
+</Directory>
+
+<Directory "config">
+    Order Deny,Allow
+    Deny from all
+</Directory>
+
+<Directory "database">
+    Order Deny,Allow
+    Deny from all
+</Directory>
+
+# Deny PHP execution in uploads
+<FilesMatch "\.php$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Version control protection
+RedirectMatch 404 /\.git
+RedirectMatch 404 /composer\.(json|lock)$
+
+# Block common exploits
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Block direct access to PHP files outside public/
+    RewriteRule ^(classes|controllers|config|database|tests|helpers|logs)/ - [F,L]
+    
+    # Redirect everything else to public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always unset X-Powered-By
+</IfModule>

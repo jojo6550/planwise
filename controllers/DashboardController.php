@@ -31,7 +31,7 @@ class DashboardController
         // Check if user is authenticated
         if (!$this->auth->check()) {
             $_SESSION['error'] = 'Please login to access the dashboard';
-            header('Location: /planwise/public/index.php?page=login');
+            header('Location: ' . BASE_URL . '/index.php?page=login');
             exit();
         }
 

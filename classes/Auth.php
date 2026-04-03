@@ -232,10 +232,11 @@ class Auth
      * @param string $redirectUrl URL to redirect if not authenticated
      * @return void
      */
-    public function requireAuth(string $redirectUrl = '/planwise/public/index.php?page=login')
+    public function requireAuth(string $redirectUrl = null)
     {
+        $url = $redirectUrl ?: BASE_URL . '/index.php?page=login';
         if (!$this->check()) {
-            header("Location: {$redirectUrl}");
+            header("Location: {$url}");
             exit();
         }
     }
@@ -247,10 +248,11 @@ class Auth
      * @param string $redirectUrl URL to redirect if role check fails
      * @return void
      */
-    public function requireRole(int $roleId, string $redirectUrl = '/planwise/public/index.php?page=403')
+    public function requireRole(int $roleId, string $redirectUrl = null)
     {
+        $url = $redirectUrl ?: BASE_URL . '/index.php?page=403';
         if (!$this->hasRole($roleId)) {
-            header("Location: {$redirectUrl}");
+            header("Location: {$url}");
             exit();
         }
     }

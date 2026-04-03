@@ -43,7 +43,7 @@ abstract class BaseController
     protected function redirectWithError(string $message, string $page): void
     {
         $_SESSION['error'] = $message;
-        header("Location: /planwise/public/index.php?page={$page}");
+        header("Location: " . BASE_URL . "/index.php?page={$page}");
         exit();
     }
 
@@ -56,7 +56,7 @@ abstract class BaseController
     protected function redirectWithSuccess(string $message, string $page): void
     {
         $_SESSION['success'] = $message;
-        header("Location: /planwise/public/index.php?page={$page}");
+        header("Location: " . BASE_URL . "/index.php?page={$page}");
         exit();
     }
 

@@ -9,18 +9,14 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Redirect if already authenticated
-require_once __DIR__ . '/../../classes/Database.php';
-require_once __DIR__ . '/../../classes/User.php';
-require_once __DIR__ . '/../../classes/Auth.php';
-
+// Redirect if already authenticated (requires already loaded via index.php)
 $auth = new Auth();
 if ($auth->check()) {
     $user = $auth->user();
     if ($user['role_id'] == 1) {
-        header('Location: /planwise/public/index.php?page=admin/dashboard');
+        header('Location: ' . BASE_URL . '/index.php?page=admin/dashboard');
     } else {
-        header('Location: /planwise/public/index.php?page=teacher/dashboard');
+        header('Location: ' . BASE_URL . '/index.php?page=teacher/dashboard');
     }
     exit();
 }
@@ -31,7 +27,6 @@ $success = $_SESSION['success'] ?? '';
 unset($_SESSION['error'], $_SESSION['success']);
 
 // Generate CSRF token
-require_once __DIR__ . '/../../controllers/AuthController.php';
 $csrfToken = AuthController::generateCsrfToken();
 ?>
 <!DOCTYPE html>
@@ -40,8 +35,9 @@ $csrfToken = AuthController::generateCsrfToken();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - PlanWise</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/planwise/public/css/style.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS with BASE_URL -->
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(BASE_URL . '/css/style.css'); ?>">
 </head>
 <body class="bg-light">
     <div class="container">
@@ -78,7 +74,7 @@ $csrfToken = AuthController::generateCsrfToken();
                         <?php endif; ?>
 
                         <!-- Login Form -->
-                        <form method="POST" action="/planwise/controllers/AuthController.php?action=login" id="loginForm">
+                        <form method="POST" action="<?php echo htmlspecialchars(BASE_URL . '/index.php?page=login'); ?>" id="loginForm">
                             <!-- CSRF Token -->
                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
 
@@ -137,7 +133,7 @@ $csrfToken = AuthController::generateCsrfToken();
 
                             <!-- Forgot Password Link -->
                             <div class="text-center mb-3">
-                                <a href="/planwise/public/index.php?page=forgot-password" class="text-decoration-none">
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php?page=forgot-password'); ?>" class="text-decoration-none">
                                     Forgot your password?
                                 </a>
                             </div>
@@ -145,7 +141,7 @@ $csrfToken = AuthController::generateCsrfToken();
                             <!-- Registration Link -->
                             <div class="text-center">
                                 <span class="text-muted">Don't have an account?</span>
-                                <a href="/planwise/public/index.php?page=register" class="text-decoration-none">
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php?page=register'); ?>" class="text-decoration-none">
                                     Sign Up
                                 </a>
                             </div>

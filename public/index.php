@@ -71,16 +71,21 @@ error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 ini_set('log_errors', 1);
 ini_set('error_log', 'php://stderr');
 
+// Define BASE_URL for deployment flexibility (handles /planwise/ subdir on Render)
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+$host = $_SERVER['HTTP_HOST'];
+$scriptPath = dirname($_SERVER['SCRIPT_NAME']);
+$BASE_URL = rtrim($protocol . $host . $scriptPath, '/');
+define('BASE_URL', $BASE_URL);
+
 // Start session with Render-friendly settings
 if (session_status() === PHP_SESSION_NONE) {
-    // Configure session for better Render compatibility
     $isSecure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
     ini_set('session.cookie_secure', $isSecure ? 1 : 0);
     ini_set('session.cookie_httponly', 1);
     ini_set('session.use_strict_mode', 1);
-    ini_set('session.gc_maxlifetime', 3600); // 1 hour
-    ini_set('session.cookie_lifetime', 0); // Session cookie
-
+    ini_set('session.gc_maxlifetime', 3600);
+    ini_set('session.cookie_lifetime', 0);
     session_start();
 }
 
@@ -114,32 +119,50 @@ $validPages = [
     '500' => 'views/errors/500.php',
 ];
 
+// Enhanced routing with POST controller handling
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && array_key_exists($page, $validPages)) {
+    // Handle POST requests for controller actions
+    switch ($page) {
+        case 'login':
+            require_once __DIR__ . '/../controllers/AuthController.php';
+            $controller = new AuthController();
+            $controller->login();
+            break;
+        case 'register':
+            require_once __DIR__ . '/../controllers/AuthController.php';
+            $controller = new AuthController();
+            $controller->register();
+            break;
+        // Add more POST handlers as needed (forgot-password, etc.)
+        default:
+            // Fall through to GET/view
+            break;
+    }
+}
+
 // Check if the page is valid
 if (array_key_exists($page, $validPages)) {
     $viewFile = $validPages[$page];
     if ($viewFile !== null && file_exists(__DIR__ . '/../' . $viewFile)) {
-        // Include the view file
-        include __DIR__ . '/../' . $viewFile;
+        include __DIR__ . '/../views/' . $viewFile;
         exit();
     } elseif ($viewFile === null) {
-        // Handle special null-view routes
         if ($page === 'lesson-plan/pdf') {
             require_once __DIR__ . '/../controllers/ExportController.php';
             $controller = new ExportController();
             $controller->exportPDF();
             exit();
         }
-        // else: fall through to landing page HTML for 'home'
     } else {
-        // View file not found, show 404
         include __DIR__ . '/../views/errors/404.php';
         exit();
     }
 } else {
-    // Invalid page, show 404
     include __DIR__ . '/../views/errors/404.php';
     exit();
 }
+
+// Home landing page with BASE_URL (only shown for GET home)
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -152,8 +175,8 @@ if (array_key_exists($page, $validPages)) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Custom CSS with BASE_URL -->
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(BASE_URL . '/css/style.css'); ?>">
 </head>
 <body>
 
@@ -161,22 +184,23 @@ if (array_key_exists($page, $validPages)) {
          NAVBAR
     ============================================================ -->
     <nav class="navbar navbar-expand-lg lp-navbar">
-        <div class="container">
-            <a class="navbar-brand" href="/planwise/public/index.php?page=home">
-                <i class="fas fa-book-open me-2"></i>PlanWise
-            </a>
-            <button class="navbar-toggler" type="button"
-                    data-bs-toggle="collapse" data-bs-target="#lpNavbar"
-                    aria-controls="lpNavbar" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="lpNavbar">
-                <div class="ms-auto d-flex align-items-center gap-2 pt-2 pt-lg-0">
-                    <a href="/planwise/public/index.php?page=login"
-                       class="btn btn-outline-primary btn-sm px-3">Login</a>
-                    <a href="/planwise/public/index.php?page=register"
-                       class="btn btn-primary btn-sm px-3">Register</a>
+            <div class="container">
+                <a class="navbar-brand" href="<?php echo htmlspecialchars(BASE_URL . '/index.php?page=home'); ?>">
+                    <i class="fas fa-book-open me-2"></i>PlanWise
+                </a>
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#lpNavbar"
+                        aria-controls="lpNavbar" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="lpNavbar">
+                    <div class="ms-auto d-flex align-items-center gap-2 pt-2 pt-lg-0">
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php?page=login'); ?>"
+                           class="btn btn-outline-primary btn-sm px-3">Login</a>
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php?page=register'); ?>"
+                           class="btn btn-primary btn-sm px-3">Register</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -196,11 +220,11 @@ if (array_key_exists($page, $validPages)) {
                         Designed for Jamaican teachers.
                     </p>
                     <div class="d-flex flex-wrap gap-3">
-                        <a href="/planwise/public/index.php?page=register"
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php?page=register'); ?>"
                            class="btn btn-light btn-lg">
                             <i class="fas fa-rocket me-2"></i>Get Started Free
                         </a>
-                        <a href="/planwise/public/index.php?page=login"
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php?page=login'); ?>"
                            class="btn btn-outline-light btn-lg">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </a>
@@ -314,7 +338,7 @@ if (array_key_exists($page, $validPages)) {
         <div class="container">
             <h2>Start Building Better Lesson Plans Today</h2>
             <p>Join teachers across Jamaica who use PlanWise to save time and teach smarter.</p>
-            <a href="/planwise/public/index.php?page=register" class="btn btn-light btn-lg">
+            <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php?page=register'); ?>" class="btn btn-light btn-lg">
                 <i class="fas fa-user-plus me-2"></i>Sign Up Free
             </a>
         </div>

@@ -102,6 +102,24 @@ $page = $_GET['page'] ?? 'home';
 $validPages = [
     'home'            => null, // Show landing page
     'lesson-plan/pdf' => null, // Public inline PDF for QR code scans (no auth required)
+    'logout'                          => null,
+    'teacher/lesson-plans/update'     => null,
+    'teacher/lesson-plans/delete'     => null,
+    'lesson-plan/email'               => null,
+    'lesson-plan/email-multiple'      => null,
+    'lesson-plan/export-pdf'          => null,
+    'lesson-plan/qr-generate'         => null,
+    'lesson-plan/qr-display'          => null,
+    'file/download'                   => null,
+    'admin/users/update'              => null,
+    'admin/users/change-password'     => null,
+    'admin/users/update-status'       => null,
+    'admin/users/delete'              => null,
+    'admin/users/export'              => null,
+    'admin/import/template'           => null,
+    'admin/import/upload'             => null,
+    'admin/activity-log/cleanup'      => null,
+    'admin/ajax/search-users'         => null,
     'login' => 'views/auth/login.php',
     'register' => 'views/auth/register.php',
     'forgot-password' => 'views/auth/forgot-password.php',
@@ -139,7 +157,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && array_key_exists($page, $validPages
             $controller = new AuthController();
             $controller->register();
             break;
-        // Add more POST handlers as needed (forgot-password, etc.)
+        case 'forgot-password':
+            require_once __DIR__ . '/../controllers/AuthController.php';
+            $controller = new AuthController();
+            $controller->forgotPassword();
+            break;
+        case 'reset-password':
+            require_once __DIR__ . '/../controllers/AuthController.php';
+            $controller = new AuthController();
+            $controller->resetPassword();
+            break;
+        case 'teacher/lesson-plans/create':
+            require_once __DIR__ . '/../controllers/LessonPlanController.php';
+            $controller = new LessonPlanController();
+            $controller->create();
+            break;
+        case 'teacher/lesson-plans/update':
+            require_once __DIR__ . '/../controllers/LessonPlanController.php';
+            $controller = new LessonPlanController();
+            $controller->update();
+            break;
+        case 'teacher/lesson-plans/delete':
+            require_once __DIR__ . '/../controllers/LessonPlanController.php';
+            $controller = new LessonPlanController();
+            $controller->delete();
+            break;
+        case 'lesson-plan/email':
+            require_once __DIR__ . '/../controllers/LessonPlanController.php';
+            $controller = new LessonPlanController();
+            $controller->emailLesson();
+            break;
+        case 'lesson-plan/email-multiple':
+            require_once __DIR__ . '/../controllers/LessonPlanController.php';
+            $controller = new LessonPlanController();
+            $controller->emailLessonMultiple();
+            break;
+        case 'lesson-plan/qr-generate':
+            require_once __DIR__ . '/../controllers/QRCodeController.php';
+            $controller = new QRCodeController();
+            $controller->generate();
+            break;
+        case 'admin/users/create':
+            require_once __DIR__ . '/../controllers/UserController.php';
+            $controller = new UserController();
+            $controller->create();
+            break;
+        case 'admin/users/update':
+            require_once __DIR__ . '/../controllers/UserController.php';
+            $controller = new UserController();
+            $controller->update();
+            break;
+        case 'admin/users/change-password':
+            require_once __DIR__ . '/../controllers/UserController.php';
+            $controller = new UserController();
+            $controller->update(); // changePassword() not yet implemented; delegate to update()
+            break;
+        case 'admin/users/update-status':
+            require_once __DIR__ . '/../controllers/UserController.php';
+            $controller = new UserController();
+            $controller->updateStatus();
+            break;
+        case 'admin/users/delete':
+            require_once __DIR__ . '/../controllers/UserController.php';
+            $controller = new UserController();
+            $controller->delete();
+            break;
+        case 'admin/import/upload':
+            require_once __DIR__ . '/../controllers/ImportController.php';
+            $controller = new ImportController();
+            $controller->upload();
+            break;
+        case 'admin/activity-log/cleanup':
+            require_once __DIR__ . '/../controllers/ActivityLogController.php';
+            $controller = new ActivityLogController();
+            $controller->cleanup();
+            break;
         default:
             // Fall through to GET/view
             break;
@@ -157,11 +249,46 @@ if (array_key_exists($page, $validPages)) {
         include __DIR__ . '/../' . $viewFile;
         exit();
     } elseif ($viewFile === null) {
-        if ($page === 'lesson-plan/pdf') {
-            require_once __DIR__ . '/../controllers/ExportController.php';
-            $controller = new ExportController();
-            $controller->exportPDF();
-            exit();
+        switch ($page) {
+            case 'lesson-plan/pdf':
+            case 'lesson-plan/export-pdf':
+                require_once __DIR__ . '/../controllers/ExportController.php';
+                $controller = new ExportController();
+                $controller->exportPDF();
+                exit();
+            case 'logout':
+                require_once __DIR__ . '/../controllers/AuthController.php';
+                $controller = new AuthController();
+                $controller->logout();
+                exit();
+            case 'lesson-plan/qr-display':
+                require_once __DIR__ . '/../controllers/QRCodeController.php';
+                $controller = new QRCodeController();
+                $controller->display();
+                exit();
+            case 'file/download':
+                require_once __DIR__ . '/../controllers/FileController.php';
+                $controller = new FileController();
+                $controller->download();
+                exit();
+            case 'admin/users/export':
+                require_once __DIR__ . '/../controllers/ExportController.php';
+                $controller = new ExportController();
+                $controller->exportTeachers();
+                exit();
+            case 'admin/import/template':
+                require_once __DIR__ . '/../controllers/ImportController.php';
+                $controller = new ImportController();
+                $controller->downloadTemplate();
+                exit();
+            case 'admin/ajax/search-users':
+                require_once __DIR__ . '/../controllers/AjaxController.php';
+                $controller = new AjaxController();
+                $controller->searchUsers();
+                exit();
+            default:
+                // No-op: POST-only routes (already handled above) fall through here
+                break;
         }
     } else {
         include __DIR__ . '/../views/errors/404.php';

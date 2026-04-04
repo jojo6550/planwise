@@ -16,7 +16,7 @@ $auth = new Auth();
 
 if (!$auth->check()) {
     $_SESSION['error'] = 'Please login to access your profile';
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $_SESSION['error'] = 'Invalid security token';
-        header('Location: /planwise/public/index.php?page=teacher/profile');
+        header('Location: ' . BASE_URL . '/index.php?page=teacher/profile');
         exit();
     }
 
@@ -99,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = implode('<br>', $errors);
     }
 
-    header('Location: /planwise/public/index.php?page=teacher/profile');
+    header('Location: ' . BASE_URL . '/index.php?page=teacher/profile');
     exit();
 }
 
@@ -227,7 +227,7 @@ require __DIR__ . '/../layouts/teacher-start.php';
                                     </svg>
                                     Update Profile
                                 </button>
-                                <a href="/planwise/public/index.php?page=teacher/dashboard" class="btn btn-outline-secondary">Cancel</a>
+                                <a href="<?= BASE_URL ?>/index.php?page=teacher/dashboard" class="btn btn-outline-secondary">Cancel</a>
                             </div>
                         </form>
                     </div>
@@ -258,13 +258,13 @@ require __DIR__ . '/../layouts/teacher-start.php';
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <a href="/planwise/public/index.php?page=teacher/dashboard" class="btn btn-outline-primary btn-sm">
+                            <a href="<?= BASE_URL ?>/index.php?page=teacher/dashboard" class="btn btn-outline-primary btn-sm">
                                 Back to Dashboard
                             </a>
-                            <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-outline-success btn-sm">
+                            <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/create" class="btn btn-outline-success btn-sm">
                                 Create Lesson Plan
                             </a>
-                            <a href="/planwise/controllers/AuthController.php?action=logout" class="btn btn-outline-danger btn-sm">
+                            <a href="<?= BASE_URL ?>/index.php?page=logout" class="btn btn-outline-danger btn-sm">
                                 Logout
                             </a>
                         </div>

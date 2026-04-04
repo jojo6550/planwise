@@ -18,9 +18,9 @@ $auth = new Auth();
 if ($auth->check()) {
     $user = $auth->user();
     if ($user['role_id'] == 1) {
-        header('Location: /planwise/public/index.php?page=admin/dashboard');
+        header('Location: ' . BASE_URL . '/index.php?page=admin/dashboard');
     } else {
-        header('Location: /planwise/public/index.php?page=teacher/dashboard');
+        header('Location: ' . BASE_URL . '/index.php?page=teacher/dashboard');
     }
     exit();
 }
@@ -42,7 +42,7 @@ $csrfToken = AuthController::generateCsrfToken();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - PlanWise</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/planwise/public/css/style.css">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(BASE_URL); ?>/css/style.css">
 </head>
 <body class="bg-light">
     <div class="container">
@@ -90,7 +90,7 @@ $csrfToken = AuthController::generateCsrfToken();
                         <?php endif; ?>
 
                         <!-- Registration Form -->
-                        <form method="POST" action="/planwise/controllers/AuthController.php?action=register" id="registerForm" novalidate>
+                        <form method="POST" action="<?php echo htmlspecialchars(BASE_URL); ?>/index.php?page=register" id="registerForm" novalidate>
                             <!-- CSRF Token -->
                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
 
@@ -197,7 +197,7 @@ $csrfToken = AuthController::generateCsrfToken();
                             <!-- Login Link -->
                             <div class="text-center">
                                 <span class="text-muted">Already have an account?</span>
-                                <a href="/planwise/public/index.php?page=login" class="text-decoration-none">
+                                <a href="<?php echo htmlspecialchars(BASE_URL); ?>/index.php?page=login" class="text-decoration-none">
                                     Sign In
                                 </a>
                             </div>

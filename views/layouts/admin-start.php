@@ -21,11 +21,11 @@ $_email    = htmlspecialchars($user['email'] ?? '');
 $_active   = $activePage ?? '';
 
 $_navLinks = [
-    'dashboard'       => ['label' => 'Dashboard',       'icon' => 'fas fa-tachometer-alt', 'url' => '/planwise/public/index.php?page=admin/dashboard',       'group' => ['dashboard']],
-    'users'           => ['label' => 'User Management', 'icon' => 'fas fa-users',           'url' => '/planwise/public/index.php?page=admin/users',           'group' => ['users','users-create','users-edit','users-view']],
-    'activity-logs'   => ['label' => 'Activity Logs',   'icon' => 'fas fa-history',         'url' => '/planwise/public/index.php?page=admin/activity-logs',   'group' => ['activity-logs']],
-    'system-settings' => ['label' => 'System Settings', 'icon' => 'fas fa-cog',             'url' => '/planwise/public/index.php?page=admin/system-settings', 'group' => ['system-settings']],
-    'import'          => ['label' => 'Data Import',     'icon' => 'fas fa-file-import',     'url' => '/planwise/public/index.php?page=admin/import',           'group' => ['import']],
+    'dashboard'       => ['label' => 'Dashboard',       'icon' => 'fas fa-tachometer-alt', 'url' => BASE_URL . '/index.php?page=admin/dashboard',       'group' => ['dashboard']],
+    'users'           => ['label' => 'User Management', 'icon' => 'fas fa-users',           'url' => BASE_URL . '/index.php?page=admin/users',           'group' => ['users','users-create','users-edit','users-view']],
+    'activity-logs'   => ['label' => 'Activity Logs',   'icon' => 'fas fa-history',         'url' => BASE_URL . '/index.php?page=admin/activity-logs',   'group' => ['activity-logs']],
+    'system-settings' => ['label' => 'System Settings', 'icon' => 'fas fa-cog',             'url' => BASE_URL . '/index.php?page=admin/system-settings', 'group' => ['system-settings']],
+    'import'          => ['label' => 'Data Import',     'icon' => 'fas fa-file-import',     'url' => BASE_URL . '/index.php?page=admin/import',           'group' => ['import']],
 ];
 ?>
 <!DOCTYPE html>
@@ -48,7 +48,7 @@ $_navLinks = [
 <!-- ===================== SIDEBAR ===================== -->
 <nav class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
 
-    <a href="/planwise/public/index.php?page=admin/dashboard" class="sidebar-brand">
+    <a href="<?= BASE_URL ?>/index.php?page=admin/dashboard" class="sidebar-brand">
         <div class="sidebar-brand-icon">
             <i class="fas fa-book-open"></i>
         </div>
@@ -103,7 +103,7 @@ $_navLinks = [
 
         <div class="sidebar-divider"></div>
 
-        <a href="/planwise/controllers/AuthController.php?action=logout" class="sidebar-link"
+        <a href="<?= BASE_URL ?>/index.php?page=logout" class="sidebar-link"
            onclick="return confirm('Are you sure you want to logout?');">
             <i class="fas fa-sign-out-alt"></i>
             <span>Logout</span>
@@ -160,7 +160,7 @@ $_navLinks = [
                         </div>
                     </li>
                     <li>
-                        <a class="dropdown-item rounded" href="/planwise/public/index.php?page=admin/system-settings"
+                        <a class="dropdown-item rounded" href="<?= BASE_URL ?>/index.php?page=admin/system-settings"
                            style="font-size:0.875rem;">
                             <i class="fas fa-cog me-2 text-muted fa-sm"></i> Settings
                         </a>
@@ -168,7 +168,7 @@ $_navLinks = [
                     <li><hr class="dropdown-divider my-1"></li>
                     <li>
                         <a class="dropdown-item rounded text-danger"
-                           href="/planwise/controllers/AuthController.php?action=logout"
+                           href="<?= BASE_URL ?>/index.php?page=logout"
                            onclick="return confirm('Are you sure you want to logout?');"
                            style="font-size:0.875rem;">
                             <i class="fas fa-sign-out-alt me-2 fa-sm"></i> Logout
@@ -184,6 +184,7 @@ $_navLinks = [
 <script>
 /* === Admin Topbar Search (AJAX) === */
 (function () {
+    const BASE_URL = '<?= BASE_URL ?>';
     const input = document.getElementById('adminSearchInput');
     if (!input) return;
 
@@ -206,7 +207,7 @@ $_navLinks = [
         debounceTimer = setTimeout(async function () {
             try {
                 const res = await fetch(
-                    '/planwise/controllers/AjaxController.php?action=searchUsers&q=' + encodeURIComponent(q)
+                    BASE_URL + '/index.php?page=admin/ajax/search-users&q=' + encodeURIComponent(q)
                 );
                 const data = await res.json();
                 if (!data.success) { dropdown.style.display = 'none'; return; }
@@ -216,7 +217,7 @@ $_navLinks = [
                 } else {
                     dropdown.innerHTML = data.data.slice(0, 8).map(function (u) {
                         const initials = ((u.first_name || '?')[0] + (u.last_name || '?')[0]).toUpperCase();
-                        return '<a href="/planwise/public/index.php?page=admin/users/view&id=' + u.user_id + '"' +
+                        return '<a href="' + BASE_URL + '/index.php?page=admin/users/view&id=' + u.user_id + '"' +
                             ' style="display:flex;align-items:center;gap:10px;padding:8px 14px;text-decoration:none;' +
                             'color:#1a2535;border-bottom:1px solid #f5f5f5;">' +
                             '<div class="user-avatar size-sm">' + initials + '</div>' +

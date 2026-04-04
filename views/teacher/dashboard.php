@@ -16,7 +16,7 @@ $auth = new Auth();
 
 if (!$auth->check()) {
     $_SESSION['error'] = 'Please login to access the dashboard';
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
@@ -134,17 +134,17 @@ require __DIR__ . '/../layouts/teacher-start.php';
                                 </a>
                             </div>
                             <div class="col-md-3">
-                                <a href="/planwise/public/index.php?page=teacher/lesson-plans" class="btn btn-outline-primary w-100">
+                                <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans" class="btn btn-outline-primary w-100">
                                     View All Plans
                                 </a>
                             </div>
                             <div class="col-md-3">
-                                <a href="/planwise/public/index.php?page=teacher/profile" class="btn btn-outline-secondary w-100">
+                                <a href="<?= BASE_URL ?>/index.php?page=teacher/profile" class="btn btn-outline-secondary w-100">
                                     Edit Profile
                                 </a>
                             </div>
                             <div class="col-md-3">
-                                <a href="/planwise/controllers/AuthController.php?action=logout" class="btn btn-outline-danger w-100">
+                                <a href="<?= BASE_URL ?>/index.php?page=logout" class="btn btn-outline-danger w-100">
                                     Logout
                                 </a>
                             </div>
@@ -190,7 +190,7 @@ require __DIR__ . '/../layouts/teacher-start.php';
                                                 <td><span class="badge <?php echo $badgeClass; ?>"><?php echo ucfirst($activity['status'] ?? ''); ?></span></td>
                                                 <td class="text-muted small"><?php echo date('M j, Y', strtotime($activity['updated_at'] ?? '')); ?></td>
                                                 <td>
-                                                    <a href="/planwise/public/index.php?page=teacher/lesson-plans/view&id=<?php echo $activity['lesson_id']; ?>"
+                                                    <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/view&id=<?php echo $activity['lesson_id']; ?>"
                                                        class="btn btn-sm btn-outline-primary">View</a>
                                                 </td>
                                             </tr>
@@ -205,7 +205,7 @@ require __DIR__ . '/../layouts/teacher-start.php';
                                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                 </svg>
                                 <p class="text-muted">No recent activity. Start by creating your first lesson plan!</p>
-                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">
+                                <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">
                                     Create Lesson Plan
                                 </a>
                             </div>

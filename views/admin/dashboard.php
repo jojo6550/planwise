@@ -21,12 +21,12 @@ require_once __DIR__ . '/../../classes/ActivityLog.php';
 $auth = new Auth();
 
 if (!$auth->check()) {
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
 if (!$auth->hasRole(1)) {
-    header('Location: /planwise/public/index.php?page=403');
+    header('Location: ' . BASE_URL . '/index.php?page=403');
     exit();
 }
 
@@ -122,10 +122,10 @@ function dashActionBadge(string $action): string {
         <p class="admin-breadcrumb">Welcome back, <?= h($user['first_name'] ?? 'Admin') ?>! Here's what's happening today.</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="/planwise/public/index.php?page=admin/users/create" class="btn btn-primary btn-sm">
+        <a href="<?= BASE_URL ?>/index.php?page=admin/users/create" class="btn btn-primary btn-sm">
             <i class="fas fa-user-plus me-1"></i> Add User
         </a>
-        <a href="/planwise/public/index.php?page=admin/activity-logs" class="btn btn-outline-secondary btn-sm">
+        <a href="<?= BASE_URL ?>/index.php?page=admin/activity-logs" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-history me-1"></i> View Logs
         </a>
     </div>
@@ -206,7 +206,7 @@ function dashActionBadge(string $action): string {
                 <h2 class="data-card-title">
                     <i class="fas fa-history"></i> Recent Activity
                 </h2>
-                <a href="/planwise/public/index.php?page=admin/activity-logs"
+                <a href="<?= BASE_URL ?>/index.php?page=admin/activity-logs"
                    class="btn btn-sm btn-outline-secondary" style="font-size:0.8rem;">
                     View All <i class="fas fa-arrow-right ms-1"></i>
                 </a>
@@ -271,7 +271,7 @@ function dashActionBadge(string $action): string {
                 <h2 class="data-card-title">
                     <i class="fas fa-user-clock"></i> Recent Users
                 </h2>
-                <a href="/planwise/public/index.php?page=admin/users"
+                <a href="<?= BASE_URL ?>/index.php?page=admin/users"
                    class="btn btn-sm btn-outline-secondary" style="font-size:0.8rem;">
                     Manage <i class="fas fa-arrow-right ms-1"></i>
                 </a>
@@ -314,7 +314,7 @@ function dashActionBadge(string $action): string {
                     </ul>
                     <?php if ($totalUsers > 6): ?>
                     <div style="padding:0.75rem 1.25rem; text-align:center;">
-                        <a href="/planwise/public/index.php?page=admin/users" style="font-size:0.82rem; color:#4e7cf6; text-decoration:none; font-weight:600;">
+                        <a href="<?= BASE_URL ?>/index.php?page=admin/users" style="font-size:0.82rem; color:#4e7cf6; text-decoration:none; font-weight:600;">
                             View all <?= number_format($totalUsers) ?> users →
                         </a>
                     </div>
@@ -338,10 +338,10 @@ function dashActionBadge(string $action): string {
                     <a href="/planwise/public/index.php?page=admin/users/create" class="btn btn-primary">
                         <i class="fas fa-user-plus me-2"></i>Add New User
                     </a>
-                    <a href="/planwise/public/index.php?page=admin/users" class="btn btn-outline-primary">
+                    <a href="<?= BASE_URL ?>/index.php?page=admin/users" class="btn btn-outline-primary">
                         <i class="fas fa-users me-2"></i>Manage Users
                     </a>
-                    <a href="/planwise/public/index.php?page=admin/activity-logs" class="btn btn-outline-secondary">
+                    <a href="<?= BASE_URL ?>/index.php?page=admin/activity-logs" class="btn btn-outline-secondary">
                         <i class="fas fa-history me-2"></i>View All Logs
                     </a>
                     <a href="/planwise/public/index.php?page=admin/system-settings" class="btn btn-outline-secondary">

@@ -18,9 +18,9 @@ $auth = new Auth();
 if ($auth->check()) {
     $user = $auth->user();
     if ($user['role_id'] == 1) {
-        header('Location: /planwise/public/index.php?page=admin/dashboard');
+        header('Location: ' . BASE_URL . '/index.php?page=admin/dashboard');
     } else {
-        header('Location: /planwise/public/index.php?page=teacher/dashboard');
+        header('Location: ' . BASE_URL . '/index.php?page=teacher/dashboard');
     }
     exit();
 }
@@ -41,7 +41,7 @@ $csrfToken = AuthController::generateCsrfToken();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password - PlanWise</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/planwise/public/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/css/style.css">
 </head>
 <body class="bg-light">
     <div class="container">
@@ -81,7 +81,7 @@ $csrfToken = AuthController::generateCsrfToken();
                         <?php endif; ?>
 
                         <!-- Forgot Password Form -->
-                        <form method="POST" action="/planwise/controllers/AuthController.php?action=forgot-password" id="forgotPasswordForm">
+                        <form method="POST" action="<?= BASE_URL ?>/index.php?page=forgot-password" id="forgotPasswordForm">
                             <!-- CSRF Token -->
                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
 
@@ -111,7 +111,7 @@ $csrfToken = AuthController::generateCsrfToken();
 
                             <!-- Back to Login Link -->
                             <div class="text-center">
-                                <a href="/planwise/public/index.php?page=login" class="text-decoration-none">
+                                <a href="<?= BASE_URL ?>/index.php?page=login" class="text-decoration-none">
                                     Back to Login
                                 </a>
                             </div>

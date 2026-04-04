@@ -17,7 +17,7 @@ $auth = new Auth();
 
 if (!$auth->check()) {
     $_SESSION['error'] = 'Please login to access lesson plans';
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
@@ -31,7 +31,7 @@ unset($_SESSION['success'], $_SESSION['error']);
 
 $pageTitle    = 'My Lesson Plans';
 $activePage   = 'lesson-plans';
-$extraScripts = '<script src="/planwise/public/js/app.js"></script>';
+$extraScripts = '<script src="' . BASE_URL . '/js/app.js"></script>';
 require __DIR__ . '/../../layouts/teacher-start.php';
 ?>
 
@@ -56,7 +56,7 @@ require __DIR__ . '/../../layouts/teacher-start.php';
                 <p class="text-muted">Manage your lesson plans</p>
             </div>
             <div class="col-md-4 text-end">
-                <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">
+                <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">
                     <i class="bi bi-plus-lg"></i> Create New Plan
                 </a>
             </div>
@@ -104,7 +104,7 @@ require __DIR__ . '/../../layouts/teacher-start.php';
                 <?php if (empty($lessonPlans)): ?>
                     <div class="text-center py-5">
                         <p class="text-muted">No lesson plans yet. Create your first lesson plan!</p>
-                        <a href="/planwise/public/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">Create Lesson Plan</a>
+                        <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/create" class="btn btn-primary">Create Lesson Plan</a>
                     </div>
                 <?php else: ?>
                     <div class="mb-3">
@@ -143,10 +143,10 @@ require __DIR__ . '/../../layouts/teacher-start.php';
                                         <td><?php echo date('M j, Y', strtotime($plan['updated_at'] ?? '')); ?></td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/view&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-outline-primary">View</a>
-                                                <a href="/planwise/public/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-outline-secondary">Edit</a>
-                                                <a href="/planwise/controllers/ExportController.php?action=exportPDF&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-outline-info">PDF</a>
-                                                <form action="/planwise/controllers/LessonPlanController.php?action=delete" method="POST" class="d-inline"
+                                                <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/view&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-outline-primary">View</a>
+                                                <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-outline-secondary">Edit</a>
+                                                <a href="<?= BASE_URL ?>/index.php?page=lesson-plan/export-pdf&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-outline-info">PDF</a>
+                                                <form action="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/delete" method="POST" class="d-inline"
                                                       onsubmit="return confirm('Are you sure you want to delete this lesson plan?');">
                                                     <input type="hidden" name="lesson_id" value="<?php echo $plan['lesson_id']; ?>">
                                                     <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?? ''; ?>">

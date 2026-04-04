@@ -18,7 +18,7 @@ $auth = new Auth();
 // Redirect if not authenticated
 if (!$auth->check()) {
     $_SESSION['error'] = 'Please login to create lesson plans';
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
@@ -58,7 +58,7 @@ require __DIR__ . '/../../layouts/teacher-start.php';
 
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
-                        <form id="lesson-plan-form" action="/planwise/controllers/LessonPlanController.php?action=create" method="POST">
+                        <form id="lesson-plan-form" action="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/create" method="POST">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
 
                             <!-- Basic Information -->
@@ -174,7 +174,7 @@ require __DIR__ . '/../../layouts/teacher-start.php';
 
                             <!-- Submit Buttons -->
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <a href="/planwise/public/index.php?page=teacher/lesson-plans" class="btn btn-secondary">Cancel</a>
+                                <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans" class="btn btn-secondary">Cancel</a>
                                 <button type="submit" class="btn btn-primary">Create Lesson Plan</button>
                             </div>
                         </form>

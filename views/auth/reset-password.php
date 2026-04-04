@@ -19,7 +19,7 @@ $token = $_GET['token'] ?? '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - PlanWise</title>
-    <link href="/planwise/public/css/style.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>/css/style.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
@@ -48,7 +48,7 @@ $token = $_GET['token'] ?? '';
                                 Invalid reset link. Please request a new password reset.
                             </div>
                             <div class="text-center">
-                                <a href="/planwise/public/index.php?page=forgot-password" class="btn btn-primary">
+                                <a href="<?= BASE_URL ?>/index.php?page=forgot-password" class="btn btn-primary">
                                     Request New Reset Link
                                 </a>
                             </div>
@@ -57,7 +57,7 @@ $token = $_GET['token'] ?? '';
                                 Enter your new password below.
                             </p>
 
-                            <form method="POST" action="/planwise/controllers/AuthController.php?action=reset-password">
+                            <form method="POST" action="<?= BASE_URL ?>/index.php?page=reset-password">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
                                 <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
 
@@ -80,7 +80,7 @@ $token = $_GET['token'] ?? '';
                             </form>
 
                             <div class="text-center mt-3">
-                                <a href="/planwise/public/index.php?page=login" class="text-decoration-none">
+                                <a href="<?= BASE_URL ?>/index.php?page=login" class="text-decoration-none">
                                     Back to Login
                                 </a>
                             </div>

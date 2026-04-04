@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
 
                 // Send single email
-                const response = await fetch('/planwise/controllers/LessonPlanController.php?action=emailLesson', {
+                const response = await fetch('<?= BASE_URL ?>/index.php?page=lesson-plan/email', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
 
                 // Send to multiple recipients
-                const response = await fetch('/planwise/controllers/LessonPlanController.php?action=emailLessonMultiple', {
+                const response = await fetch('<?= BASE_URL ?>/index.php?page=lesson-plan/email-multiple', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -20,7 +20,7 @@ $auth = new Auth();
 // Redirect if not authenticated
 if (!$auth->check()) {
     $_SESSION['error'] = 'Please login to edit lesson plans';
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
@@ -33,7 +33,7 @@ $lessonPlanId = (int)($_GET['id'] ?? 0);
 
 if ($lessonPlanId <= 0) {
     $_SESSION['error'] = 'Invalid lesson plan ID';
-    header('Location: /planwise/public/index.php?page=teacher/lesson-plans');
+    header('Location: ' . BASE_URL . '/index.php?page=teacher/lesson-plans');
     exit();
 }
 
@@ -42,7 +42,7 @@ $plan = $lessonPlan->getById($lessonPlanId, $user['user_id']);
 
 if (!$plan) {
     $_SESSION['error'] = 'Lesson plan not found or you do not have permission to edit it';
-    header('Location: /planwise/public/index.php?page=teacher/lesson-plans');
+    header('Location: ' . BASE_URL . '/index.php?page=teacher/lesson-plans');
     exit();
 }
 
@@ -88,7 +88,7 @@ require __DIR__ . '/../../layouts/teacher-start.php';
 
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
-                        <form action="/planwise/controllers/LessonPlanController.php?action=update" method="POST">
+                        <form action="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/update" method="POST">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                             <input type="hidden" name="lesson_id" value="<?php echo $plan['lesson_id']; ?>">
 
@@ -203,7 +203,7 @@ require __DIR__ . '/../../layouts/teacher-start.php';
 
                             <!-- Submit Buttons -->
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <a href="/planwise/public/index.php?page=teacher/lesson-plans" class="btn btn-secondary">Cancel</a>
+                                <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans" class="btn btn-secondary">Cancel</a>
                                 <button type="submit" class="btn btn-primary">Update Lesson Plan</button>
                             </div>
                         </form>

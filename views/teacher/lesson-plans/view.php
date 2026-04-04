@@ -21,14 +21,14 @@ $auth = new Auth();
 // Redirect if not authenticated
 if (!$auth->check()) {
     $_SESSION['error'] = 'Please login to view lesson plans';
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
 $lessonPlanId = (int)($_GET['id'] ?? 0);
 if ($lessonPlanId <= 0) {
     $_SESSION['error'] = 'Invalid lesson plan ID';
-    header('Location: /planwise/public/index.php?page=teacher/lesson-plans');
+    header('Location: ' . BASE_URL . '/index.php?page=teacher/lesson-plans');
     exit();
 }
 
@@ -40,7 +40,7 @@ $fileHandler = new File();
 $plan = $lessonPlan->getById($lessonPlanId, $user['user_id']);
 if (!$plan) {
     $_SESSION['error'] = 'Lesson plan not found or unauthorized';
-    header('Location: /planwise/public/index.php?page=teacher/lesson-plans');
+    header('Location: ' . BASE_URL . '/index.php?page=teacher/lesson-plans');
     exit();
 }
 
@@ -51,14 +51,14 @@ $qr       = $qrCode->getByLessonPlanId($lessonPlanId);
 
 $pageTitle    = htmlspecialchars($plan['title']);
 $activePage   = 'lesson-plans';
-$extraScripts = <<<'JS'
+$extraScripts = '<script>const BASE_URL = ' . json_encode(BASE_URL) . ';</script>' . <<<'JS'
 <script>
 function generateQRCode(lessonId) {
     const btn = document.getElementById('generate-qr-btn');
     const spinner = btn.querySelector('.spinner-border');
     btn.disabled = true;
     spinner.classList.remove('d-none');
-    fetch('/planwise/controllers/QRCodeController.php?action=generate', {
+    fetch(BASE_URL + '/index.php?page=lesson-plan/qr-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lesson_id: lessonId })
@@ -85,7 +85,7 @@ function regenerateQRCode(lessonId) {
     const spinner = btn.querySelector('.spinner-border');
     btn.disabled = true;
     spinner.classList.remove('d-none');
-    fetch('/planwise/controllers/QRCodeController.php?action=generate', {
+    fetch(BASE_URL + '/index.php?page=lesson-plan/qr-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lesson_id: lessonId })
@@ -120,8 +120,8 @@ require __DIR__ . '/../../layouts/teacher-start.php';
                 <p class="text-muted">Created on <?php echo date('F j, Y', strtotime($plan['created_at'])); ?></p>
             </div>
             <div class="col-md-4 text-end">
-                <a href="/planwise/public/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-secondary">Edit</a>
-                <a href="/planwise/controllers/ExportController.php?action=exportPDF&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-primary">Export PDF</a>
+                <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/edit&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-secondary">Edit</a>
+                <a href="<?= BASE_URL ?>/index.php?page=lesson-plan/export-pdf&id=<?php echo $plan['lesson_id']; ?>" class="btn btn-primary">Export PDF</a>
             </div>
         </div>
 
@@ -212,7 +212,7 @@ require __DIR__ . '/../../layouts/teacher-start.php';
                         <?php foreach ($files as $file): ?>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <?php echo htmlspecialchars($file['original_name']); ?>
-                                <a href="/planwise/controllers/FileController.php?action=download&id=<?php echo $file['file_id']; ?>" class="btn btn-sm btn-primary">Download</a>
+                                <a href="<?= BASE_URL ?>/index.php?page=file/download&id=<?php echo $file['file_id']; ?>" class="btn btn-sm btn-primary">Download</a>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -241,7 +241,7 @@ require __DIR__ . '/../../layouts/teacher-start.php';
                 <?php if ($qr && !empty($qr['qr_path'])): ?>
                     <!-- Display QR Code -->
                     <div class="mb-3">
-                        <img src="/planwise/controllers/QRCodeController.php?action=display&lesson_id=<?php echo $plan['lesson_id']; ?>"
+                        <img src="<?= BASE_URL ?>/index.php?page=lesson-plan/qr-display&lesson_id=<?php echo $plan['lesson_id']; ?>"
                              alt="QR Code" class="img-fluid" style="max-width: 200px;">
                     </div>
                     <p class="text-muted mb-3">Scan this QR code to access this lesson plan</p>
@@ -269,7 +269,7 @@ require __DIR__ . '/../../layouts/teacher-start.php';
         </div>
 
         <div class="mb-4">
-            <a href="/planwise/public/index.php?page=teacher/lesson-plans" class="btn btn-secondary">Back to Lesson Plans</a>
+            <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans" class="btn btn-secondary">Back to Lesson Plans</a>
         </div>
     </div>
 

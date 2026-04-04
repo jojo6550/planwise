@@ -19,7 +19,7 @@ $roleMiddleware->requireRole(1); // Admin only
 $userId = (int)($_GET['id'] ?? 0);
 if ($userId <= 0) {
     $_SESSION['error'] = 'Invalid user ID';
-    header('Location: /planwise/public/index.php?page=admin/users');
+    header('Location: ' . BASE_URL . '/index.php?page=admin/users');
     exit();
 }
 
@@ -34,7 +34,7 @@ $roleModel = new Role();
 $user = $userModel->findById($userId);
 if (!$user) {
     $_SESSION['error'] = 'User not found';
-    header('Location: /planwise/public/index.php?page=admin/users');
+    header('Location: ' . BASE_URL . '/index.php?page=admin/users');
     exit();
 }
 
@@ -54,7 +54,7 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Edit User</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    <a href="/planwise/public/index.php?page=admin/users" class="btn btn-secondary">
+                    <a href="<?= BASE_URL ?>/index.php?page=admin/users" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Users
                     </a>
                 </div>
@@ -71,7 +71,7 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                             <h5 class="card-title mb-0">Edit User Information</h5>
                         </div>
                         <div class="card-body">
-                            <form action="/planwise/controllers/UserController.php?action=update" method="post" id="editUserForm">
+                            <form action="<?= BASE_URL ?>/index.php?page=admin/users/update" method="post" id="editUserForm">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
                                 <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
 
@@ -152,7 +152,7 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                                 </div>
 
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                                    <a href="/planwise/public/index.php?page=admin/users" class="btn btn-secondary me-md-2">
+                                    <a href="<?= BASE_URL ?>/index.php?page=admin/users" class="btn btn-secondary me-md-2">
                                         <i class="fas fa-times"></i> Cancel
                                     </a>
                                     <button type="submit" class="btn btn-primary">
@@ -172,7 +172,7 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                             <p class="text-muted mb-3">
                                 Leave blank to keep the current password unchanged.
                             </p>
-                            <form action="/planwise/controllers/UserController.php?action=changePassword" method="post" id="changePasswordForm">
+                            <form action="<?= BASE_URL ?>/index.php?page=admin/users/change-password" method="post" id="changePasswordForm">
                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrfToken); ?>">
                                 <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
 
@@ -263,7 +263,7 @@ document.getElementById('email').addEventListener('input', function() {
 
     if (email && email.includes('@') && email !== currentEmail) {
         emailCheckTimeout = setTimeout(() => {
-            fetch('/planwise/public/js/ajax-handler.php?action=check_email', {
+            fetch('<?= BASE_URL ?>/js/ajax-handler.php?action=check_email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

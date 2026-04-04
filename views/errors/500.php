@@ -43,7 +43,7 @@ http_response_code(500);
                         Please try again later or contact support if the problem persists.
                     </p>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <a href="/planwise/public/index.php?page=home" class="btn btn-primary">
+                        <a href="<?= defined('BASE_URL') ? BASE_URL : '' ?>/index.php?page=home" class="btn btn-primary">
                             <i class="bi bi-house-door me-2"></i>Go Home
                         </a>
                         <button onclick="window.location.reload()" class="btn btn-outline-secondary">

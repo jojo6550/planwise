@@ -21,12 +21,12 @@ require_once __DIR__ . '/../../../classes/ActivityLog.php';
 $auth = new Auth();
 
 if (!$auth->check()) {
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
 if (!$auth->hasRole(1)) {
-    header('Location: /planwise/public/index.php?page=403');
+    header('Location: ' . BASE_URL . '/index.php?page=403');
     exit();
 }
 
@@ -84,11 +84,11 @@ require __DIR__ . '/../../layouts/admin-start.php';
     <div>
         <h1 class="admin-page-title">User Management</h1>
         <p class="admin-breadcrumb">
-            <a href="/planwise/public/index.php?page=admin/dashboard">Dashboard</a> /
+            <a href="<?= BASE_URL ?>/index.php?page=admin/dashboard">Dashboard</a> /
             Users
         </p>
     </div>
-    <a href="/planwise/public/index.php?page=admin/users/create" class="btn btn-primary">
+    <a href="<?= BASE_URL ?>/index.php?page=admin/users/create" class="btn btn-primary">
         <i class="fas fa-user-plus me-2"></i>Add New User
     </a>
 </div>
@@ -320,11 +320,11 @@ require __DIR__ . '/../../layouts/admin-start.php';
                     </td>
                     <td>
                         <div class="d-flex gap-1">
-                            <a href="/planwise/public/index.php?page=admin/users/view&id=<?= $u['user_id'] ?>"
+                            <a href="<?= BASE_URL ?>/index.php?page=admin/users/view&id=<?= $u['user_id'] ?>"
                                class="action-btn primary" title="View">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="/planwise/public/index.php?page=admin/users/edit&id=<?= $u['user_id'] ?>"
+                            <a href="<?= BASE_URL ?>/index.php?page=admin/users/edit&id=<?= $u['user_id'] ?>"
                                class="action-btn" title="Edit">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
@@ -348,9 +348,11 @@ require __DIR__ . '/../../layouts/admin-start.php';
 
 <?php
 $csrfTokenJson = json_encode($csrfToken);
+$baseUrlJson   = json_encode(BASE_URL);
 $extraScripts = <<<JS
 <script>
 const CSRF_TOKEN = {$csrfTokenJson};
+const BASE_URL   = {$baseUrlJson};
 
 /* ---- Export type toggle: show pattern input ---- */
 const exportTypeSelect = document.getElementById('exportType');
@@ -419,7 +421,7 @@ function handleExport(format) {
         }
     }
 
-    let url = '/planwise/controllers/ExportController.php?action=exportTeachers&format=' + format;
+    let url = BASE_URL + '/index.php?page=admin/users/export&format=' + format;
 
     if (exportType === 'all' || exportType === 'filtered') {
         url += '&type=all';
@@ -451,7 +453,7 @@ document.querySelectorAll('.status-toggle-btn').forEach(btn => {
         if (!confirm(`Set this user to ${newStatus}?`)) return;
 
         try {
-            const res = await fetch('/planwise/controllers/UserController.php?action=updateStatus', {
+            const res = await fetch(BASE_URL + '/index.php?page=admin/users/update-status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: parseInt(userId), status: newStatus, csrf_token: CSRF_TOKEN })
@@ -478,7 +480,7 @@ document.querySelectorAll('.delete-user-btn').forEach(btn => {
         if (!confirm(`Delete user "${userName}"?\n\nThis will permanently remove their account and all associated data. This action cannot be undone.`)) return;
 
         try {
-            const res = await fetch('/planwise/controllers/UserController.php?action=delete', {
+            const res = await fetch(BASE_URL + '/index.php?page=admin/users/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: parseInt(userId), csrf_token: CSRF_TOKEN })

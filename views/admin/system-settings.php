@@ -21,12 +21,12 @@ require_once __DIR__ . '/../../classes/ActivityLog.php';
 $auth = new Auth();
 
 if (!$auth->check()) {
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
 if (!$auth->hasRole(1)) {
-    header('Location: /planwise/public/index.php?page=403');
+    header('Location: ' . BASE_URL . '/index.php?page=403');
     exit();
 }
 
@@ -104,7 +104,7 @@ require __DIR__ . '/../layouts/admin-start.php';
     <div>
         <h1 class="admin-page-title">System Settings</h1>
         <p class="admin-breadcrumb">
-            <a href="/planwise/public/index.php?page=admin/dashboard">Dashboard</a> /
+            <a href="<?= BASE_URL ?>/index.php?page=admin/dashboard">Dashboard</a> /
             System Settings
         </p>
     </div>
@@ -266,7 +266,7 @@ require __DIR__ . '/../layouts/admin-start.php';
                         Delete activity logs older than a specified number of days.
                         Currently <strong><?= number_format($totalLogs) ?></strong> logs stored.
                     </p>
-                    <form action="/planwise/controllers/ActivityLogController.php?action=cleanup" method="POST"
+                    <form action="<?= BASE_URL ?>/index.php?page=admin/activity-log/cleanup" method="POST"
                           onsubmit="return confirm('Delete old logs? This cannot be undone.')">
                         <input type="hidden" name="csrf_token" value="<?= h($csrfToken) ?>">
                         <div class="d-flex align-items-center gap-2">
@@ -289,7 +289,7 @@ require __DIR__ . '/../layouts/admin-start.php';
                     <p style="font-size:0.82rem; color:#6c757d; margin-bottom:0.75rem;">
                         View and filter all recorded user activity across the system.
                     </p>
-                    <a href="/planwise/public/index.php?page=admin/activity-logs" class="btn btn-primary btn-sm">
+                    <a href="<?= BASE_URL ?>/index.php?page=admin/activity-logs" class="btn btn-primary btn-sm">
                         <i class="fas fa-history me-1"></i> View Activity Logs
                     </a>
                 </div>

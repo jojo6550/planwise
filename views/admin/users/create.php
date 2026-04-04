@@ -21,12 +21,12 @@ require_once __DIR__ . '/../../../classes/Role.php';
 $auth = new Auth();
 
 if (!$auth->check()) {
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
 if (!$auth->hasRole(1)) {
-    header('Location: /planwise/public/index.php?page=403');
+    header('Location: ' . BASE_URL . '/index.php?page=403');
     exit();
 }
 
@@ -68,12 +68,12 @@ require __DIR__ . '/../../layouts/admin-start.php';
     <div>
         <h1 class="admin-page-title">Create New User</h1>
         <p class="admin-breadcrumb">
-            <a href="/planwise/public/index.php?page=admin/dashboard">Dashboard</a> /
-            <a href="/planwise/public/index.php?page=admin/users">Users</a> /
+            <a href="<?= BASE_URL ?>/index.php?page=admin/dashboard">Dashboard</a> /
+            <a href="<?= BASE_URL ?>/index.php?page=admin/users">Users</a> /
             Create
         </p>
     </div>
-    <a href="/planwise/public/index.php?page=admin/users" class="btn btn-outline-secondary btn-sm">
+    <a href="<?= BASE_URL ?>/index.php?page=admin/users" class="btn btn-outline-secondary btn-sm">
         <i class="fas fa-arrow-left me-1"></i> Back to Users
     </a>
 </div>
@@ -102,7 +102,7 @@ require __DIR__ . '/../../layouts/admin-start.php';
                 </h2>
             </div>
             <div class="data-card-body">
-                <form action="/planwise/controllers/UserController.php?action=create"
+                <form action="<?= BASE_URL ?>/index.php?page=admin/users/create"
                       method="POST" id="createUserForm" novalidate>
                     <input type="hidden" name="csrf_token" value="<?= h($csrfToken) ?>">
 
@@ -211,7 +211,7 @@ require __DIR__ . '/../../layouts/admin-start.php';
                     <hr class="my-4">
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="/planwise/public/index.php?page=admin/users" class="btn btn-outline-secondary">
+                        <a href="<?= BASE_URL ?>/index.php?page=admin/users" class="btn btn-outline-secondary">
                             <i class="fas fa-times me-1"></i> Cancel
                         </a>
                         <button type="submit" class="btn btn-primary">

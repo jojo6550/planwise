@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Service Temporarily Unavailable - PlanWise</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/planwise/public/css/style.css">
+    <link rel="stylesheet" href="<?= defined('BASE_URL') ? BASE_URL : '' ?>/css/style.css">
 </head>
 <body class="bg-light">
     <div class="container">
@@ -31,7 +31,7 @@
 
                         <!-- Retry Button -->
                         <div class="d-grid mb-3">
-                            <a href="/planwise/public/index.php" class="btn btn-primary">
+                            <a href="<?= defined('BASE_URL') ? BASE_URL : '' ?>/index.php" class="btn btn-primary">
                                 <i class="bi bi-arrow-clockwise me-2"></i>
                                 Try Again
                             </a>

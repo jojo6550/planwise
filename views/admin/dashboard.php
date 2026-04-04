@@ -335,7 +335,7 @@ function dashActionBadge(string $action): string {
             </div>
             <div class="data-card-body">
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="/planwise/public/index.php?page=admin/users/create" class="btn btn-primary">
+                    <a href="<?= BASE_URL ?>/index.php?page=admin/users/create" class="btn btn-primary">
                         <i class="fas fa-user-plus me-2"></i>Add New User
                     </a>
                     <a href="<?= BASE_URL ?>/index.php?page=admin/users" class="btn btn-outline-primary">
@@ -344,7 +344,7 @@ function dashActionBadge(string $action): string {
                     <a href="<?= BASE_URL ?>/index.php?page=admin/activity-logs" class="btn btn-outline-secondary">
                         <i class="fas fa-history me-2"></i>View All Logs
                     </a>
-                    <a href="/planwise/public/index.php?page=admin/system-settings" class="btn btn-outline-secondary">
+                    <a href="<?= BASE_URL ?>/index.php?page=admin/system-settings" class="btn btn-outline-secondary">
                         <i class="fas fa-cog me-2"></i>System Settings
                     </a>
                 </div>

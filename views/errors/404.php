@@ -43,7 +43,7 @@ http_response_code(404);
                         Please check the URL or navigate back to our homepage.
                     </p>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <a href="/planwise/public/index.php?page=home" class="btn btn-primary">
+                        <a href="<?= defined('BASE_URL') ? BASE_URL : '' ?>/index.php?page=home" class="btn btn-primary">
                             <i class="bi bi-house-door me-2"></i>Go Home
                         </a>
                         <button onclick="window.history.back()" class="btn btn-outline-secondary">

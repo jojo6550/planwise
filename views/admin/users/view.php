@@ -21,12 +21,12 @@ require_once __DIR__ . '/../../../classes/ActivityLog.php';
 $auth = new Auth();
 
 if (!$auth->check()) {
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
 if (!$auth->hasRole(1)) {
-    header('Location: /planwise/public/index.php?page=403');
+    header('Location: ' . BASE_URL . '/index.php?page=403');
     exit();
 }
 
@@ -39,7 +39,7 @@ $targetUser = $userModel->findById($targetId);
 
 if (!$targetUser || $targetId <= 0) {
     $_SESSION['error'] = 'User not found.';
-    header('Location: /planwise/public/index.php?page=admin/users');
+    header('Location: ' . BASE_URL . '/index.php?page=admin/users');
     exit();
 }
 
@@ -96,17 +96,17 @@ function viewActionBadge(string $action): string {
     <div>
         <h1 class="admin-page-title">User Profile</h1>
         <p class="admin-breadcrumb">
-            <a href="/planwise/public/index.php?page=admin/dashboard">Dashboard</a> /
-            <a href="/planwise/public/index.php?page=admin/users">Users</a> /
+            <a href="<?= BASE_URL ?>/index.php?page=admin/dashboard">Dashboard</a> /
+            <a href="<?= BASE_URL ?>/index.php?page=admin/users">Users</a> /
             <?= h($targetUser['first_name'] . ' ' . $targetUser['last_name']) ?>
         </p>
     </div>
     <div class="d-flex gap-2">
-        <a href="/planwise/public/index.php?page=admin/users/edit&id=<?= $targetUser['user_id'] ?>"
+        <a href="<?= BASE_URL ?>/index.php?page=admin/users/edit&id=<?= $targetUser['user_id'] ?>"
            class="btn btn-primary btn-sm">
             <i class="fas fa-pencil-alt me-1"></i> Edit User
         </a>
-        <a href="/planwise/public/index.php?page=admin/users" class="btn btn-outline-secondary btn-sm">
+        <a href="<?= BASE_URL ?>/index.php?page=admin/users" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left me-1"></i> Back
         </a>
     </div>
@@ -190,13 +190,13 @@ function viewActionBadge(string $action): string {
                 <h3 class="data-card-title"><i class="fas fa-tools"></i> Actions</h3>
             </div>
             <div class="data-card-body d-flex flex-column gap-2">
-                <a href="/planwise/public/index.php?page=admin/users/edit&id=<?= $targetUser['user_id'] ?>"
+                <a href="<?= BASE_URL ?>/index.php?page=admin/users/edit&id=<?= $targetUser['user_id'] ?>"
                    class="btn btn-primary w-100">
                     <i class="fas fa-pencil-alt me-2"></i>Edit Profile
                 </a>
 
                 <!-- Status toggle -->
-                <form action="/planwise/controllers/UserController.php?action=updateStatus"
+                <form action="<?= BASE_URL ?>/index.php?page=admin/users/update-status"
                       method="POST" id="statusForm">
                     <input type="hidden" name="csrf_token" value="<?= h($csrfToken) ?>">
                     <input type="hidden" name="user_id"    value="<?= $targetUser['user_id'] ?>">
@@ -230,7 +230,7 @@ function viewActionBadge(string $action): string {
                     <i class="fas fa-history"></i>
                     Recent Activity
                 </h2>
-                <a href="/planwise/public/index.php?page=admin/activity-logs&user_id=<?= $targetUser['user_id'] ?>"
+                <a href="<?= BASE_URL ?>/index.php?page=admin/activity-logs&user_id=<?= $targetUser['user_id'] ?>"
                    class="btn btn-sm btn-outline-secondary" style="font-size:0.8rem;">
                     View All <i class="fas fa-arrow-right ms-1"></i>
                 </a>
@@ -284,6 +284,7 @@ function viewActionBadge(string $action): string {
 $_targetUserId   = (int)$targetUser['user_id'];
 $_targetUserName = h($targetUser['first_name'] . ' ' . $targetUser['last_name']);
 $_csrfJson       = json_encode($csrfToken);
+$_baseUrlJson    = json_encode(BASE_URL);
 $extraScripts    = <<<ENDJS
 <script>
 const deleteBtn = document.getElementById('deleteUserBtn');
@@ -292,14 +293,14 @@ if (deleteBtn) {
         const name = {$_targetUserName};
         if (!confirm('Permanently delete "' + name + '"?\\n\\nThis action cannot be undone.')) return;
         try {
-            const res = await fetch('/planwise/controllers/UserController.php?action=delete', {
+            const res = await fetch({$_baseUrlJson} + '/index.php?page=admin/users/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: {$_targetUserId}, csrf_token: {$_csrfJson} })
             });
             const data = await res.json();
             if (data.success) {
-                window.location.href = '/planwise/public/index.php?page=admin/users';
+                window.location.href = {$_baseUrlJson} + '/index.php?page=admin/users';
             } else {
                 alert('Error: ' + (data.message || 'Failed to delete user.'));
             }

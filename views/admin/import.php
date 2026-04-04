@@ -22,12 +22,12 @@ require_once __DIR__ . '/../../classes/ActivityLog.php';
 $auth = new Auth();
 
 if (!$auth->check()) {
-    header('Location: /planwise/public/index.php?page=login');
+    header('Location: ' . BASE_URL . '/index.php?page=login');
     exit();
 }
 
 if (!$auth->hasRole(1)) {
-    header('Location: /planwise/public/index.php?page=403');
+    header('Location: ' . BASE_URL . '/index.php?page=403');
     exit();
 }
 
@@ -75,11 +75,11 @@ require __DIR__ . '/../layouts/admin-start.php';
         <p class="text-muted mb-0">Import lesson plans or users from a CSV file</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="/planwise/controllers/ImportController.php?action=downloadTemplate&type=lesson_plans"
+        <a href="<?= BASE_URL ?>/index.php?page=admin/import/template&type=lesson_plans"
            class="btn btn-outline-primary btn-sm">
             <i class="fas fa-download me-1"></i> Lesson Plan Template
         </a>
-        <a href="/planwise/controllers/ImportController.php?action=downloadTemplate&type=users"
+        <a href="<?= BASE_URL ?>/index.php?page=admin/import/template&type=users"
            class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-download me-1"></i> User Template
         </a>
@@ -131,7 +131,7 @@ require __DIR__ . '/../layouts/admin-start.php';
                         <button type="submit" class="btn btn-primary" id="importSubmitBtn">
                             <i class="fas fa-upload me-1"></i> Import Data
                         </button>
-                        <a href="/planwise/public/index.php?page=admin/dashboard" class="btn btn-outline-secondary">
+                        <a href="<?= BASE_URL ?>/index.php?page=admin/dashboard" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Back
                         </a>
                     </div>
@@ -230,7 +230,7 @@ require __DIR__ . '/../layouts/admin-start.php';
 </div>
 
 <?php
-$extraScripts = <<<'JS'
+$extraScripts = '<script>const BASE_URL = ' . json_encode(BASE_URL) . ';</script>' . <<<'JS'
 <script>
 (function () {
     // Toggle instruction panel based on import type selection
@@ -283,7 +283,7 @@ $extraScripts = <<<'JS'
         resultsDiv.innerHTML = '<div class="alert alert-secondary"><i class="fas fa-spinner fa-spin me-2"></i> Uploading and processing CSV file...</div>';
 
         try {
-            const res  = await fetch('/planwise/controllers/ImportController.php?action=upload', {
+            const res  = await fetch(BASE_URL + '/index.php?page=admin/import/upload', {
                 method: 'POST',
                 body:   formData  // Content-Type set automatically with multipart boundary
             });

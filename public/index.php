@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && array_key_exists($page, $validPages
         case 'admin/users/change-password':
             require_once __DIR__ . '/../controllers/UserController.php';
             $controller = new UserController();
-            $controller->update(); // changePassword() not yet implemented; delegate to update()
+            $controller->changePassword();
             break;
         case 'admin/users/update-status':
             require_once __DIR__ . '/../controllers/UserController.php';

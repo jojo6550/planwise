@@ -335,6 +335,26 @@ $sql = "UPDATE users SET
     }
 
     /**
+     * Update a user's password
+     *
+     * @param int $userId
+     * @param string $newPassword Plain-text password (will be hashed)
+     * @return array Result
+     */
+    public function updatePassword(int $userId, string $newPassword): array
+    {
+        try {
+            $hash = password_hash($newPassword, PASSWORD_DEFAULT);
+            $sql = "UPDATE users SET password_hash = :hash WHERE user_id = :user_id";
+            $this->db->update($sql, [':hash' => $hash, ':user_id' => $userId]);
+            return ['success' => true, 'message' => 'Password updated successfully'];
+        } catch (Exception $e) {
+            error_log("User password update failed: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Failed to update password'];
+        }
+    }
+
+    /**
      * Get all teachers (role_id = 2)
      *
      * @return array All teacher users

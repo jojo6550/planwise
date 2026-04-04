@@ -174,6 +174,54 @@ class UserController extends BaseController
     }
 
     /**
+     * Change a user's password (Admin)
+     */
+    public function changePassword()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirectWithError('Invalid request method', 'admin/users');
+            return;
+        }
+
+        if (!$this->validateCsrfToken($_POST['csrf_token'] ?? '')) {
+            $this->redirectWithError('Invalid security token', 'admin/users');
+            return;
+        }
+
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_new_password'] ?? '';
+
+        if ($userId <= 0) {
+            $this->redirectWithError('Invalid user ID', 'admin/users');
+            return;
+        }
+
+        if (strlen($newPassword) < 8) {
+            $this->redirectWithError('Password must be at least 8 characters', 'admin/users/edit&id=' . $userId);
+            return;
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            $this->redirectWithError('Passwords do not match', 'admin/users/edit&id=' . $userId);
+            return;
+        }
+
+        $result = $this->user->updatePassword($userId, $newPassword);
+
+        if ($result['success']) {
+            $this->activityLog->log(
+                $this->auth->id(),
+                'user_password_changed',
+                "Changed password for user ID: {$userId}"
+            );
+            $this->redirectWithSuccess('Password changed successfully', 'admin/users/edit&id=' . $userId);
+        } else {
+            $this->redirectWithError($result['message'], 'admin/users/edit&id=' . $userId);
+        }
+    }
+
+    /**
      * Update user status (AJAX)
      */
     public function updateStatus()

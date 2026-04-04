@@ -72,7 +72,10 @@ ini_set('log_errors', 1);
 ini_set('error_log', 'php://stderr');
 
 // Define BASE_URL for deployment flexibility (handles /planwise/ subdir on Render)
-$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+// Also check X-Forwarded-Proto for reverse proxies (Render, Railway, etc.)
+$isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+$protocol = $isHttps ? 'https://' : 'http://';
 $host = $_SERVER['HTTP_HOST'];
 $scriptPath = dirname($_SERVER['SCRIPT_NAME']);
 $BASE_URL = rtrim($protocol . $host . $scriptPath, '/');
@@ -144,7 +147,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && array_key_exists($page, $validPages
 if (array_key_exists($page, $validPages)) {
     $viewFile = $validPages[$page];
     if ($viewFile !== null && file_exists(__DIR__ . '/../' . $viewFile)) {
-        include __DIR__ . '/../views/' . $viewFile;
+        // Pre-load classes required by auth views
+        if (in_array($page, ['login', 'register', 'forgot-password', 'reset-password'])) {
+            require_once __DIR__ . '/../controllers/AuthController.php';
+        }
+        include __DIR__ . '/../' . $viewFile;
         exit();
     } elseif ($viewFile === null) {
         if ($page === 'lesson-plan/pdf') {

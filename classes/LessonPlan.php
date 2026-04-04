@@ -362,12 +362,12 @@ class LessonPlan
             }
 
             // Get recent lesson sections
-            $sqlSections = "SELECT ls.section_id, ls.title, lp.title as plan_title, 'section' as type, ls.created_at, ls.updated_at
+            $sqlSections = "SELECT ls.section_id, ls.section_type as title, lp.title as plan_title, 'section' as type, lp.created_at, lp.updated_at
                             FROM lesson_sections ls
                             JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
                             WHERE lp.user_id = :user_id
-                            AND (ls.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR ls.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
-                            ORDER BY ls.updated_at DESC";
+                            AND (lp.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR lp.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
+                            ORDER BY lp.updated_at DESC";
 
             $sections = $this->db->fetchAll($sqlSections, [':user_id' => $userId]);
 

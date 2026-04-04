@@ -398,4 +398,4 @@ if (basename($_SERVER['PHP_SELF']) === 'AuthController.php') {
     }
 }
 
-?>// Direct access handler removed - use index.php router only
+

@@ -340,54 +340,13 @@ class LessonPlan
     public function getRecentActivity(int $userId): array
     {
         try {
-            $activities = [];
+            $sql = "SELECT lesson_id, title, subject, status, updated_at
+                    FROM lesson_plans
+                    WHERE user_id = :user_id
+                    ORDER BY updated_at DESC
+                    LIMIT 10";
 
-            // Get recent lesson plans
-            $sqlPlans = "SELECT lesson_id, title, 'plan' as type, created_at, updated_at
-                         FROM lesson_plans
-                         WHERE user_id = :user_id
-                         AND (created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
-                         ORDER BY updated_at DESC";
-
-            $plans = $this->db->fetchAll($sqlPlans, [':user_id' => $userId]);
-
-            foreach ($plans as $plan) {
-                $activities[] = [
-                    'id' => $plan['lesson_id'],
-                    'title' => $plan['title'],
-                    'type' => 'plan',
-                    'action' => $plan['created_at'] == $plan['updated_at'] ? 'created' : 'updated',
-                    'date' => $plan['updated_at']
-                ];
-            }
-
-            // Get recent lesson sections
-            $sqlSections = "SELECT ls.section_id, ls.section_type as title, lp.title as plan_title, 'section' as type, lp.created_at, lp.updated_at
-                            FROM lesson_sections ls
-                            JOIN lesson_plans lp ON ls.lesson_id = lp.lesson_id
-                            WHERE lp.user_id = :user_id
-                            AND (lp.created_at >= DATE_SUB(NOW(), INTERVAL 5 DAY) OR lp.updated_at >= DATE_SUB(NOW(), INTERVAL 5 DAY))
-                            ORDER BY lp.updated_at DESC";
-
-            $sections = $this->db->fetchAll($sqlSections, [':user_id' => $userId]);
-
-            foreach ($sections as $section) {
-                $activities[] = [
-                    'id' => $section['section_id'],
-                    'title' => $section['title'],
-                    'plan_title' => $section['plan_title'],
-                    'type' => 'section',
-                    'action' => $section['created_at'] == $section['updated_at'] ? 'created' : 'updated',
-                    'date' => $section['updated_at']
-                ];
-            }
-
-            // Sort activities by date descending
-            usort($activities, function($a, $b) {
-                return strtotime($b['date']) - strtotime($a['date']);
-            });
-
-            return $activities;
+            return $this->db->fetchAll($sql, [':user_id' => $userId]);
 
         } catch (Exception $e) {
             error_log("Get recent activity failed: " . $e->getMessage());

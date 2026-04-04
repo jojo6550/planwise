@@ -190,7 +190,7 @@ require __DIR__ . '/../layouts/teacher-start.php';
                                                 <td><span class="badge <?php echo $badgeClass; ?>"><?php echo ucfirst($activity['status'] ?? ''); ?></span></td>
                                                 <td class="text-muted small"><?php echo date('M j, Y', strtotime($activity['updated_at'] ?? '')); ?></td>
                                                 <td>
-                                                    <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/view&id=<?php echo $activity['lesson_id']; ?>"
+                                                    <a href="<?= BASE_URL ?>/index.php?page=teacher/lesson-plans/view&id=<?php echo $activity['lesson_id'] ?? $activity['id'] ?? ''; ?>"
                                                        class="btn btn-sm btn-outline-primary">View</a>
                                                 </td>
                                             </tr>

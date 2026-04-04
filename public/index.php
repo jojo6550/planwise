@@ -71,15 +71,18 @@ error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 ini_set('log_errors', 1);
 ini_set('error_log', 'php://stderr');
 
-// Define BASE_URL for deployment flexibility (handles /planwise/ subdir on Render)
-// Also check X-Forwarded-Proto for reverse proxies (Render, Railway, etc.)
-$isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
-$protocol = $isHttps ? 'https://' : 'http://';
-$host = $_SERVER['HTTP_HOST'];
-$scriptPath = dirname($_SERVER['SCRIPT_NAME']);
-$BASE_URL = rtrim($protocol . $host . $scriptPath, '/');
-define('BASE_URL', $BASE_URL);
+// Define BASE_URL — prefer APP_URL env var (set in Render/Railway dashboard) to avoid
+// path detection issues behind reverse proxies or in non-root deployments.
+if (!empty($_ENV['APP_URL'])) {
+    define('BASE_URL', rtrim($_ENV['APP_URL'], '/'));
+} else {
+    $isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+    $protocol = $isHttps ? 'https://' : 'http://';
+    $host = $_SERVER['HTTP_HOST'];
+    $scriptPath = dirname($_SERVER['SCRIPT_NAME']);
+    define('BASE_URL', rtrim($protocol . $host . ($scriptPath === '/' ? '' : $scriptPath), '/'));
+}
 
 // Start session with Render-friendly settings
 if (session_status() === PHP_SESSION_NONE) {

@@ -27,8 +27,9 @@ RUN mkdir -p uploads exports public/qr logs \
 
 # Apache config
 RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf \
-    && a2enmod rewrite headers dir \
-    && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
+    && a2enmod rewrite headers dir expires deflate mime \
+    && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf \
+    && sed -i 's|</VirtualHost>|<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n</VirtualHost>|' /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 80
 CMD ["apache2-foreground"]

@@ -35,12 +35,13 @@ if (!$userDetails) {
     ];
 }
 
+// Ensure CSRF token exists for form rendering (GET and POST)
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $_SESSION['error'] = 'Invalid security token';
         header('Location: ' . BASE_URL . '/index.php?page=teacher/profile');

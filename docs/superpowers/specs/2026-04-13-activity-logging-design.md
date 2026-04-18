@@ -47,13 +47,13 @@ In the `login()` failure branch, after the `$result['success']` check fails, add
 
 ```php
 $this->activityLog->log(
-    0,  // no authenticated user; 0 is the sentinel for unauthenticated
+    null,  // no authenticated user
     ActivityLog::ACTION_LOGIN_FAILED,
     "Failed login attempt for email: {$email}"
 );
 ```
 
-> Note: `user_id = 0` is used because the attempt may not correspond to a real user. The DB column must allow 0 or NULL — check schema. If it requires a foreign key to `users`, use NULL instead.
+> `user_id` is NULL for failed logins since there may be no matching user. `ActivityLog::log()` signature must accept `?int $userId` and the `activity_logs` table `user_id` column must allow NULL (no FK constraint, or FK with `ON DELETE SET NULL`).
 
 ### 3. `views/teacher/profile.php` — Profile update
 

@@ -28,7 +28,7 @@ class Auth
      * @param string $password User password
      * @return array Success or error response
      */
-    public function login(string $email, string $password)
+    public function login(string $email, string $password, bool $rememberMe = false)
     {
         try {
             // Validate input
@@ -90,6 +90,10 @@ class Auth
             $_SESSION['authenticated'] = true;
             $_SESSION['login_time'] = time();
 
+            if ($rememberMe) {
+                $this->setRememberToken((int)$userData['user_id']);
+            }
+
             error_log("Login successful for email - " . strtolower($email));
 
             return [
@@ -121,6 +125,8 @@ class Auth
     public function logout()
     {
         try {
+            $this->clearRememberToken();
+
             // Unset all session variables
             $_SESSION = [];
 
@@ -163,13 +169,12 @@ class Auth
     {
         // Check basic authentication
         if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true || !isset($_SESSION['user_id'])) {
-            return false;
+            return $this->checkRememberToken();
         }
 
         // Check session timeout (30 minutes)
-        $sessionTimeout = 30 * 60; // 30 minutes in seconds
+        $sessionTimeout = 30 * 60;
         if (isset($_SESSION['login_time']) && (time() - $_SESSION['login_time']) > $sessionTimeout) {
-            // Session expired, logout user
             $this->logout();
             return false;
         }
@@ -178,6 +183,100 @@ class Auth
         $_SESSION['last_activity'] = time();
 
         return true;
+    }
+
+    private function setRememberToken(int $userId): void
+    {
+        try {
+            $rawToken = bin2hex(random_bytes(32));
+            $tokenHash = hash('sha256', $rawToken);
+            $expiresAt = date('Y-m-d H:i:s', time() + 30 * 24 * 3600);
+            $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+
+            $db = Database::getInstance();
+            $db->insert(
+                "INSERT INTO remember_tokens (user_id, token_hash, expires_at) VALUES (?, ?, ?)",
+                [$userId, $tokenHash, $expiresAt]
+            );
+
+            setcookie('remember_token', $rawToken, [
+                'expires'  => time() + 30 * 24 * 3600,
+                'path'     => '/',
+                'secure'   => $isHttps,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        } catch (Exception $e) {
+            error_log("Remember token set failed: " . $e->getMessage());
+        }
+    }
+
+    private function clearRememberToken(): void
+    {
+        try {
+            if (isset($_COOKIE['remember_token'])) {
+                $tokenHash = hash('sha256', $_COOKIE['remember_token']);
+                $db = Database::getInstance();
+                $db->delete("DELETE FROM remember_tokens WHERE token_hash = ?", [$tokenHash]);
+
+                $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+                setcookie('remember_token', '', [
+                    'expires'  => time() - 3600,
+                    'path'     => '/',
+                    'secure'   => $isHttps,
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]);
+            }
+        } catch (Exception $e) {
+            error_log("Remember token clear failed: " . $e->getMessage());
+        }
+    }
+
+    private function checkRememberToken(): bool
+    {
+        if (empty($_COOKIE['remember_token'])) {
+            return false;
+        }
+
+        try {
+            $tokenHash = hash('sha256', $_COOKIE['remember_token']);
+
+            $db = Database::getInstance();
+
+            // Clean up expired tokens opportunistically
+            $db->delete("DELETE FROM remember_tokens WHERE expires_at < NOW()");
+
+            $rows = $db->fetchAll(
+                "SELECT rt.token_id, u.user_id, u.email, u.first_name, u.last_name, u.role_id, u.status
+                 FROM remember_tokens rt
+                 JOIN users u ON rt.user_id = u.user_id
+                 WHERE rt.token_hash = ? AND rt.expires_at > NOW()
+                 LIMIT 1",
+                [$tokenHash]
+            );
+
+            if (empty($rows) || $rows[0]['status'] !== 'active') {
+                $this->clearRememberToken();
+                return false;
+            }
+
+            $userData = $rows[0];
+
+            session_regenerate_id(true);
+            $_SESSION['user_id']     = $userData['user_id'];
+            $_SESSION['email']       = $userData['email'];
+            $_SESSION['first_name']  = $userData['first_name'];
+            $_SESSION['last_name']   = $userData['last_name'];
+            $_SESSION['role_id']     = $userData['role_id'];
+            $_SESSION['authenticated'] = true;
+            $_SESSION['login_time']  = time();
+
+            return true;
+        } catch (Exception $e) {
+            error_log("Remember token check failed: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**

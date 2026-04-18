@@ -60,9 +60,10 @@ class AuthController extends BaseController
         // Get and sanitize input
         $email = $this->sanitize($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
+        $rememberMe = isset($_POST['remember']) && $_POST['remember'] === 'on';
 
         // Attempt login
-        $result = $this->auth->login($email, $password);
+        $result = $this->auth->login($email, $password, $rememberMe);
 
         if ($result['success']) {
             // Login successful - redirect to dashboard based on role

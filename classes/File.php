@@ -342,7 +342,13 @@ class File
             }
 
             // Create thumbnail
+            $newWidth  = (int) $newWidth;
+            $newHeight = (int) $newHeight;
             $thumbnail = imagecreatetruecolor($newWidth, $newHeight);
+            if (!$thumbnail) {
+                imagedestroy($sourceImage);
+                return null;
+            }
             imagecopyresampled($thumbnail, $sourceImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 
             // Generate thumbnail filename
@@ -369,7 +375,7 @@ class File
 
             return $thumbnailPath;
 
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             error_log("Thumbnail generation failed: " . $e->getMessage());
             return null;
         }

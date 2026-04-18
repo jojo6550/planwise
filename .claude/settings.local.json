@@ -10,7 +10,12 @@
       "Bash(vendor/bin/phpunit --testdox)",
       "Bash(npm install:*)",
       "Bash(npm test:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(coderabbit --version)",
+      "Read(//c/xampp/mysql/bin/**)",
+      "Bash(./mysql.exe -u root planwise -e \"ALTER TABLE users ADD COLUMN IF NOT EXISTS remember_token VARCHAR\\(64\\) DEFAULT NULL, ADD COLUMN IF NOT EXISTS remember_expires DATETIME DEFAULT NULL;\")",
+      "Read(//c/xampp/logs/**)",
+      "Read(//c/xampp/apache/logs/**)"
     ]
   }
 }

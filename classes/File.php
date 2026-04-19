@@ -327,6 +327,9 @@ class File
                 case 'image/gif':
                     $sourceImage = imagecreatefromgif($imagePath);
                     break;
+                case 'image/webp':
+                    $sourceImage = imagecreatefromwebp($imagePath);
+                    break;
                 default:
                     return null;
             }
@@ -360,6 +363,9 @@ class File
                     break;
                 case 'image/gif':
                     imagegif($thumbnail, $thumbnailPath);
+                    break;
+                case 'image/webp':
+                    imagewebp($thumbnail, $thumbnailPath, 80);
                     break;
             }
 
@@ -426,6 +432,9 @@ class File
 
         // Generate thumbnail
         $thumbPath = $this->generateThumbnail($picturePath, $fullName);
+        if (!$thumbPath) {
+            error_log("Warning: Thumbnail generation failed for profile picture of user {$userId}, but image was saved");
+        }
         $thumbName = $thumbPath ? basename($thumbPath) : null;
 
         // Relative paths for DB

@@ -1,10 +1,4 @@
 <?php
-/**
- * Mail Class
- * Handles email sending using PHP mail() function
- * CS334 Module 2 - PHP Mail (10 marks)
- */
-
 require_once __DIR__ . '/../config/mail.php';
 
 class Mail

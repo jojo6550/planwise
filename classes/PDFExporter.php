@@ -1,10 +1,4 @@
 <?php
-/**
- * PDFExporter Class
- * Generates PDF reports for lesson plans using TCPDF
- * CS334 Module 2 - Generate PDF reports (22 marks) + Use of Files (10 marks)
- */
-
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/LessonPlan.php';

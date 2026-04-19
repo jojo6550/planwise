@@ -1,10 +1,4 @@
 <?php
-/**
- * Role Class
- * Handles user role management and role-based access control
- * CS334 Module 3 - Custom PHP Classes, RBAC
- */
-
 require_once __DIR__ . '/Database.php';
 
 class Role

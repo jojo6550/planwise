@@ -1,10 +1,4 @@
 <?php
-/**
- * ActivityLogController
- * Handles activity log retrieval (Admin only)
- * CS334 Module 3 - Activity logs (10), Different access levels (13)
- */
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

@@ -1,10 +1,4 @@
 <?php
-/**
- * DataExporter Class
- * Handles exporting data to CSV and XLS formats
- * CS334 Module 2 - Generate reports (22 marks) + Use of Files (10 marks)
- */
-
 class DataExporter
 {
     private $exportDir;

@@ -1,10 +1,4 @@
 <?php
-/**
- * LessonPlanController
- * Handles lesson plan CRUD operations
- * CS334 Module 1 + Module 3 - Input validation (40), AJAX (10), Control structures (18)
- */
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -585,11 +579,6 @@ class LessonPlanController extends BaseController
         ]);
     }
 
-    /**
-     * Email a lesson plan to a single recipient
-     * POST request with: lesson_id, recipient_email, recipient_name, message
-     * CS334 Module 2 - PHP Mail (10 marks)
-     */
     public function emailLesson()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -660,11 +649,6 @@ class LessonPlanController extends BaseController
         }
     }
 
-    /**
-     * Email a lesson plan to multiple recipients
-     * POST request with: lesson_id, recipients (array), message
-     * CS334 Module 2 - PHP Mail (10 marks)
-     */
     public function emailLessonMultiple()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

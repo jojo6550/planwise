@@ -1,10 +1,4 @@
 <?php
-/**
- * ExportController
- * Handles PDF export operations
- * CS334 Module 2 - Generate PDF reports (22), Use of Files (10)
- */
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

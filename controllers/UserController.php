@@ -1,10 +1,4 @@
 <?php
-/**
- * UserController
- * Handles user management operations (Admin only)
- * CS334 Module 3 - Different access levels (13), Registered users only (12), Custom classes (10)
- */
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

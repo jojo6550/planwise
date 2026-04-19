@@ -1,10 +1,4 @@
 <?php
-/**
- * LessonPlan Class
- * Handles lesson plan CRUD operations
- * CS334 Module 1 + Module 3 - DB manipulation, OOP, Control structures
- */
-
 require_once __DIR__ . '/Database.php';
 
 class LessonPlan

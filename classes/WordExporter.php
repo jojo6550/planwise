@@ -1,10 +1,4 @@
 <?php
-/**
- * WordExporter Class
- * Generates Word documents for lesson plans using PHPWord
- * CS334 Module 2 - Generate Word reports (22 marks) + Use of Files (10 marks)
- */
-
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/LessonPlan.php';

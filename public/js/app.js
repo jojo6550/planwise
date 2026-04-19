@@ -1,20 +1,7 @@
-/**
- * PlanWise Application
- * AJAX dynamic content loading
- * CS334 Module 1 - AJAX (10 marks)
- */
-console.log('PlanWise Application Loaded');
-
-/* ===================================================================
- * Teacher Lesson Plan Live Search
- * Targets:
- *   #lessonPlanSearchInput  - search text input
- *   #lessonPlansTable       - the table to update
- * Calls: AjaxController.php?action=searchLessonPlans
- * =================================================================== */
+// Live search for lesson plans
 (function () {
     const searchInput = document.getElementById('lessonPlanSearchInput');
-    if (!searchInput) return; // Only active on lesson plans page
+    if (!searchInput) return;
 
     const table = document.getElementById('lessonPlansTable');
     if (!table) return;
@@ -70,14 +57,11 @@ console.log('PlanWise Application Loaded');
                 }).join('');
 
             } catch (e) {
-                // Silent fail — table retains its current state
+                // ignore errors, keep current table
             }
-        }, 300); // 300ms debounce
+        }, 300);
     });
 
-    /**
-     * Escape HTML to prevent XSS when inserting API data into innerHTML
-     */
     function escapeHtml(str) {
         const div = document.createElement('div');
         div.appendChild(document.createTextNode(String(str)));

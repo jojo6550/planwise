@@ -1,10 +1,4 @@
 <?php
-/**
- * Admin Import View
- * CSV/XLS Data Import Interface
- * CS334 Module 2 - Read .xls/.csv files (22 marks) + Use of Files (10 marks)
- */
-
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -46,7 +40,7 @@ unset($_SESSION['success'], $_SESSION['error']);
 
 // Recent import activity from activity logs
 $activityLog   = new ActivityLog();
-$recentImports = $activityLog->getAll(['action' => ActivityLog::ACTION_LESSON_PLAN_IMPORTED], 10, 0);
+$recentImports = $activityLog->getAll(['action' => 'lesson_plan_imported'], 10, 0);
 
 $pageTitle  = 'Data Import';
 $activePage = 'import';

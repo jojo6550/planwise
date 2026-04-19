@@ -1,10 +1,4 @@
 <?php
-/**
- * LessonSection Class
- * Handles lesson plan sections
- * CS334 Module 3 - OOP, DB manipulation
- */
-
 require_once __DIR__ . '/Database.php';
 
 class LessonSection

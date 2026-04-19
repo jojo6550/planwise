@@ -1,10 +1,4 @@
 <?php
-/**
- * AjaxController
- * Handles AJAX search endpoints returning JSON
- * CS334 Module 1 - AJAX (10 marks)
- */
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

@@ -1,10 +1,4 @@
 <?php
-/**
- * ActivityLog Class
- * Handles activity logging for security and audit purposes
- * CS334 Module 3 - Activity logs (10 marks)
- */
-
 require_once __DIR__ . '/Database.php';
 require_once __DIR__ . '/../helpers/sanitize.php';
 
@@ -12,45 +6,12 @@ class ActivityLog
 {
     private $db;
 
-    // Activity Action Constants
-    public const ACTION_USER_LOGIN = 'user_login';
-    public const ACTION_USER_LOGOUT = 'user_logout';
-    public const ACTION_USER_REGISTERED = 'user_registered';
-    public const ACTION_USER_CREATED = 'user_created';
-    public const ACTION_USER_UPDATED = 'user_updated';
-    public const ACTION_USER_DELETED = 'user_deleted';
-    public const ACTION_USER_STATUS_UPDATED = 'user_status_updated';
-    public const ACTION_PASSWORD_RESET = 'password_reset_completed';
-    public const ACTION_LESSON_PLAN_CREATED = 'lesson_plan_created';
-    public const ACTION_LESSON_PLAN_UPDATED = 'lesson_plan_updated';
-    public const ACTION_LESSON_PLAN_DELETED = 'lesson_plan_deleted';
-    public const ACTION_LESSON_PLAN_VIEWED = 'lesson_plan_viewed';
-    public const ACTION_LESSON_PLAN_EXPORTED_PDF = 'pdf_exported';
-    public const ACTION_LESSON_PLAN_EXPORTED_WORD = 'word_exported';
-    public const ACTION_LESSON_PLAN_SAVED_PDF = 'pdf_saved';
-    public const ACTION_LESSON_PLAN_SAVED_WORD = 'word_saved';
-    public const ACTION_LESSON_PLAN_IMPORTED = 'lesson_plan_imported';
-    public const ACTION_QR_CODE_GENERATED = 'qr_code_generated';
-    public const ACTION_FILE_UPLOADED = 'file_uploaded';
-    public const ACTION_FILE_DOWNLOADED = 'file_downloaded';
-    public const ACTION_FILE_DELETED = 'file_deleted';
-
-    /**
-     * Constructor - Initialize Database connection
-     */
     public function __construct()
     {
         $this->db = Database::getInstance();
     }
 
-    /**
-     * Log an activity
-     *
-     * @param int $userId User ID performing the action
-     * @param string $action Action performed (use constants for standard actions)
-     * @param string $description Detailed description of the action
-     * @return bool Success status
-     */
+    // Log an activity to DB and file
     public function log(int $userId, string $action, string $description = ''): bool
     {
         try {
@@ -66,11 +27,7 @@ class ActivityLog
             ];
 
             $this->db->insert($sql, $params);
-            
-            // Also log to file for backup (include description if provided)
-            $logDescription = $description ?: $action;
-            $this->logToFile($userId, $action, $logDescription);
-            
+            $this->logToFile($userId, $action, $description ?: $action);
             return true;
 
         } catch (Exception $e) {
@@ -79,49 +36,25 @@ class ActivityLog
         }
     }
 
-    /**
-     * Get all activity logs with optional filtering (admin only)
-     *
-     * @param array $filters Filter options (user_id, action, date_from, date_to, search)
-     * @param int $limit Number of records to retrieve
-     * @param int $offset Offset for pagination
-     * @return array Activity logs
-     */
     public function getAll(array $filters = [], int $limit = 50, int $offset = 0): array
     {
         try {
             $where = [];
             $params = [];
 
-            // Filter by user ID - sanitize as integer
             if (!empty($filters['user_id'])) {
-                $userId = Database::castInt($filters['user_id'], 0);
+                $userId = (int)$filters['user_id'];
                 if ($userId > 0) {
                     $where[] = "al.user_id = :user_id";
                     $params[':user_id'] = $userId;
                 }
             }
 
-            // Filter by action type - sanitize as string and use whitelist
             if (!empty($filters['action'])) {
-                $action = Database::castString($filters['action']);
-                // Whitelist allowed actions for security
-                $allowedActions = [
-                    'user_login', 'user_logout', 'user_registered', 'user_created',
-                    'user_updated', 'user_deleted', 'user_status_updated',
-                    'password_reset_completed', 'lesson_plan_created', 'lesson_plan_updated',
-                    'lesson_plan_deleted', 'lesson_plan_viewed', 'pdf_exported',
-                    'word_exported', 'pdf_saved', 'word_saved', 'lesson_plan_imported',
-                    'qr_code_generated', 'file_uploaded', 'file_downloaded', 'file_deleted'
-                ];
-                if (in_array($action, $allowedActions, true)) {
-                    $where[] = "al.action = :action";
-                    $params[':action'] = $action;
-                }
+                $where[] = "al.action = :action";
+                $params[':action'] = trim($filters['action']);
             }
 
-            // Filter by date range - validate date format (YYYY-MM-DD)
-            // Note: FILTER_SANITIZE_STRING was removed in PHP 8.1; use trim() + regex instead.
             if (!empty($filters['date_from'])) {
                 $dateFrom = trim($filters['date_from']);
                 if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateFrom)) {
@@ -138,10 +71,9 @@ class ActivityLog
                 }
             }
 
-            // Search in action or description - sanitize properly
             if (!empty($filters['search'])) {
-                $search = sanitizeSearchQuery($filters['search']);
-                if (!empty($search)) {
+                $search = trim($filters['search']);
+                if ($search !== '') {
                     $where[] = "(al.action LIKE :search OR al.description LIKE :search)";
                     $params[':search'] = '%' . $search . '%';
                 }
@@ -149,7 +81,6 @@ class ActivityLog
 
             $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
-            // Enforce maximum limit
             $limit = min(max($limit, 1), 100);
             $offset = max($offset, 0);
 
@@ -161,11 +92,9 @@ class ActivityLog
                     LIMIT :limit OFFSET :offset";
 
             $stmt = $this->db->getConnection()->prepare($sql);
-            
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value);
             }
-            
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
@@ -178,13 +107,6 @@ class ActivityLog
         }
     }
 
-    /**
-     * Get activity logs for a specific user
-     *
-     * @param int $userId User ID
-     * @param int $limit Number of records to retrieve
-     * @return array Activity logs
-     */
     public function getByUser(int $userId, int $limit = 20): array
     {
         try {
@@ -206,12 +128,6 @@ class ActivityLog
         }
     }
 
-    /**
-     * Get total count of activity logs with optional filtering
-     *
-     * @param array $filters Filter options
-     * @return int Total count
-     */
     public function getTotalCount(array $filters = []): int
     {
         try {
@@ -229,9 +145,8 @@ class ActivityLog
             }
 
             $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
-
             $sql = "SELECT COUNT(*) as total FROM activity_logs {$whereClause}";
-            
+
             $stmt = $this->db->getConnection()->prepare($sql);
             foreach ($params as $key => $value) {
                 $stmt->bindValue($key, $value);
@@ -247,22 +162,9 @@ class ActivityLog
         }
     }
 
-    /**
-     * Get recent activity for dashboard widget
-     *
-     * @param int $limit Number of records
-     * @return array Recent activity logs
-     */
     public function getRecentActivity(int $limit = 10): array
     {
         try {
-            // First check if activity_logs table exists and has required columns
-            $tableCheck = $this->db->fetch("SHOW TABLES LIKE 'activity_logs'");
-            if (!$tableCheck) {
-                error_log("ActivityLog: activity_logs table does not exist");
-                return [];
-            }
-
             $sql = "SELECT al.*, u.first_name, u.last_name, u.email
                     FROM activity_logs al
                     JOIN users u ON al.user_id = u.user_id
@@ -281,49 +183,35 @@ class ActivityLog
         }
     }
 
-    /**
-     * Get activity statistics for dashboard
-     *
-     * @return array Statistics data
-     */
     public function getActivityStats(): array
     {
         try {
             $stats = [];
-
-            // Total logs
             $stats['total'] = $this->getTotalCount();
 
-            // Today's logs
-            $sql = "SELECT COUNT(*) as today_count FROM activity_logs 
-                    WHERE DATE(created_at) = CURDATE()";
-            $result = $this->db->fetch($sql);
+            $result = $this->db->fetch("SELECT COUNT(*) as today_count FROM activity_logs WHERE DATE(created_at) = CURDATE()");
             $stats['today'] = (int)($result['today_count'] ?? 0);
 
-            // Logs by action (top 5)
-            $sql = "SELECT action, COUNT(*) as count 
-                    FROM activity_logs 
-                    GROUP BY action 
-                    ORDER BY count DESC 
-                    LIMIT 5";
-            $stats['by_action'] = $this->db->fetchAll($sql);
+            $stats['by_action'] = $this->db->fetchAll(
+                "SELECT action, COUNT(*) as count FROM activity_logs GROUP BY action ORDER BY count DESC LIMIT 5"
+            );
 
-            // Logs by user (top 5)
-            $sql = "SELECT al.user_id, u.first_name, u.last_name, COUNT(*) as count
-                    FROM activity_logs al
-                    JOIN users u ON al.user_id = u.user_id
-                    GROUP BY al.user_id
-                    ORDER BY count DESC
-                    LIMIT 5";
-            $stats['by_user'] = $this->db->fetchAll($sql);
+            $stats['by_user'] = $this->db->fetchAll(
+                "SELECT al.user_id, u.first_name, u.last_name, COUNT(*) as count
+                 FROM activity_logs al
+                 JOIN users u ON al.user_id = u.user_id
+                 GROUP BY al.user_id
+                 ORDER BY count DESC
+                 LIMIT 5"
+            );
 
-            // Last 7 days activity
-            $sql = "SELECT DATE(created_at) as date, COUNT(*) as count
-                    FROM activity_logs
-                    WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-                    GROUP BY DATE(created_at)
-                    ORDER BY date ASC";
-            $stats['last_7_days'] = $this->db->fetchAll($sql);
+            $stats['last_7_days'] = $this->db->fetchAll(
+                "SELECT DATE(created_at) as date, COUNT(*) as count
+                 FROM activity_logs
+                 WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                 GROUP BY DATE(created_at)
+                 ORDER BY date ASC"
+            );
 
             return $stats;
 
@@ -333,16 +221,10 @@ class ActivityLog
         }
     }
 
-    /**
-     * Get unique action types for filtering
-     *
-     * @return array List of unique actions
-     */
     public function getActionTypes(): array
     {
         try {
-            $sql = "SELECT DISTINCT action FROM activity_logs ORDER BY action";
-            $results = $this->db->fetchAll($sql);
+            $results = $this->db->fetchAll("SELECT DISTINCT action FROM activity_logs ORDER BY action");
             return array_column($results, 'action');
         } catch (Exception $e) {
             error_log("Get action types failed: " . $e->getMessage());
@@ -350,81 +232,35 @@ class ActivityLog
         }
     }
 
-    /**
-     * Cleanup old activity logs
-     *
-     * @param int $days Number of days to keep (default 90)
-     * @return int Number of deleted records
-     */
     public function cleanupOldLogs(int $days = 90): int
     {
         try {
-            $sql = "DELETE FROM activity_logs 
-                    WHERE created_at < DATE_SUB(NOW(), INTERVAL :days DAY)";
-            
+            $sql = "DELETE FROM activity_logs WHERE created_at < DATE_SUB(NOW(), INTERVAL :days DAY)";
             $stmt = $this->db->getConnection()->prepare($sql);
             $stmt->bindValue(':days', $days, PDO::PARAM_INT);
             $stmt->execute();
-
             return $stmt->rowCount();
-
         } catch (Exception $e) {
             error_log("Cleanup old logs failed: " . $e->getMessage());
             return 0;
         }
     }
 
-    /**
-     * Log activity to file for backup
-     *
-     * @param int $userId User ID
-     * @param string $action Action performed
-     * @param string $description Description
-     */
     private function logToFile(int $userId, string $action, string $description): void
     {
         $logFile = __DIR__ . '/../logs/activity.log';
-        $logDir = dirname($logFile);
-
-        // Create logs directory if it doesn't exist
-        if (!is_dir($logDir)) {
-            mkdir($logDir, 0755, true);
-        }
-
         $timestamp = date('Y-m-d H:i:s');
         $ip = $this->getIpAddress();
-        $logEntry = "[{$timestamp}] User:{$userId} Action:{$action} IP:{$ip} - {$description}" . PHP_EOL;
-
-        // Append to log file
-        file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
+        $entry = "[{$timestamp}] User:{$userId} Action:{$action} IP:{$ip} - {$description}" . PHP_EOL;
+        file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
     }
 
-    /**
-     * Get client IP address
-     *
-     * @return string IP address
-     */
     private function getIpAddress(): string
     {
-        $ipKeys = [
-            'HTTP_CLIENT_IP',
-            'HTTP_X_FORWARDED_FOR',
-            'HTTP_X_FORWARDED',
-            'HTTP_FORWARDED',
-            'HTTP_FORWARDED_FOR',
-            'HTTP_FORWARDED',
-            'REMOTE_ADDR'
-        ];
-
-        foreach ($ipKeys as $key) {
-            if (array_key_exists($key, $_SERVER)) {
-                $ip = $_SERVER[$key];
-                if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                    return $ip;
-                }
-            }
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+        if ($ip && filter_var($ip, FILTER_VALIDATE_IP)) {
+            return $ip;
         }
-
         return 'Unknown';
     }
 }

@@ -1,10 +1,4 @@
 <?php
-/**
- * ImportController
- * Handles CSV data import operations (admin only)
- * CS334 Module 2 - Read .xls/.csv files (22 marks) + Use of Files (10 marks)
- */
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -91,7 +85,7 @@ class ImportController extends BaseController
         if (!$validateOnly && $result['success_count'] > 0) {
             $this->activityLog->log(
                 $this->auth->id(),
-                ActivityLog::ACTION_LESSON_PLAN_IMPORTED,
+                'lesson_plan_imported',
                 "CSV import ({$importType}): {$result['success_count']} imported, {$result['error_count']} errors"
             );
         }

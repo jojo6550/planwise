@@ -1,11 +1,4 @@
 <?php
-/**
- * Admin Edit User View
- * User editing form for administrators
- * CS334 Module 3 - Different access levels (13)
- */
-
-// Require admin authentication
 require_once __DIR__ . '/../../middleware/AuthMiddleware.php';
 require_once __DIR__ . '/../../middleware/RoleMiddleware.php';
 

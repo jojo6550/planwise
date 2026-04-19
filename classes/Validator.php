@@ -1,10 +1,4 @@
 <?php
-/**
- * Validator Class
- * Handles server-side input validation using filter_input, filter_var, empty(), strlen()
- * CS334 Module 1 - Input validation (40 marks)
- */
-
 class Validator
 {
     private $errors = [];

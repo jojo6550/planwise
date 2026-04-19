@@ -1,10 +1,4 @@
 <?php
-/**
- * File Class
- * Handles secure file uploads and management
- * CS334 Module 2 - Use of Files (10 marks) + Upload images (10 marks)
- */
-
 require_once __DIR__ . '/Database.php';
 
 class File

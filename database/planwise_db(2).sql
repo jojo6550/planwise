@@ -175,7 +175,7 @@ INSERT INTO `roles` (`role_id`, `role_name`) VALUES
 (2, 'Teacher');
 
 CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `first_name` varchar(100) NOT NULL,
   `last_name` varchar(100) NOT NULL,
   `email` varchar(150) NOT NULL,
@@ -184,19 +184,8 @@ CREATE TABLE `users` (
   `status` enum('active','inactive') DEFAULT 'active',
   `profile_picture` varchar(255) DEFAULT NULL,
   `profile_thumbnail` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE IF NOT EXISTS `remember_tokens` (
-  `token_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `token_hash` varchar(64) NOT NULL,
-  `expires_at` datetime NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`token_id`),
-  UNIQUE KEY `token_hash` (`token_hash`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `fk_rt_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+  PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `users` (`user_id`, `first_name`, `last_name`, `email`, `password_hash`, `role_id`, `status`, `profile_picture`, `profile_thumbnail`, `created_at`) VALUES
@@ -229,7 +218,6 @@ ALTER TABLE `roles`
   ADD PRIMARY KEY (`role_id`),
   ADD UNIQUE KEY `role_name` (`role_name`);
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`),
   ADD UNIQUE KEY `email` (`email`),
   ADD KEY `idx_user_role` (`role_id`);
 ALTER TABLE `activity_logs`
@@ -262,4 +250,17 @@ ALTER TABLE `qr_codes`
   ADD CONSTRAINT `qr_codes_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lesson_plans` (`lesson_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `users`
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON UPDATE CASCADE;
+
+CREATE TABLE IF NOT EXISTS `remember_tokens` (
+  `token_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `token_hash` varchar(64) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`token_id`),
+  UNIQUE KEY `token_hash` (`token_hash`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `fk_rt_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 COMMIT;

@@ -66,3 +66,32 @@
 [2026-03-30 18:10:19] User:7 Action:user_logout IP:::1 - User logged out: josiahsdigitalservices@gmail.com
 [2026-03-30 18:10:24] User:6 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
 [2026-04-13 02:54:30] User:6 Action:user_login IP:127.0.0.1 - User logged in: josiah.johnson6550@gmail.com
+[2026-04-20 01:05:33] User:6 Action:user_login IP:127.0.0.1 - User logged in: josiah.johnson6550@gmail.com
+[2026-04-20 01:05:46] User:6 Action:user_logout IP:127.0.0.1 - User logged out: josiah.johnson6550@gmail.com
+[2026-04-20 01:05:47] User:7 Action:user_login IP:127.0.0.1 - User logged in: josiahsdigitalservices@gmail.com
+[2026-04-21 01:26:46] User:8 Action:user_registered IP:::1 - New user registered: josiah.johnson6550@gmail.com
+[2026-04-21 01:27:28] User:8 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-04-21 01:29:19] User:8 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-04-21 01:29:25] User:8 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-04-21 01:29:50] User:8 Action:user_created IP:::1 - Created user: josiahsdigitalservices@gmail.com
+[2026-04-21 01:29:56] User:8 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-04-21 01:30:00] User:9 Action:user_login IP:::1 - User logged in: josiahsdigitalservices@gmail.com
+[2026-04-21 01:35:29] User:9 Action:user_logout IP:::1 - User logged out: josiahsdigitalservices@gmail.com
+[2026-04-21 01:36:57] User:9 Action:user_login IP:::1 - User logged in: josiahsdigitalservices@gmail.com
+[2026-04-21 01:52:45] User:9 Action:user_logout IP:::1 - User logged out: josiahsdigitalservices@gmail.com
+[2026-04-21 01:52:50] User:8 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-04-21 01:54:27] User:8 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-04-21 01:58:12] User:9 Action:user_login IP:::1 - User logged in: josiahsdigitalservices@gmail.com
+[2026-04-21 01:59:53] User:9 Action:lesson_plan_created IP:::1 - Created lesson plan: Planwise Presentation
+[2026-04-21 01:59:57] User:9 Action:lesson_plan_updated IP:::1 - Updated lesson plan ID: 1003
+[2026-04-21 02:00:19] User:9 Action:pdf_exported IP:::1 - Exported lesson plan ID: 1003 to PDF
+[2026-04-21 02:00:21] User:9 Action:pdf_exported IP:::1 - Exported lesson plan ID: 1003 to PDF
+[2026-04-21 02:02:16] User:9 Action:user_logout IP:::1 - User logged out: josiahsdigitalservices@gmail.com
+[2026-04-21 02:02:23] User:8 Action:user_login IP:::1 - User logged in: josiah.johnson6550@gmail.com
+[2026-04-21 02:05:16] User:8 Action:user_created IP:::1 - Created user: josiah.johnson655@gmail.com
+[2026-04-21 02:08:39] User:8 Action:user_logout IP:::1 - User logged out: josiah.johnson6550@gmail.com
+[2026-04-21 02:08:43] User:9 Action:user_login IP:::1 - User logged in: josiahsdigitalservices@gmail.com
+[2026-04-21 02:08:48] User:9 Action:qr_code_generated IP:::1 - Generated QR code for lesson plan ID: 1003
+[2026-04-21 02:08:49] User:9 Action:qr_code_generated IP:::1 - Generated QR code for lesson plan ID: 1003
+[2026-04-21 02:09:51] User:9 Action:user_logout IP:::1 - User logged out: josiahsdigitalservices@gmail.com
+[2026-04-21 02:10:28] User:9 Action:user_login IP:::1 - User logged in: josiahsdigitalservices@gmail.com
